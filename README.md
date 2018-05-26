@@ -12,7 +12,7 @@ with your other frontend code.
 - Support for related models (autocompletion, linking, ...)
 - Familiar interfaces
 
-# Example
+## Example
 ```
 # models.py
 class Group(models.Model):
@@ -45,5 +45,16 @@ urlpatterns += [
 
 
 # settings.py
-INSTALLED_APPS += ['beam']
+INSTALLED_APPS += [
+    "beam",
+    "beam.themes.bootstrap4",  # or choose any theme you like
+]
 ```
+
+## Themes
+We currently ship two different themes.
+* `beam.themes.plain`  
+  Just plain and simple HTML5
+
+* `beam.themes.bootstrap4`  
+  Using default Bootstrap v4 markup and include a basic Bootstrap CSS file.
