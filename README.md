@@ -15,6 +15,10 @@ with your other frontend code.
 # Example
 ```
 # models.py
+class Group(models.Model):
+    name = models.TextField()
+
+    
 class Person(models.Model):
     name = models.TextField()
     email = models.EmailField()
@@ -22,22 +26,24 @@ class Person(models.Model):
     groups = models.ManyToManyField(Group)
 
 
-class Group(models.Model):
-    name = models.TextField()
-
-
 # views.py
+import beam
+
 class PersonViewSet(beam.ViewSet):
-    fields = ('name', 'groups', )
+    fields = ['name', 'groups']
 
 
 class GroupViewSet(beam.ViewSet):
-    fields = ('name', )
+    fields = ['name']
 
 
 # urls.py
 urlpatterns += [
-    include('person/', PersonViewSet.get_urls()),
-    include('group/', GroupViewSet.get_urls()),
+    path('person/', include(PersonViewSet().get_urls())),
+    path('group/', include(GroupViewSet().get_urls())),
 ]
+
+
+# settings.py
+INSTALLED_APPS += ['beam']
 ```
