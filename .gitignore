@@ -7,3 +7,4 @@ env/
 build/
 dist/
 .tox
+.pytest_cache
