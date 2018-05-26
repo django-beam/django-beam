@@ -1,5 +1,6 @@
-from django.views.generic import CreateView, UpdateView, DetailView, ListView
 from django.urls import path
+
+from .views import CreateView, UpdateView, DetailView, DeleteView, ListView
 
 
 def _view_accepts(view, attribute_name):
@@ -7,7 +8,7 @@ def _view_accepts(view, attribute_name):
 
 
 class ViewSet:
-    view_types = ["create", "update", "detail", "list"]
+    view_types = ["create", "update", "detail", "list", "delete"]
 
     model = None
     fields = None
@@ -16,6 +17,7 @@ class ViewSet:
     update_view_class = UpdateView
     detail_view_class = DetailView
     list_view_class = ListView
+    delete_view_class = DeleteView
 
     def _get_fields(self, view_type):
         specific_getter_name = "get_{}_fields".format(view_type)
@@ -28,9 +30,9 @@ class ViewSet:
 
     def _get_view_kwargs(self, view_type, view):
         kwargs = {}
-        if _view_accepts("model"):
+        if _view_accepts(view, "model"):
             kwargs["model"] = self.model
-        if _view_accepts("fields"):  # FIXME generalize this
+        if _view_accepts(view, "fields"):  # FIXME generalize this
             kwargs["fields"] = self._get_fields(view_type)
         return kwargs
 
