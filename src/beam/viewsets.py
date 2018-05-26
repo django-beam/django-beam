@@ -3,8 +3,8 @@ from django.urls import path
 from .views import CreateView, UpdateView, DetailView, DeleteView, ListView
 
 
-def _view_accepts(view, attribute_name):
-    return hasattr(view, attribute_name)
+def _view_accepts(view_class, attribute_name):
+    return hasattr(view_class, attribute_name)
 
 
 class ViewSet:
@@ -28,16 +28,18 @@ class ViewSet:
     def get_fields(self):
         return self.fields
 
-    def _get_view_kwargs(self, view_type, view):
+    def _get_view_kwargs(self, view_type, view_class):
         kwargs = {}
-        if _view_accepts(view, "model"):
+        if _view_accepts(view_class, "model"):
             kwargs["model"] = self.model
-        if _view_accepts(view, "fields"):  # FIXME generalize this
+        if _view_accepts(view_class, "fields"):  # FIXME generalize this
             kwargs["fields"] = self._get_fields(view_type)
         return kwargs
 
-    def _get_view(self, view_type):
-        view_class = getattr(self, "{}_view_class".format(view_type))
+    def _get_view_class(self, view_type):
+        return getattr(self, "{}_view_class".format(view_type))
+
+    def _get_view(self, view_type, view_class):
         view_kwargs = self._get_view_kwargs(view_type, view_class)
         return view_class.as_view(**view_kwargs)
 
@@ -46,11 +48,15 @@ class ViewSet:
             self.model._meta.app_label, self.model._meta.model_name, view_type
         )
 
-    def _get_url(self, view_type, view):
-        if _view_accepts(view, "pk"):
-            url = "<int:pk>/{}/".format(view_type)
+    def _get_url(self, view_type):
+        view_class = self._get_view_class(view_type)
+
+        if hasattr(view_class, "pk_url_kwarg"):
+            url = "<int:{}>/{}/".format(getattr(view_class, "pk_url_kwarg"), view_type)
         else:
             url = view_type + "/"
+
+        view = self._get_view(view_type, view_class)
 
         url_name = self._get_url_name(view_type)
 
@@ -59,6 +65,5 @@ class ViewSet:
     def get_urls(self):
         urlpatterns = []
         for view_type in self.view_types:
-            view = self._get_view(view_type)
-            urlpatterns.append(self._get_url(view_type, view))
+            urlpatterns.append(self._get_url(view_type))
         return urlpatterns
