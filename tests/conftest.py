@@ -10,7 +10,7 @@ def pytest_configure(config):
             }
         },
         INSTALLED_APPS=[
-            'django-beam',
+            'beam',
         ],
         SECRET_KEY='secret_key_for_testing',
     )
