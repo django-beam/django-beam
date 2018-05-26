@@ -2,9 +2,9 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-beam',
-    version='0.0.1',
+    version='0.0.2',
     url='https://github.com/django-beam/django-beam',
-    download_url='https://github.com/django-beam/django-beam/archive/0.0.1.tar.gz',
+    download_url='https://github.com/django-beam/django-beam/archive/0.0.2.tar.gz',
     description='A crud library for python',
     packages=find_packages(),
     author='Raphael Kimmig',
