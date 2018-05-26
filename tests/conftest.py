@@ -11,6 +11,7 @@ def pytest_configure(config):
         },
         INSTALLED_APPS=[
             'beam',
+            'testapp',
         ],
         SECRET_KEY='secret_key_for_testing',
     )
