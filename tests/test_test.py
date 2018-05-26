@@ -2,11 +2,7 @@ from django.db import models
 from beam import ViewSet
 from pytest import mark
 from testapp.models import Dragonfly
-
-
-class DragonflyViewSet(ViewSet):
-    model = Dragonfly
-    fields = ["name"]
+from testapp.views import DragonflyViewSet
 
 
 @mark.django_db
@@ -15,6 +11,36 @@ def test_create():
     assert Dragonfly.objects.all().count() == 1
 
 
-@mark.django_db
 def test_get_urls_produces_urls():
     assert len(DragonflyViewSet().get_urls()) == 5
+
+
+urls = {
+    "testapp_dragonfly_list": "list/",
+    "testapp_dragonfly_detail": "detail/",
+    "testapp_dragonfly_delete": "delete/",
+    "testapp_dragonfly_update": "update/",
+}
+
+
+@mark.parametrize("url", urls.items())
+def test_list_url(url):
+    urlpattern = next(
+        filter(lambda p: p.name == url[0], DragonflyViewSet().get_urls())
+    )
+    assert str(urlpattern.pattern) == url[1]
+
+
+@mark.django_db
+def test_list(client):
+    Dragonfly.objects.create(name="alpha", age=12)
+    Dragonfly.objects.create(name="omega", age=99)
+    response = client.get("/dragonfly/list/")
+    assert "alpha" in response
+    assert "omega" in response
+
+
+@mark.django_db
+def test_detail(client):
+    alpha = Dragonfly.objects.create(name="alpha", age=47)
+    assert "alpha" in client.get(f"/dragonfly/{alpha.pk}/detail/")
