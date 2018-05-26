@@ -14,7 +14,7 @@ def test_get_urls_produces_urls():
 
 
 urls = {
-    "testapp_dragonfly_list": "list/",
+    "testapp_dragonfly_list": "",
     "testapp_dragonfly_detail": "<int:pk>/detail/",
     "testapp_dragonfly_delete": "<int:pk>/delete/",
     "testapp_dragonfly_update": "<int:pk>/update/",
@@ -31,7 +31,7 @@ def test_list_url(url):
 def test_list(client):
     Dragonfly.objects.create(name="alpha", age=12)
     Dragonfly.objects.create(name="omega", age=99)
-    response = client.get("/dragonfly/list/")
+    response = client.get("/dragonfly/")
     assert b"alpha" in response.content
     assert b"omega" in response.content
 

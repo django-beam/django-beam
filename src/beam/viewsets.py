@@ -10,6 +10,15 @@ def _view_accepts(view_class, attribute_name):
 class ViewSet:
     view_types = ["create", "update", "detail", "list", "delete"]
 
+    create_url = "create/"
+    update_url = "<int:pk>/update/"
+    detail_url = "<int:pk>/detail/"
+    delete_url = "<int:pk>/delete/"
+    list_url = ""
+    view_urls = {
+
+    }
+
     model = None
     fields = None
 
@@ -51,10 +60,7 @@ class ViewSet:
     def _get_url(self, view_type):
         view_class = self._get_view_class(view_type)
 
-        if hasattr(view_class, "pk_url_kwarg"):
-            url = "<int:{}>/{}/".format(getattr(view_class, "pk_url_kwarg"), view_type)
-        else:
-            url = view_type + "/"
+        url = getattr(self, "{}_url".format(view_type))
 
         view = self._get_view(view_type, view_class)
 
