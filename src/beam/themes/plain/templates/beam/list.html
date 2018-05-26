@@ -1,0 +1,17 @@
+{% extends "beam/base.html" %}
+{% load i18n %}
+
+
+{% block heading %}
+    <h1>{% trans "Objects" %}</h1>
+{% endblock %}
+
+{% block content %}
+    {% if object_list %}
+        <ul>
+            {% for object in object_list %}
+                <li>{{ object }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Useful meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>{% block title %}Hello, world!{% endblock %}</title>
+</head>
+
+<body>
+{% block layout %}
+    {% block actions %}
+        {% include "beam/partials/actions.html" %}
+    {% endblock %}
+
+    {% block heading %}
+    {% endblock %}
+
+    {% block content %}
+    {% endblock %}
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,17 @@
+{% extends "beam/base.html" %}
+{% load i18n %}
+
+
+{% block heading %}
+    <h1>{% trans "Delete object" %}</h1>
+{% endblock %}
+
+{% block content %}
+    <p>
+        {% trans "Are you sure you want to delete this object:" %} {{ object }}?
+    </p>
+    <form method="post">
+        {{ form|as_p }}
+        <button type="submit">{% trans "Yes, I'm sure" %}</button>
+    </form>
+{% endblock %}

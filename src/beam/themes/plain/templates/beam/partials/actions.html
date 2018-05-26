@@ -1,0 +1,9 @@
+{% if actions %}
+    <ul>
+        {% for action in actions %}
+            <li>
+                <a href="{{ action.url }}">{{ action.label }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
