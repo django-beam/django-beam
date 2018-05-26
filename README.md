@@ -27,12 +27,17 @@ class Group(models.Model):
 
 
 # views.py
-class PersonBeam(Beam):
+class PersonViewSet(beam.ViewSet):
     fields = ('name', 'groups', )
 
-class GroupBeam(Beam):
+
+class GroupViewSet(beam.ViewSet):
     fields = ('name', )
 
+
 # urls.py
-TBD
+urlpatterns += [
+    include('person/', PersonViewSet.get_urls()),
+    include('group/', GroupViewSet.get_urls()),
+]
 ```
