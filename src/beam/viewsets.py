@@ -14,8 +14,8 @@ class ViewSet:
     list_view_class = ListView
 
     def _get_fields(self, view_type):
-        if hasattr(self, 'get_{}_fields'.format(view_type)):
-            return getattr(self, 'get_{}_fields'.format(view_type))()
+        if hasattr(self, "get_{}_fields".format(view_type)):
+            return getattr(self, "get_{}_fields".format(view_type))()
         return self.get_fields()
 
     def get_fields(self):
@@ -28,7 +28,7 @@ class ViewSet:
 
     def _get_url_name(self, view_type):
         return "{}_{}_{}".format(
-            self.model._meta.app_label, self.model._meta.name, view_type
+            self.model._meta.app_label, self.model._meta.model_name, view_type
         )
 
     def _get_url(self, view_type, view):
