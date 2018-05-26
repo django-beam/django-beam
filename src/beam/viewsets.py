@@ -13,6 +13,14 @@ class ViewSet:
     detail_view_class = DetailView
     list_view_class = ListView
 
+    def _get_fields(self, view_type):
+        if hasattr(self, 'get_{}_fields'.format(view_type)):
+            return getattr(self, 'get_{}_fields'.format(view_type))()
+        return self.get_fields()
+
+    def get_fields(self):
+        return self.fields
+
     def _get_view(self, view_type):
         view_class = getattr(self, "{}_view_class".format(view_type))
         view_kwargs = {"model": self.model, "fields": self._get_fields(view_type)}
