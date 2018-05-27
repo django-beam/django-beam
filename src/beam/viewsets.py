@@ -138,9 +138,6 @@ class ListMixin(BaseViewSet):
     list_url = ""
     list_verbose_name = _("list")
 
-    def list_reverse(self):
-        return reverse(self._get_url_name("list"))
-
     def get_view_types(self):
         return super().get_view_types() + ["list"]
 
