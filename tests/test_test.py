@@ -1,3 +1,4 @@
+from beam.templatetags.beam_tags import resolve_link
 from pytest import mark
 from testapp.models import Dragonfly
 from testapp.views import DragonflyViewSet
@@ -49,3 +50,42 @@ def test_update(client):
     assert b"alpha" in response.content
     assert "form" in response.context
     assert response.context["form"]["name"].value() == "alpha"
+
+
+view_types_which_require_object_to_link = {
+    "update": "/dragonfly/123/update/",
+    "detail": "/dragonfly/123/detail/",
+    "delete": "/dragonfly/123/delete/",
+}
+
+
+view_types_which_require_no_object_to_link = {
+    "create": "/dragonfly/create/",
+    "list": "/dragonfly/",
+}
+
+
+@mark.parametrize("view_type, url", view_types_which_require_no_object_to_link.items())
+def test_resolve_links_that_require_object(view_type, url):
+    link = dict(DragonflyViewSet().get_links())[view_type]
+    assert resolve_link(link, None) == url
+
+
+@mark.parametrize("view_type", view_types_which_require_object_to_link.keys())
+def test_resolve_links_with_missing_object(view_type):
+    link = dict(DragonflyViewSet().get_links())[view_type]
+    assert resolve_link(link, None) is None
+
+
+@mark.parametrize("view_type, url", view_types_which_require_object_to_link.items())
+def test_resolve_links_that_require_object(view_type, url):
+    instance = Dragonfly(pk=123)
+    link = dict(DragonflyViewSet().get_links())[view_type]
+    assert resolve_link(link, instance) == url
+
+
+@mark.parametrize("view_type, url", view_types_which_require_no_object_to_link.items())
+def test_resolve_links_that_require_object(view_type, url):
+    instance = Dragonfly(pk=123)
+    link = dict(DragonflyViewSet().get_links())[view_type]
+    assert resolve_link(link, instance) == url
