@@ -5,9 +5,9 @@
 
 {% if links %}
     <div class="btn-group" role="group" aria-label="Actions">
-        {% for label, url in links.items %}
+        {% for view_type, url in links.items %}
             {% if viewset_context.view_type != view_type %}
-                <a href="{{ url }}" class="btn btn-secondary">{{ label }}</a>
+                <a href="{{ url }}" class="btn btn-secondary">{{ view_type }}</a>
             {% endif %}
         {% endfor %}
     </div>
