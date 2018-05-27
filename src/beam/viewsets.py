@@ -7,49 +7,80 @@ def _view_accepts(view_class, attribute_name):
     return hasattr(view_class, attribute_name)
 
 
+class ViewsetContext(dict):
+    pass
+
+
 class ViewSet:
     view_types = ["create", "update", "detail", "list", "delete"]
 
+    create_view_class = CreateView
     create_url = "create/"
-    update_url = "<int:pk>/update/"
-    detail_url = "<int:pk>/detail/"
-    delete_url = "<int:pk>/delete/"
-    list_url = ""
-    view_urls = {
 
-    }
+    update_view_class = UpdateView
+    update_url = "<int:pk>/update/"
+
+    detail_view_class = DetailView
+    detail_url = "<int:pk>/detail/"
+
+    list_view_class = ListView
+    list_url = ""
+
+    delete_view_class = DeleteView
+    delete_url = "<int:pk>/delete/"
+
+    context_items = ["model", "fields", "queryset", "view_kwargs"]
 
     model = None
     fields = None
+    queryset = None
+    view_kwargs = None
 
-    create_view_class = CreateView
-    update_view_class = UpdateView
-    detail_view_class = DetailView
-    list_view_class = ListView
-    delete_view_class = DeleteView
+    def _get_with_generic_fallback(self, view_type, item_name):
+        specific_getter_name = "get_{}_{}".format(view_type, item_name)
+        specific_attribute_name = "{}_{}".format(view_type, item_name)
+        generic_getter_name = "get_{}".format(item_name)
+        generic_attribute_name = item_name
 
-    def _get_fields(self, view_type):
-        specific_getter_name = "get_{}_fields".format(view_type)
         if hasattr(self, specific_getter_name):
             return getattr(self, specific_getter_name)()
-        return self.get_fields()
+        if hasattr(self, specific_attribute_name):
+            return getattr(self, specific_attribute_name)
+        if hasattr(self, generic_getter_name):
+            return getattr(self, generic_getter_name)()
+        if hasattr(self, generic_attribute_name):
+            return getattr(self, generic_attribute_name)
 
-    def get_fields(self):
-        return self.fields
+        raise Exception(
+            'No context item "{}" found, define any of {}'.format(
+                item_name,
+                ", ".join(
+                    (
+                        generic_attribute_name,
+                        generic_getter_name,
+                        specific_attribute_name,
+                        specific_getter_name,
+                    )
+                ),
+            )
+        )
 
-    def _get_view_kwargs(self, view_type, view_class):
-        kwargs = {}
-        if _view_accepts(view_class, "model"):
-            kwargs["model"] = self.model
-        if _view_accepts(view_class, "fields"):  # FIXME generalize this
-            kwargs["fields"] = self._get_fields(view_type)
-        return kwargs
+    def _get_viewset_context(self, view_type):
+        viewset_context = ViewsetContext()
+        for item_name in self._get_with_generic_fallback(view_type, "context_items"):
+            viewset_context[item_name] = self._get_with_generic_fallback(
+                view_type, item_name
+            )
+        return viewset_context
 
-    def _get_view_class(self, view_type):
-        return getattr(self, "{}_view_class".format(view_type))
+    def _get_view(self, view_type):
+        # FIXME handle function based views?
+        view_class = getattr(self, "{}_view_class".format(view_type))
+        view_kwargs = self._get_with_generic_fallback(view_type, "view_kwargs") or {}
+        if hasattr(view_class, "viewset_context"):
+            viewset_context = self._get_viewset_context(view_type) or {}
+            view_kwargs["viewset_context"] = viewset_context
 
-    def _get_view(self, view_type, view_class):
-        view_kwargs = self._get_view_kwargs(view_type, view_class)
         return view_class.as_view(**view_kwargs)
 
     def _get_url_name(self, view_type):
@@ -58,14 +89,9 @@ class ViewSet:
         )
 
     def _get_url(self, view_type):
-        view_class = self._get_view_class(view_type)
-
+        view = self._get_view(view_type)
         url = getattr(self, "{}_url".format(view_type))
-
-        view = self._get_view(view_type, view_class)
-
         url_name = self._get_url_name(view_type)
-
         return path(url, view, name=url_name)
 
     def get_urls(self):

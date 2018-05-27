@@ -40,3 +40,12 @@ def test_list(client):
 def test_detail(client):
     alpha = Dragonfly.objects.create(name="alpha", age=47)
     assert b"alpha" in client.get(f"/dragonfly/{alpha.pk}/detail/").content
+
+
+@mark.django_db
+def test_update(client):
+    alpha = Dragonfly.objects.create(name="alpha", age=47)
+    response = client.get(f"/dragonfly/{alpha.pk}/update/")
+    assert b"alpha" in response.content
+    assert "form" in response.context
+    assert response.context["form"]["name"].value() == "alpha"
