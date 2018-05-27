@@ -8,7 +8,7 @@ class ViewSetContextMixin(ContextMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if "viewset_context" not in context:
-            context["viewset_context"] = self.kwargs.get("viewset_context")
+            context["viewset_context"] = self.viewset_context
         return context
 
     @property

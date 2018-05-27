@@ -64,3 +64,10 @@ We currently ship two different themes.
 
 * `beam.themes.bootstrap4`  
   Using default Bootstrap v4 markup and include a basic Bootstrap CSS file.
+  
+  In order to use the bootstrap4 theme you have to install the optional dependency
+  `django-crispy-forms` and add it to your INSTALLED_APPS in settings.py:
+  ```
+  INSTALLED_APPS = (..., 'crispy_forms')
+  ```
+  

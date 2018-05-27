@@ -1,0 +1,16 @@
+{% extends "beam/base.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+
+{% block heading %}
+    <h1>{% trans "Update object" %}</h1>
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+    </form>
+{% endblock %}

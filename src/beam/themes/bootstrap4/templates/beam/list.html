@@ -1,0 +1,36 @@
+{% extends "beam/base.html" %}
+{% load i18n %}
+{% load beam_tags %}
+
+
+{% block heading %}
+    <h1>{% trans "Objects" %}</h1>
+{% endblock %}
+
+{% block content %}
+    {{ viewset_context }}
+    {% if object_list %}
+        <table class="table">
+            <thead class="thead-light">
+            <tr>
+                {% for field in viewset_context.fields %}
+                    <th scope="col">{{ field }}</th>
+                {% endfor %}
+                <th>{% trans "Actions" %}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for object in object_list %}
+                <tr>
+                    {% for field in viewset_context.fields %}
+                        <td>{% get_field object field %}</td>
+                    {% endfor %}
+                    <td>
+                        ...
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
