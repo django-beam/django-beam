@@ -1,20 +1,15 @@
-import inspect
-from collections import OrderedDict
 from django import template
-
+from django.urls import NoReverseMatch
 
 register = template.Library()
 
 
 @register.simple_tag
-def resolve_links(links, obj=None):
-    resolved = []
-    for view_type, resolver in links:
-        if "obj" not in inspect.signature(resolver).parameters:
-            resolved.append((view_type, resolver()))
-        elif obj:
-            resolved.append((view_type, resolver(obj)))
-    return OrderedDict(resolved)
+def get_link_url(link, obj=None):
+    try:
+        return link.get_url(obj)
+    except NoReverseMatch:
+        return None
 
 
 @register.simple_tag
