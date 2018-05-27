@@ -15,9 +15,9 @@ def test_get_urls_produces_urls():
 
 urls = {
     "testapp_dragonfly_list": "",
-    "testapp_dragonfly_detail": "<int:pk>/detail/",
-    "testapp_dragonfly_delete": "<int:pk>/delete/",
-    "testapp_dragonfly_update": "<int:pk>/update/",
+    "testapp_dragonfly_detail": "<str:pk>/detail/",
+    "testapp_dragonfly_delete": "<str:pk>/delete/",
+    "testapp_dragonfly_update": "<str:pk>/update/",
 }
 
 
