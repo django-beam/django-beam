@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/django-beam/django-beam.svg?style=svg)](https://circleci.com/gh/django-beam/django-beam)
+
 # django-beam
 django-beam provides you with a set of views, templates and integrations for the most common CRUD
 applications. 
