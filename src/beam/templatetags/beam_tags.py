@@ -1,4 +1,5 @@
 import inspect
+from collections import OrderedDict
 from django import template
 
 
@@ -6,8 +7,14 @@ register = template.Library()
 
 
 @register.simple_tag
-def resolve_link(link_resolver, obj=None):
-    return link_resolver(obj)
+def resolve_links(links, obj=None):
+    resolved = []
+    for view_type, resolver in links:
+        if "obj" not in inspect.signature(resolver).parameters:
+            resolved.append((view_type, resolver()))
+        elif obj is not None:
+            resolved.append((view_type, resolver(obj)))
+    return OrderedDict(resolved)
 
 
 @register.simple_tag
