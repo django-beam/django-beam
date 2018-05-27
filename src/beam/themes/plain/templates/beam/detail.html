@@ -1,9 +1,28 @@
 {% extends "beam/base.html" %}
+{% load i18n %}
+{% load beam_tags %}
+
 
 {% block heading %}
     <h1>{{ object }}</h1>
 {% endblock %}
 
 {% block content %}
-    {{ object }}
+    <dl>
+        {% for field_name in viewset_context.fields %}
+            <dt>
+                {{ field_name }}
+            </dt>
+            <dd>
+                {% get_field object field_name as field %}
+                {% if field|is_image %}
+                    <img src="{{ field.url }}"/>
+                {% elif field|is_file %}
+                    <a href="{{ field.url }}">{% trans "Download" %}</a>
+                {% else %}
+                    {{ field }}
+                {% endif %}
+            </dd>
+        {% endfor %}
+    </dl>
 {% endblock %}

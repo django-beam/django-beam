@@ -1,5 +1,6 @@
 {% extends "beam/base.html" %}
 {% load i18n %}
+{% load beam_tags %}
 
 
 {% block heading %}
@@ -10,7 +11,8 @@
     {% if object_list %}
         <ul>
             {% for object in object_list %}
-                <li>{{ object }}</li>
+                {% get_link_url links.detail object as detail_url %}
+                <li><a href="{{ detail_url }}">{{ object }}</a></li>
             {% endfor %}
         </ul>
     {% endif %}
