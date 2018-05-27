@@ -33,3 +33,6 @@ INSTALLED_APPS += [
     "beam.themes.bootstrap4",  # or choose any theme you like
 ]
 ```
+
+## Example
+[Example](example.md#example)
