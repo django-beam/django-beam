@@ -43,9 +43,6 @@ class UpdateView(ViewSetContextMixin, generic.UpdateView):
 
 class ListView(ViewSetContextMixin, generic.ListView):
 
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
     def get_template_names(self):
         return super().get_template_names() + ["beam/list.html"]
 

@@ -3,10 +3,6 @@ from django.urls import path
 from .views import CreateView, UpdateView, DetailView, DeleteView, ListView
 
 
-def _view_accepts(view_class, attribute_name):
-    return hasattr(view_class, attribute_name)
-
-
 class ViewsetContext(dict):
     pass
 
