@@ -1,0 +1,22 @@
+{% extends "beam/base.html" %}
+{% load i18n %}
+
+{% block actions %}{% endblock %}
+
+{% block heading %}<h1>{{ page_heading }}</h1>{% endblock %}
+
+{% block content %}
+<table>
+    {% for entry in entries %}
+        <tr>
+            <td>
+                <a href="{% url entry.list_url_name %}">{{ entry.name }}</a>
+            </td>
+            <td>
+                <a href="{% url entry.create_url_name %}">Create</a>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}
+
