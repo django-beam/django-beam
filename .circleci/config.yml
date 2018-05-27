@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: ~/django-beam
     docker:
-      - image: circleci/python:3.6
+      - image: themattrix/tox
     steps:
       - checkout
       - run: tox
