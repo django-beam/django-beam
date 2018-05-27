@@ -37,11 +37,17 @@ class CreateView(ViewSetContextMixin, generic.CreateView):
     def get_template_names(self):
         return super().get_template_names() + ["beam/create.html"]
 
+    def get_success_url(self):
+        return self.links['detail'].get_url(obj=self.object)
+
 
 class UpdateView(ViewSetContextMixin, generic.UpdateView):
 
     def get_template_names(self):
         return super().get_template_names() + ["beam/update.html"]
+
+    def get_success_url(self):
+        return self.links['detail'].get_url(obj=self.object)
 
 
 class ListView(ViewSetContextMixin, generic.ListView):
@@ -60,3 +66,6 @@ class DeleteView(ViewSetContextMixin, generic.DeleteView):
 
     def get_template_names(self):
         return super().get_template_names() + ["beam/delete.html"]
+
+    def get_success_url(self):
+        return self.links['list'].get_url()
