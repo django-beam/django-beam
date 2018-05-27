@@ -14,12 +14,18 @@
 <body>
 {% block layout %}
     <div class="container">
-        {% block actions %}
-            {% include "beam/partials/actions.html" %}
-        {% endblock %}
+        <div class="clearfix">
+            <div class="float-right">
+                {% block actions %}
+                    {% include "beam/partials/actions.html" %}
+                {% endblock %}
+            </div>
+        </div>
 
         {% block heading %}
         {% endblock %}
+
+
 
         {% block content %}
         {% endblock %}

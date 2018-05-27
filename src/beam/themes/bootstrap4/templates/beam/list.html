@@ -8,7 +8,6 @@
 {% endblock %}
 
 {% block content %}
-    {{ viewset_context }}
     {% if object_list %}
         <table class="table">
             <thead class="thead-light">
@@ -26,7 +25,8 @@
                         <td>{% get_field object field %}</td>
                     {% endfor %}
                     <td>
-                        ...
+                        {% resolve_links viewset_context.links object as links %}
+                        <a href="{{ links.detail }}" class="btn btn-secondary">{% trans "Show" %}</a>
                     </td>
                 </tr>
             {% endfor %}

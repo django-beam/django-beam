@@ -1,14 +1,14 @@
 {% load beam_tags %}
 
-{% with links=viewset_context.links %}
-    {% if links %}
-        <div class="btn-group" role="group" aria-label="Actions">
-            {% for link in links %}
-                {% if viewset_context.view_type != view_type %}
-                    {% resolve_link link.1 object as url %}
-                    <a href="{{ url }}" class="btn btn-secondary">{{ link.0 }}</a>
-                {% endif %}
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endwith %}
+
+{% resolve_links viewset_context.links object as links %}
+
+{% if links %}
+    <div class="btn-group" role="group" aria-label="Actions">
+        {% for label, url in links.items %}
+            {% if viewset_context.view_type != view_type %}
+                <a href="{{ url }}" class="btn btn-secondary">{{ label }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}

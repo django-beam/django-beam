@@ -12,7 +12,7 @@ def resolve_links(links, obj=None):
     for view_type, resolver in links:
         if "obj" not in inspect.signature(resolver).parameters:
             resolved.append((view_type, resolver()))
-        elif obj is not None:
+        elif obj:
             resolved.append((view_type, resolver(obj)))
     return OrderedDict(resolved)
 
