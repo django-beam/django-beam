@@ -136,6 +136,7 @@ class BaseViewSet:
 class ListMixin(BaseViewSet):
     list_view_class = ListView
     list_url = ""
+    list_verbose_name = _("list")
 
     def list_reverse(self):
         return reverse(self._get_url_name("list"))
@@ -147,6 +148,7 @@ class ListMixin(BaseViewSet):
 class CreateMixin(BaseViewSet):
     create_view_class = CreateView
     create_url = "create/"
+    create_verbose_name = _("create")
 
     def get_view_types(self):
         return super().get_view_types() + ["create"]
@@ -155,6 +157,7 @@ class CreateMixin(BaseViewSet):
 class DetailMixin(BaseViewSet):
     detail_view_class = DetailView
     detail_url = "<str:pk>/detail/"
+    detail_verbose_name = _("detail")
 
     def get_view_types(self):
         return super().get_view_types() + ["detail"]
@@ -163,7 +166,7 @@ class DetailMixin(BaseViewSet):
 class UpdateMixin(BaseViewSet):
     update_view_class = UpdateView
     update_url = "<str:pk>/update/"
-    update_verbose_name = _("Update")
+    update_verbose_name = _("update")
 
     def get_view_types(self):
         return super().get_view_types() + ["update"]
@@ -172,7 +175,7 @@ class UpdateMixin(BaseViewSet):
 class DeleteMixin(BaseViewSet):
     delete_view_class = DeleteView
     delete_url = "<str:pk>/delete/"
-    delete_verbose_name = _("Delete")
+    delete_verbose_name = _("delete")
 
     def get_view_types(self):
         return super().get_view_types() + ["delete"]
