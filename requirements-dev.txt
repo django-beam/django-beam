@@ -1,0 +1,6 @@
+-r requirements.txt
+
+black
+recommonmark
+sphinx
+sphinx_rtd_theme
