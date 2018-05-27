@@ -1,4 +1,5 @@
 [![CircleCI](https://circleci.com/gh/django-beam/django-beam.svg?style=svg)](https://circleci.com/gh/django-beam/django-beam)
+[![ReadTheDocs](https://readthedocs.org/projects/django-beam/badge/)](https://django-beam.readthedocs.io/en/latest/)
 
 # django-beam
 django-beam provides you with a set of views, templates and integrations for the most common CRUD
@@ -13,6 +14,9 @@ with your other frontend code.
 - Extensions for common use cases, e.g. export as csv, ...
 - Support for related models (autocompletion, linking, ...)
 - Familiar interfaces
+
+## Documentation
+See https://django-beam.readthedocs.io/en/latest/
 
 ## Example
 ```
