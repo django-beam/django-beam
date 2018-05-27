@@ -7,39 +7,8 @@ class ViewsetContext(dict):
     pass
 
 
-class ViewSet:
-    view_types = ["create", "update", "detail", "list", "delete"]
-
-    create_view_class = CreateView
-    create_url = "create/"
-
-    def create_reverse(self):
-        return reverse(self._get_url_name("create"))
-
-    update_view_class = UpdateView
-    update_url = "<str:pk>/update/"
-
-    def update_reverse(self, obj):
-        return reverse(self._get_url_name("update"), kwargs={"pk": obj.pk})
-
-    detail_view_class = DetailView
-    detail_url = "<str:pk>/detail/"
-
-    def detail_reverse(self, obj):
-        return reverse(self._get_url_name("detail"), kwargs={"pk": obj.pk})
-
-    list_view_class = ListView
-    list_url = ""
-
-    def list_reverse(self):
-        return reverse(self._get_url_name("list"))
-
-    delete_view_class = DeleteView
-    delete_url = "<str:pk>/delete/"
-
-    def delete_reverse(self, obj):
-        return reverse(self._get_url_name("delete"), kwargs={"pk": obj.pk})
-
+class BaseViewSet:
+    view_types = []
     context_items = ["model", "fields", "queryset", "view_kwargs", "links"]
 
     model = None
@@ -49,7 +18,7 @@ class ViewSet:
 
     def get_links(self):
         links = []
-        for view_type in self.view_types:
+        for view_type in self.get_view_types():
             links.append((view_type, self._get_lazy_reverse(view_type)))
         return links
 
@@ -117,7 +86,7 @@ class ViewSet:
 
     def get_urls(self):
         urlpatterns = []
-        for view_type in self.view_types:
+        for view_type in self.get_view_types():
             urlpatterns.append(self._get_url(view_type))
         return urlpatterns
 
@@ -125,7 +94,68 @@ class ViewSet:
         return self.view_types
 
 
-class ExportMixin(ViewSet):
+class ListMixin(BaseViewSet):
+    list_view_class = ListView
+    list_url = ""
+
+    def list_reverse(self):
+        return reverse(self._get_url_name("list"))
+
+    def get_view_types(self):
+        return super().get_view_types() + ["list"]
+
+
+class CreateMixin(BaseViewSet):
+    create_view_class = CreateView
+    create_url = "create/"
+
+    def create_reverse(self):
+        return reverse(self._get_url_name("create"))
+
+    def get_view_types(self):
+        return super().get_view_types() + ["create"]
+
+
+class DetailMixin(BaseViewSet):
+    detail_view_class = DetailView
+    detail_url = "<str:pk>/detail/"
+
+    def detail_reverse(self, obj):
+        return reverse(self._get_url_name("detail"), kwargs={"pk": obj.pk})
+
+    def get_view_types(self):
+        return super().get_view_types() + ["detail"]
+
+
+class UpdateMixin(BaseViewSet):
+    update_view_class = UpdateView
+    update_url = "<str:pk>/update/"
+
+    def update_reverse(self, obj):
+        return reverse(self._get_url_name("update"), kwargs={"pk": obj.pk})
+
+    def get_view_types(self):
+        return super().get_view_types() + ["update"]
+
+
+class DeleteMixin(BaseViewSet):
+    delete_view_class = DeleteView
+    delete_url = "<str:pk>/delete/"
+
+    def delete_reverse(self, obj):
+        return reverse(self._get_url_name("delete"), kwargs={"pk": obj.pk})
+
+    def get_view_types(self):
+        return super().get_view_types() + ["delete"]
+
+
+class ViewSet(
+    DeleteMixin, UpdateMixin, DetailMixin, CreateMixin, ListMixin, BaseViewSet
+):
+    pass
+
+
+class ExportMixin(BaseViewSet):
     export_view_class = NotImplemented
     export_url = "<str:pk>/export/"
 
