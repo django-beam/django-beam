@@ -4,11 +4,14 @@ from django.views.generic.base import ContextMixin
 
 class ViewSetContextMixin(ContextMixin):
     viewset_context = None
+    links = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if "viewset_context" not in context:
             context["viewset_context"] = self.viewset_context
+        if "links" not in context:
+            context["links"] = self.links
         return context
 
     @property

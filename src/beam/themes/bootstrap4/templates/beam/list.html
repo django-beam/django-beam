@@ -25,8 +25,8 @@
                         <td>{% get_field object field %}</td>
                     {% endfor %}
                     <td>
-                        {% resolve_links viewset_context.links object as links %}
-                        <a href="{{ links.detail }}" class="btn btn-secondary">{% trans "Show" %}</a>
+                        {% get_link_url links.detail object as detail_url %}
+                        <a href="{{ detail_url }}" class="btn btn-secondary">{{ links.detail.verbose_name }}</a>
                     </td>
                 </tr>
             {% endfor %}
