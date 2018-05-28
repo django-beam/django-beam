@@ -1,7 +1,18 @@
-from beam.viewsets import BaseViewSet, ViewSet
-from pytest import mark
-from testapp.models import Dragonfly
+import pytest
+from beam.viewsets import ViewSet, default_registry
+
 from testapp.views import DragonflyViewSet
+
+
+def test_registry_contains_viewset():
+    assert default_registry["testapp"]["dragonfly"] is DragonflyViewSet
+
+
+def test_duplicate_registration_errors():
+    with pytest.raises(Exception):
+
+        class AnotherDragonFlyViewSet(DragonflyViewSet):
+            pass
 
 
 def test_context_items_are_passed_to_viewset_context():

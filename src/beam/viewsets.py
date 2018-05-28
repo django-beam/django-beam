@@ -15,7 +15,26 @@ class ContextItemNotFound(Exception):
     pass
 
 
-class BaseViewSet:
+class RegistryMetaClass(type):
+
+    def __new__(cls, name, bases, namespace, **kwds):
+        result = type.__new__(cls, name, bases, dict(namespace))
+
+        if result.registry is not None and result.model is not None:
+            app_registry = result.registry.setdefault(result.model._meta.app_label, {})
+            model_name = result.model._meta.model_name
+            if model_name in app_registry:
+                raise Exception("duplicate registration")
+            app_registry[model_name] = result
+
+        return result
+
+
+default_registry = {}
+
+
+class BaseViewSet(metaclass=RegistryMetaClass):
+    registry = default_registry
     view_types = []
     context_items = ["model", "fields", "queryset"]
 
