@@ -153,7 +153,7 @@ class CreateMixin(BaseViewSet):
 
 class DetailMixin(BaseViewSet):
     detail_view_class = DetailView
-    detail_url = "<str:pk>/detail/"
+    detail_url = "<str:pk>/"
     detail_verbose_name = _("detail")
 
     def get_view_types(self):
