@@ -15,6 +15,16 @@ def test_duplicate_registration_errors():
             pass
 
 
+def test_register_with_custom_registry():
+    custom_registry = {}
+
+    class AnotherDragonFlyViewSet(DragonflyViewSet):
+        registry = custom_registry
+
+    assert default_registry["testapp"]["dragonfly"] is DragonflyViewSet
+    assert custom_registry["testapp"]["dragonfly"] is AnotherDragonFlyViewSet
+
+
 def test_context_items_are_passed_to_viewset_context():
 
     class TestViewSet(ViewSet):
