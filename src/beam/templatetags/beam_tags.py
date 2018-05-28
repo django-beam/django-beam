@@ -17,8 +17,8 @@ def get_link_url(link, obj=None):
 def get_attribute(obj, field_name):
     if not hasattr(obj, field_name):
         return None
-    if hasattr(obj, 'get_{}_display'.format(field_name)):
-        return getattr(obj, 'get_{}_display'.format(field_name))
+    if hasattr(obj, "get_{}_display".format(field_name)):
+        return getattr(obj, "get_{}_display".format(field_name))
     return getattr(obj, field_name)
 
 

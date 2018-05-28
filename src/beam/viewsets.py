@@ -11,6 +11,10 @@ class ViewsetContext(dict):
     pass
 
 
+class ContextItemNotFound(Exception):
+    pass
+
+
 class BaseViewSet:
     view_types = []
     context_items = ["model", "fields", "queryset"]
@@ -67,19 +71,7 @@ class BaseViewSet:
         if hasattr(self, generic_attribute_name):
             return getattr(self, generic_attribute_name)
 
-        raise Exception(
-            'No context item "{}" found, define any of {}'.format(
-                item_name,
-                ", ".join(
-                    (
-                        generic_attribute_name,
-                        generic_getter_name,
-                        specific_attribute_name,
-                        specific_getter_name,
-                    )
-                ),
-            )
-        )
+        raise ContextItemNotFound
 
     def _get_viewset_context(self, view_type, request):
         viewset_context = ViewsetContext()
@@ -87,9 +79,12 @@ class BaseViewSet:
         for item_name in self._get_with_generic_fallback(
             view_type, "context_items", request
         ):
-            viewset_context[item_name] = self._get_with_generic_fallback(
-                view_type, item_name, request
-            )
+            try:
+                viewset_context[item_name] = self._get_with_generic_fallback(
+                    view_type, item_name, request
+                )
+            except ContextItemNotFound:
+                pass
         return viewset_context
 
     def _get_view(self, view_type):
