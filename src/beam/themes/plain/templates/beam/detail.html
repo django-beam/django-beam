@@ -14,13 +14,21 @@
                 {{ field_name }}
             </dt>
             <dd>
-                {% get_field object field_name as field %}
-                {% if field|is_image %}
-                    <img src="{{ field.url }}"/>
-                {% elif field|is_file %}
-                    <a href="{{ field.url }}">{% trans "Download" %}</a>
+                {% get_attribute object field_name as value %}
+                {% if value|is_image %}
+                    {% if value %}
+                        <img src="{{ value.url }}"/>
+                    {% else %}
+                        -
+                    {% endif %}
+                {% elif value|is_file %}
+                    {% if value %}
+                        <a href="{{ value.url }}">{% trans "Download" %}</a>
+                    {% else %}
+                        -
+                    {% endif %}
                 {% else %}
-                    {{ field }}
+                    {{ value }}
                 {% endif %}
             </dd>
         {% endfor %}

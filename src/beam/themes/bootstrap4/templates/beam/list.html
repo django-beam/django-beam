@@ -22,7 +22,7 @@
             {% for object in object_list %}
                 <tr>
                     {% for field in viewset_context.fields %}
-                        <td>{% get_field object field %}</td>
+                        <td>{% get_attribute object field %}</td>
                     {% endfor %}
                     <td>
                         {% get_link_url links.detail object as detail_url %}
