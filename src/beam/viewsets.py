@@ -187,7 +187,7 @@ class ViewSet(
 class ViewLink:
 
     def __init__(self, view_type, resolve_url, verbose_name):
-        self.name = view_type
+        self.view_type = view_type
         self.resolve_url = resolve_url
         self.verbose_name = verbose_name
 
