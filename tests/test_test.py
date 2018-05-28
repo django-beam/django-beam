@@ -16,7 +16,7 @@ def test_get_urls_produces_urls():
 
 urls = {
     "testapp_dragonfly_list": "",
-    "testapp_dragonfly_detail": "<str:pk>/detail/",
+    "testapp_dragonfly_detail": "<str:pk>/",
     "testapp_dragonfly_delete": "<str:pk>/delete/",
     "testapp_dragonfly_update": "<str:pk>/update/",
 }
@@ -40,7 +40,7 @@ def test_list(client):
 @mark.django_db
 def test_detail(client):
     alpha = Dragonfly.objects.create(name="alpha", age=47)
-    assert b"alpha" in client.get(f"/dragonfly/{alpha.pk}/detail/").content
+    assert b"alpha" in client.get(f"/dragonfly/{alpha.pk}/").content
 
 
 @mark.django_db
@@ -54,7 +54,7 @@ def test_update(client):
 
 view_types_which_require_object_to_link = {
     "update": "/dragonfly/123/update/",
-    "detail": "/dragonfly/123/detail/",
+    "detail": "/dragonfly/123/",
     "delete": "/dragonfly/123/delete/",
 }
 
