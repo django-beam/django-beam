@@ -155,7 +155,7 @@ class BaseViewSet(metaclass=RegistryMetaClass):
         else:
             return view
 
-    def _get_url_name(self, view_type):
+    def get_url_name(self, view_type):
         return "{}_{}_{}".format(
             self.model._meta.app_label, self.model._meta.model_name, view_type
         )
@@ -163,7 +163,7 @@ class BaseViewSet(metaclass=RegistryMetaClass):
     def _get_url(self, view_type):
         view = self._get_view(view_type)
         url = getattr(self, "{}_url".format(view_type))
-        url_name = self._get_url_name(view_type)
+        url_name = self.get_url_name(view_type)
         return path(url, view, name=url_name)
 
     def get_urls(self):
