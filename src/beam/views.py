@@ -1,3 +1,4 @@
+from beam.registry import register
 from beam.viewsets import default_registry
 from django.apps import apps
 from django.views import generic
@@ -79,17 +80,15 @@ class DashboardView(TemplateView):
     viewsets = None
     registry = default_registry
 
-    def group_viewsets_by_app(self, viewsets):
-        grouped = {}
+    def build_registry(self, viewsets):
+        registry = {}
         for viewset in viewsets:
-            app_label = viewsets.model._meta.app_label
-            model_name = viewsets.model._meta.model_name
-            grouped.setdefault(app_label, {})[model_name] = viewset
-        return grouped
+            register(registry, viewset)
+        return registry
 
-    def get_viewsets(self):
+    def get_registry(self):
         if self.viewsets:
-            return self.group_viewsets_by_app(self.viewsets)
+            return self.build_registry(self.viewsets)
         else:
             return self.registry
 
@@ -97,7 +96,7 @@ class DashboardView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         grouped = []
-        for app_label, viewsets_dict in self.get_viewsets().items():
+        for app_label, viewsets_dict in self.get_registry().items():
             group = {
                 "app_label": app_label,
                 "app_config": apps.get_app_config(app_label),

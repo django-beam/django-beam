@@ -1,4 +1,5 @@
-def register(registry, model, viewset):
+def register(registry, viewset):
+    model = viewset.model
     app_label = model._meta.app_label
     model_name = model._meta.model_name
 
@@ -37,7 +38,7 @@ class RegistryMetaClass(type):
         result = type.__new__(cls, name, bases, dict(namespace))
 
         if result.registry is not None and result.model is not None:
-            register(result.registry, result.model, result)
+            register(result.registry, result)
 
         return result
 
