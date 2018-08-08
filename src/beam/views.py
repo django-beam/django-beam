@@ -1,5 +1,8 @@
+from beam.registry import register
+from beam.viewsets import default_registry
+from django.apps import apps
 from django.views import generic
-from django.views.generic.base import ContextMixin
+from django.views.generic.base import ContextMixin, TemplateView
 
 
 class ViewSetContextMixin(ContextMixin):
@@ -69,3 +72,36 @@ class DeleteView(ViewSetContextMixin, generic.DeleteView):
 
     def get_success_url(self):
         return self.links["list"].get_url()
+
+
+class DashboardView(TemplateView):
+    template_name = "beam/dashboard.html"
+
+    viewsets = None
+    registry = default_registry
+
+    def build_registry(self, viewsets):
+        registry = {}
+        for viewset in viewsets:
+            register(registry, viewset)
+        return registry
+
+    def get_registry(self):
+        if self.viewsets:
+            return self.build_registry(self.viewsets)
+        else:
+            return self.registry
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        grouped = []
+        for app_label, viewsets_dict in self.get_registry().items():
+            group = {
+                "app_label": app_label,
+                "app_config": apps.get_app_config(app_label),
+                "viewsets": viewsets_dict.values(),
+            }
+            grouped.append(group)
+        context["grouped_by_app"] = grouped
+        return context

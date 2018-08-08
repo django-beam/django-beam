@@ -1,0 +1,22 @@
+{% extends "beam/base.html" %}
+{% load i18n beam_tags %}
+
+
+{% block heading %}
+    <h1>{% trans "Dashboard" %}</h1>
+{% endblock %}
+
+
+{% block content %}
+    {% for entry in grouped_by_app %}
+        <h2>{{ entry.app_config.name }}</h2>
+        <hr>
+        {% for viewset in entry.viewsets %}
+            {% get_attribute viewset.model "_meta" as model_options %}
+            <h3>{{ model_options.verbose_name_plural }}</h3>
+            <a href="{{ viewset.links.create.get_url }}">{% trans "Create" %}</a> |
+            <a href="{{ viewset.links.list.get_url }}">{% trans "List" %}</a>
+            <h3></h3>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}
