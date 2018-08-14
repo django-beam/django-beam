@@ -11,6 +11,12 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form|crispy }}
+
+        {% for inline in inlines %}
+            <h2>{{ inline.get_title|capfirst }}</h2>
+            {{ inline.formset|crispy }}
+        {% endfor %}
+
         <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
     </form>
 {% endblock %}

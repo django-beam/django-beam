@@ -15,25 +15,31 @@
                         {{ field_name }}
                     </dt>
                     <dd class="col-sm-8 col-md-9 col-lg-10">
-                        {% get_attribute object field_name as value %}
-                        {% if value|is_image %}
-                            {% if value %}
-                                <img class="img-fluid" src="{{ value.url }}"/>
-                            {% else %}
-                                -
-                            {% endif %}
-                        {% elif value|is_file %}
-                            {% if value %}
-                                <a href="{{ value.url }}">{% trans "Download" %}</a>
-                            {% else %}
-                                -
-                            {% endif %}
-                        {% else %}
-                            {{ value }}
-                        {% endif %}
+                        {% include "beam/partials/detail_field.html" with object=object field_name=field_name %}
                     </dd>
                 {% endfor %}
             </dl>
         </div>
     </div>
+
+    {% for inline in inlines %}
+        <h2>{{ inline.get_title|capfirst }}</h2>
+        {% for instance in inline.instances %}
+            <h3>{{ instance }}</h3>
+            <div class="card">
+                <div class="card-body">
+                    {% for field_name in inline.fields %}
+                        <dl class="row">
+                            <dt class="col-sm-4 col-md-3 col-lg-2">
+                                {{ field_name }}
+                            </dt>
+                            <dd class="col-sm-8 col-md-9 col-lg-10">
+                                {% include "beam/partials/detail_field.html" with object=instance field_name=field_name %}
+                            </dd>
+                        </dl>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endfor %}
 {% endblock %}
