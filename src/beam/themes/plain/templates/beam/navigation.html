@@ -8,7 +8,7 @@
     <ul>
         {% for app in apps %}
             <li>
-                {{ app.app_config.verbose_name }}
+                {{ app.app_config.verbose_name|capfirst }}
                 <ul>
                     {% for viewset in app.viewsets %}
                         <li>
