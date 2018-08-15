@@ -1,3 +1,4 @@
+{% load beam_tags %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,6 +11,9 @@
 
 <body>
 {% block layout %}
+    {% block navigation %}
+        {% render_navigation %}
+    {% endblock %}
     {% block actions %}
         {% include "beam/partials/links.html" %}
     {% endblock %}

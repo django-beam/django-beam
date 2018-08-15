@@ -1,0 +1,25 @@
+{% load i18n %}
+{% load beam_tags %}
+<nav>
+    {% url "dashboard" as dashboard_url %}
+    <a class="navbar-brand" href="{{ dashboard_url|default:'/' }}">
+        {% trans "Home" %}
+    </a>
+    <ul>
+        {% for app in apps %}
+            <li>
+                {{ app.app_config.verbose_name }}
+                <ul>
+                    {% for viewset in app.viewsets %}
+                        <li>
+                            {% get_attribute viewset.model "_meta" as model_options %}
+                            <a class="dropdown-item" href="{% get_link_url viewset.links.list %}">
+                                {{model_options.verbose_name_plural|capfirst }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>
