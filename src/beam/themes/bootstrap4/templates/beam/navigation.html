@@ -12,10 +12,10 @@
         <ul class="navbar-nav">
             {% for app in apps %}
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbar-link-{{ app.app_config.label }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {{ app.app_config.verbose_name }}
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <div class="dropdown-menu" aria-labelledby="navbar-link-{{ app.app_config.label }}">
                         {% for viewset in app.viewsets %}
                             {% get_attribute viewset.model "_meta" as model_options %}
                             <a class="dropdown-item" href="{% get_link_url viewset.links.list %}">
