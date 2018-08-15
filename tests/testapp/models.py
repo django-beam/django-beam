@@ -14,3 +14,8 @@ class Petaluridae(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Sighting(models.Model):
+    name = models.CharField(max_length=255)
+    dragonfly = models.ForeignKey(Dragonfly, on_delete=models.SET_NULL)

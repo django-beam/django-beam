@@ -31,5 +31,7 @@ class RelatedInline(object):
 
     @property
     def instances(self):
-        related_name = self.model._meta.get_field("car").remote_field.related_name
+        related_name = self.model._meta.get_field(
+            self.foreign_key_field
+        ).remote_field.get_accessor_name()
         return getattr(self.parent_instance, related_name).all()
