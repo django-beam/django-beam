@@ -4,7 +4,8 @@
 
 
 {% block heading %}
-    <h1>{% trans "Objects" %}</h1>
+    {% get_options viewset_context.model as options %}
+    {{ options.verbose_name_plural|capfirst }}
 {% endblock %}
 
 {% block content %}

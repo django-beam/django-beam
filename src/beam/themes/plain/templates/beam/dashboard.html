@@ -12,8 +12,8 @@
         <h2>{{ entry.app_config.verbose_name|capfirst }}</h2>
         <hr>
         {% for viewset in entry.viewsets %}
-            {% get_attribute viewset.model "_meta" as model_options %}
-            <h3>{{ model_options.verbose_name_plural }}</h3>
+            {% get_options viewset.model as options %}
+            <h3>{{ options.verbose_name_plural }}</h3>
             <a href="{{ viewset.links.create.get_url }}">{% trans "Create" %}</a> |
             <a href="{{ viewset.links.list.get_url }}">{% trans "List" %}</a>
             <h3></h3>

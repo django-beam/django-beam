@@ -1,5 +1,6 @@
 from django import template
 from django.apps import apps
+from django.db.models import Model
 from django.db.models.fields.files import ImageFieldFile, FieldFile
 from django.template.loader import get_template
 from django.urls import NoReverseMatch
@@ -34,6 +35,22 @@ def is_image(model_field):
 @register.filter
 def is_file(model_field):
     return isinstance(model_field, FieldFile)
+
+
+@register.simple_tag
+def get_options(instance_or_model):
+    """
+    Return the _meta options for a given model or instance.
+    """
+    if not instance_or_model:
+        return None
+
+    if isinstance(instance_or_model, Model):
+        model = instance_or_model.__class__
+    else:
+        model = instance_or_model
+
+    return model._meta
 
 
 @register.simple_tag(takes_context=True)

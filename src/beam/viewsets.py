@@ -78,6 +78,7 @@ class BaseViewSet(metaclass=RegistryMetaClass):
     def _get_viewset_context(self, view_type, request):
         viewset_context = ViewsetContext()
         viewset_context["view_type"] = view_type
+        viewset_context["viewset"] = self
         for item_name in self._get_with_generic_fallback(
             view_type, "context_items", request
         ):
