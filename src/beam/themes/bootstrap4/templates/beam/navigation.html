@@ -1,0 +1,30 @@
+{% load i18n %}
+{% load beam_tags %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    {% url "dashboard" as dashboard_url %}
+    <a class="navbar-brand" href="{{ dashboard_url|default:'/' }}">
+        {% trans "Home" %}
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            {% for app in apps %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ app.app_config.verbose_name }}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        {% for viewset in app.viewsets %}
+                            {% get_attribute viewset.model "_meta" as model_options %}
+                            <a class="dropdown-item" href="{% get_link_url viewset.links.list %}">
+                                {{model_options.verbose_name_plural|capfirst }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</nav>
