@@ -14,7 +14,9 @@
 
 <body>
 {% block layout %}
-    {% render_navigation %}
+    {% block navigation %}
+        {% render_navigation %}
+    {% endblock %}
     <div class="container pt-4">
         <div class="clearfix">
             <div class="float-right">
