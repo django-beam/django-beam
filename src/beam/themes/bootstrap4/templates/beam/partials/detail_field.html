@@ -1,0 +1,19 @@
+{% load i18n %}
+{% load beam_tags %}
+
+{% get_attribute object field_name as value %}
+{% if value|is_image %}
+    {% if value %}
+        <img class="img-fluid" src="{{ value.url }}"/>
+    {% else %}
+        -
+    {% endif %}
+{% elif value|is_file %}
+    {% if value %}
+        <a href="{{ value.url }}">{% trans "Download" %}</a>
+    {% else %}
+        -
+    {% endif %}
+{% else %}
+    {{ value }}
+{% endif %}

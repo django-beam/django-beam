@@ -1,3 +1,7 @@
+from django.forms import all_valid
+from django.shortcuts import redirect
+from django.views.generic.detail import SingleObjectMixin
+
 from beam.registry import register
 from beam.viewsets import default_registry
 from django.apps import apps
@@ -34,8 +38,95 @@ class ViewSetContextMixin(ContextMixin):
             return self.viewset_context["fields"]
         return super().fields
 
+    def get_inline_classes(self):
+        if self.viewset_context["inline_classes"] is not None:
+            return self.viewset_context["inline_classes"]
+        return super().get_inline_classes()
 
-class CreateView(ViewSetContextMixin, generic.CreateView):
+
+class InlinesMixin(ContextMixin):
+    inline_classes = []
+
+    def get_inline_classes(self):
+        return self.inline_classes
+
+    def get_inlines(self):
+        inlines = []
+        for inline_class in self.get_inline_classes():
+            inlines.append(
+                inline_class(
+                    parent_instance=self.object,
+                    parent_model=self.model,
+                    request=self.request,
+                )
+            )
+        return inlines
+
+    def get_context_data(self, **kwargs):
+        if "inlines" not in kwargs:
+            kwargs["inlines"] = self.get_inlines()
+        return super().get_context_data(**kwargs)
+
+
+class CreateWithInlinesMixin(InlinesMixin):
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+
+        # we update self.object here to ensure self.get_inlines uses the correct instance
+        if form.is_valid():
+            self.object = form.save(commit=False)
+            form_validated = True
+        else:
+            form_validated = False
+
+        inlines = self.get_inlines()
+
+        if all_valid(inline.formset for inline in inlines) and form_validated:
+            return self.form_valid(form, inlines)
+
+        return self.form_invalid(form, inlines)
+
+    def form_valid(self, form, inlines):
+        form.save()
+        for inline in inlines:
+            inline.formset.save()
+        return redirect(self.get_success_url())
+
+    def form_invalid(self, form, inlines):
+        return self.render_to_response(
+            self.get_context_data(form=form, inlines=inlines)
+        )
+
+
+class UpdateWithInlinesMixin(InlinesMixin):
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+
+        inlines = self.get_inlines()
+
+        if form.is_valid() and all_valid(inline.formset for inline in inlines):
+            return self.form_valid(form, inlines)
+
+        return self.form_invalid(form, inlines)
+
+    def form_valid(self, form, inlines):
+        form.save()
+        for inline in inlines:
+            inline.formset.save()
+        return redirect(self.get_success_url())
+
+    def form_invalid(self, form, inlines):
+        return self.render_to_response(
+            self.get_context_data(form=form, inlines=inlines)
+        )
+
+
+class CreateView(ViewSetContextMixin, CreateWithInlinesMixin, generic.CreateView):
 
     def get_template_names(self):
         return super().get_template_names() + ["beam/create.html"]
@@ -44,7 +135,7 @@ class CreateView(ViewSetContextMixin, generic.CreateView):
         return self.links["detail"].get_url(obj=self.object)
 
 
-class UpdateView(ViewSetContextMixin, generic.UpdateView):
+class UpdateView(ViewSetContextMixin, UpdateWithInlinesMixin, generic.UpdateView):
 
     def get_template_names(self):
         return super().get_template_names() + ["beam/update.html"]
@@ -59,13 +150,13 @@ class ListView(ViewSetContextMixin, generic.ListView):
         return super().get_template_names() + ["beam/list.html"]
 
 
-class DetailView(ViewSetContextMixin, generic.DetailView):
+class DetailView(ViewSetContextMixin, InlinesMixin, generic.DetailView):
 
     def get_template_names(self):
         return super().get_template_names() + ["beam/detail.html"]
 
 
-class DeleteView(ViewSetContextMixin, generic.DeleteView):
+class DeleteView(ViewSetContextMixin, InlinesMixin, generic.DeleteView):
 
     def get_template_names(self):
         return super().get_template_names() + ["beam/delete.html"]

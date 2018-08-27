@@ -8,7 +8,7 @@ def pytest_configure(config):
         DATABASES={
             "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": ":memory:"}
         },
-        INSTALLED_APPS=["beam", "beam.themes.plain", "testapp"],
+        INSTALLED_APPS=["beam", "beam.themes.bootstrap4", "testapp", "crispy_forms"],
         SECRET_KEY="secret_key_for_testing",
         ROOT_URLCONF="testapp.urls",
         TEMPLATES=[
