@@ -2,6 +2,9 @@
 [![ReadTheDocs](https://readthedocs.org/projects/django-beam/badge/)](https://django-beam.readthedocs.io/en/latest/)
 
 # django-beam
+
+## This project is currently in alpha and not ready for use in production
+
 django-beam provides you with a set of views, templates and integrations for the most common CRUD
 applications. 
 
