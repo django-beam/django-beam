@@ -33,31 +33,19 @@ class BaseViewSet(metaclass=RegistryMetaClass):
             links[view_type] = self._get_link(view_type)
         return links
 
+    def _get_url_kwargs(self, view_type):
+        return getattr(self, "{}_url_kwargs".format(view_type), [])
+
     def _get_link(self, view_type):
-        resolve_url = getattr(
-            self,
-            "{}_resolve_url".format(view_type),
-            self._get_default_resolve_url(view_type),
-        )
-
-        verbose_name = getattr(self, "{}_verbose_name".format(view_type), view_type)
-
-        return ViewLink(
-            view_type=view_type, resolve_url=resolve_url, verbose_name=verbose_name
-        )
-
-    def _get_default_resolve_url(self, view_type):
         url_name = self._get_url_name(view_type)
-
-        def resolve_url(obj=None):
-            if obj:
-                try:
-                    return reverse(url_name, kwargs={"pk": obj.pk})
-                except NoReverseMatch:
-                    pass
-            return reverse(url_name)
-
-        return resolve_url
+        url_kwargs = self._get_url_kwargs(view_type)
+        verbose_name = getattr(self, "{}_verbose_name".format(view_type), view_type)
+        return ViewLink(
+            view_type=view_type,
+            url_name=url_name,
+            verbose_name=verbose_name,
+            url_kwargs=url_kwargs,
+        )
 
     def _get_with_generic_fallback(self, view_type, item_name, request):
         specific_getter_name = "get_{}_{}".format(view_type, item_name)
@@ -153,6 +141,7 @@ class CreateMixin(BaseViewSet):
 class DetailMixin(BaseViewSet):
     detail_view_class = DetailView
     detail_url = "<str:pk>/"
+    detail_url_kwargs = ["pk"]
     detail_verbose_name = _("detail")
 
     def get_view_types(self):
@@ -162,6 +151,7 @@ class DetailMixin(BaseViewSet):
 class UpdateMixin(BaseViewSet):
     update_view_class = UpdateView
     update_url = "<str:pk>/update/"
+    update_url_kwargs = ["pk"]
     update_verbose_name = _("update")
 
     def get_view_types(self):
@@ -171,6 +161,7 @@ class UpdateMixin(BaseViewSet):
 class DeleteMixin(BaseViewSet):
     delete_view_class = DeleteView
     delete_url = "<str:pk>/delete/"
+    delete_url_kwargs = ["pk"]
     delete_verbose_name = _("delete")
 
     def get_view_types(self):
@@ -184,11 +175,20 @@ class ViewSet(
 
 
 class ViewLink:
-
-    def __init__(self, view_type, resolve_url, verbose_name):
+    def __init__(self, view_type, url_name, verbose_name, url_kwargs):
         self.view_type = view_type
-        self.resolve_url = resolve_url
+        self.url_name = url_name
         self.verbose_name = verbose_name
+        self.url_kwargs = url_kwargs
 
     def get_url(self, obj=None):
-        return self.resolve_url(obj=obj)
+        if not obj:
+            return reverse(self.url_name)
+
+        if not obj and self.url_kwargs:
+            return
+
+        return reverse(
+            self.url_name,
+            kwargs={kwarg: getattr(obj, kwarg) for kwarg in self.url_kwargs},
+        )

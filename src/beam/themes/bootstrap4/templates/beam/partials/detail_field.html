@@ -2,7 +2,14 @@
 {% load beam_tags %}
 
 {% get_attribute object field_name as value %}
-{% if value|is_image %}
+{% if value.pk %}
+    {% get_url_for_related value "detail" as related_url %}
+    {% if related_url %}
+        <a href="{{ related_url }}">{{ value }}</a>
+    {% else %}
+        {{ value }}
+    {% endif %}
+{% elif value|is_image %}
     {% if value %}
         <img class="img-fluid" src="{{ value.url }}"/>
     {% else %}

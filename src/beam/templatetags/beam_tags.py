@@ -5,7 +5,7 @@ from django.db.models.fields.files import ImageFieldFile, FieldFile
 from django.template.loader import get_template
 from django.urls import NoReverseMatch
 
-from beam.registry import default_registry
+from beam.registry import default_registry, get_viewset_for_model
 
 register = template.Library()
 
@@ -25,6 +25,24 @@ def get_attribute(obj, field_name):
     if hasattr(obj, "get_{}_display".format(field_name)):
         return getattr(obj, "get_{}_display".format(field_name))
     return getattr(obj, field_name)
+
+
+@register.simple_tag(takes_context=True)
+def get_url_for_related(context, instance, view_type):
+    opts = get_options(instance)
+
+    viewset = context.get("viewset", None)
+    if viewset:
+        registry = viewset.registry
+    else:
+        registry = default_registry
+
+    try:
+        viewset = get_viewset_for_model(registry, opts.model)
+    except KeyError:
+        return None
+
+    return viewset().links[view_type].get_url(instance)
 
 
 @register.filter

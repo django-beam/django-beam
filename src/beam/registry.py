@@ -32,6 +32,12 @@ def unregister(registry, model):
         registry.pop(app_label)
 
 
+def get_viewset_for_model(registry, model):
+    app_label = model._meta.app_label
+    model_name = model._meta.model_name
+    return registry[app_label][model_name]
+
+
 class RegistryMetaClass(type):
 
     def __new__(cls, name, bases, namespace, **kwds):
