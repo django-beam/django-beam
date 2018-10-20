@@ -69,7 +69,6 @@ class InlinesMixin(ContextMixin):
 
 
 class CreateWithInlinesMixin(InlinesMixin):
-
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
@@ -101,7 +100,6 @@ class CreateWithInlinesMixin(InlinesMixin):
 
 
 class UpdateWithInlinesMixin(InlinesMixin):
-
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         form_class = self.get_form_class()
@@ -127,7 +125,6 @@ class UpdateWithInlinesMixin(InlinesMixin):
 
 
 class CreateView(ViewSetContextMixin, CreateWithInlinesMixin, generic.CreateView):
-
     def get_template_names(self):
         return super().get_template_names() + ["beam/create.html"]
 
@@ -136,7 +133,6 @@ class CreateView(ViewSetContextMixin, CreateWithInlinesMixin, generic.CreateView
 
 
 class UpdateView(ViewSetContextMixin, UpdateWithInlinesMixin, generic.UpdateView):
-
     def get_template_names(self):
         return super().get_template_names() + ["beam/update.html"]
 
@@ -145,19 +141,16 @@ class UpdateView(ViewSetContextMixin, UpdateWithInlinesMixin, generic.UpdateView
 
 
 class ListView(ViewSetContextMixin, generic.ListView):
-
     def get_template_names(self):
         return super().get_template_names() + ["beam/list.html"]
 
 
 class DetailView(ViewSetContextMixin, InlinesMixin, generic.DetailView):
-
     def get_template_names(self):
         return super().get_template_names() + ["beam/detail.html"]
 
 
 class DeleteView(ViewSetContextMixin, InlinesMixin, generic.DeleteView):
-
     def get_template_names(self):
         return super().get_template_names() + ["beam/delete.html"]
 

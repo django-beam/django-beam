@@ -39,7 +39,6 @@ def get_viewset_for_model(registry, model):
 
 
 class RegistryMetaClass(type):
-
     def __new__(cls, name, bases, namespace, **kwds):
         result = type.__new__(cls, name, bases, dict(namespace))
 
