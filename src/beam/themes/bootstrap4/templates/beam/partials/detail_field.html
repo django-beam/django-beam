@@ -22,14 +22,14 @@
     {% if value %}
         <img class="img-fluid" src="{{ value.url }}"/>
     {% else %}
-        -
+        &nbsp;
     {% endif %}
 {% elif value|is_file %}
     {% if value %}
         <a href="{{ value.url }}">{% trans "Download" %}</a>
     {% else %}
-        -
+        &nbsp;
     {% endif %}
 {% else %}
-    {{ value }}
+    {{ value|default:"&nbsp;" }}
 {% endif %}
