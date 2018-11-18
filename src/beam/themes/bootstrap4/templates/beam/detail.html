@@ -3,11 +3,13 @@
 {% load beam_tags %}
 
 {% block heading %}
-    <h1>{{ object }}</h1>
+    <div class="card-body">
+        <h1 class="card-title">{{ object }}</h1>
+    </div>
 {% endblock %}
 
 {% block content %}
-    <div class="card">
+    <div class="card mb-4">
         <div class="card-body">
             <dl class="row">
                 {% for field_name in viewset_context.fields %}
@@ -23,9 +25,12 @@
     </div>
 
     {% for inline in inlines %}
-        <h2>{{ inline.get_title|capfirst }}</h2>
+        <div class="card-body">
+            <h2 class="card-title">{{ inline.get_title|capfirst }}</h2>
+        </div>
+
         {% for instance in inline.instances %}
-            <div class="card">
+            <div class="card mb-4">
                 <div class="card-body">
                     {% for field_name in inline.fields %}
                         <dl class="row">
