@@ -1,6 +1,6 @@
 from django import template
 from django.apps import apps
-from django.db.models import Model
+from django.db.models import Model, QuerySet, Manager
 from django.db.models.fields.files import ImageFieldFile, FieldFile
 from django.template.loader import get_template
 from django.urls import NoReverseMatch
@@ -24,7 +24,17 @@ def get_attribute(obj, field_name):
         return None
     if hasattr(obj, "get_{}_display".format(field_name)):
         return getattr(obj, "get_{}_display".format(field_name))
-    return getattr(obj, field_name)
+    value = getattr(obj, field_name)
+
+    if isinstance(value, Manager):
+        return value.all()
+
+    return value
+
+
+@register.filter
+def is_queryset(value):
+    return isinstance(value, QuerySet)
 
 
 @register.simple_tag(takes_context=True)
@@ -69,6 +79,14 @@ def get_options(instance_or_model):
         model = instance_or_model
 
     return model._meta
+
+
+@register.filter
+def field_verbose_name(instance, field_name):
+    options = get_options(instance)
+    field = options.get_field(field_name)
+
+    return getattr(field, "verbose_name", field_name.replace("_", ""))
 
 
 @register.simple_tag(takes_context=True)

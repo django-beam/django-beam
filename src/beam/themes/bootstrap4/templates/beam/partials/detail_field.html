@@ -2,7 +2,16 @@
 {% load beam_tags %}
 
 {% get_attribute object field_name as value %}
-{% if value.pk %}
+{% if value|is_queryset %}
+    {% for related in value %}
+        {% get_url_for_related related "detail" as related_url %}
+        {% if related_url %}
+            <a href="{{ related_url }}">{{ related }}</a>
+        {% else %}
+            {{ related }}
+        {% endif %}
+    {% endfor %}
+{% elif value.pk %}
     {% get_url_for_related value "detail" as related_url %}
     {% if related_url %}
         <a href="{{ related_url }}">{{ value }}</a>

@@ -16,7 +16,9 @@
             <thead class="thead-light">
             <tr>
                 {% for field in viewset_context.fields %}
-                    <th scope="col">{{ field }}</th>
+                    <th scope="col">
+                        {{ viewset_context.model|field_verbose_name:field|capfirst }}
+                    </th>
                 {% endfor %}
                 <th>{% trans "Actions" %}</th>
             </tr>
