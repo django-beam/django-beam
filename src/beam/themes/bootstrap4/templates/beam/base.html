@@ -18,12 +18,10 @@
         {% render_navigation %}
     {% endblock %}
     <div class="container pt-4">
-        <div class="clearfix">
-            <div class="float-right">
-                {% block actions %}
-                    {% include "beam/partials/links.html" %}
-                {% endblock %}
-            </div>
+        <div class="float-right">
+            {% block actions %}
+                {% include "beam/partials/links.html" %}
+            {% endblock %}
         </div>
 
         {% block heading %}
