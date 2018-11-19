@@ -16,13 +16,22 @@ class ContextItemNotFound(Exception):
     pass
 
 
+class HTML:
+    is_html = True
+
+    def __init__(self, content):
+        self.content = content
+
+
+
 class BaseViewSet(metaclass=RegistryMetaClass):
     registry = default_registry
     view_types = []
-    context_items = ["model", "fields", "queryset", "inline_classes"]
+    context_items = ["model", "fields", "queryset", "inline_classes", "layout"]
 
     model = None
     fields = None
+    layout = None
     queryset = None
     inline_classes = None
 

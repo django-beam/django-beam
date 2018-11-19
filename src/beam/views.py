@@ -78,6 +78,7 @@ class CreateWithInlinesMixin(InlinesMixin):
             self.object = form.save(commit=False)
             form_validated = True
         else:
+            self.object = form.instance
             form_validated = False
 
         inlines = self.get_inlines()

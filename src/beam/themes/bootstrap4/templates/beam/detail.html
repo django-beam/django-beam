@@ -20,16 +20,7 @@
             {% endblock %}
 
             {% block details %}
-                <dl class="row">
-                    {% for field_name in viewset_context.fields %}
-                        <dt class="col-sm-4 col-md-3 col-lg-2">
-                            {{ object|field_verbose_name:field_name|capfirst }}
-                        </dt>
-                        <dd class="col-sm-8 col-md-9 col-lg-10">
-                            {% include "beam/partials/detail_field.html" with object=object field_name=field_name %}
-                        </dd>
-                    {% endfor %}
-                </dl>
+                {% include "beam/partials/layout.html" with object=object layout=viewset_context.layout fields=viewset_context.fields %}
             {% endblock %}
         </div>
     </section>
@@ -41,16 +32,7 @@
                     {% block inline %}
                         <h2 class="pt-2">{{ inline.get_title|capfirst }}</h2>
                         {% for instance in inline.instances %}
-                            <dl class="row">
-                                {% for field_name in inline.fields %}
-                                    <dt class="col-sm-4 col-md-3 col-lg-2">
-                                        {{ instance|field_verbose_name:field_name|capfirst }}
-                                    </dt>
-                                    <dd class="col-sm-8 col-md-9 col-lg-10">
-                                        {% include "beam/partials/detail_field.html" with object=instance field_name=field_name %}
-                                    </dd>
-                                {% endfor %}
-                            </dl>
+                            {% include "beam/partials/layout.html" with object=instance layout=inline.layout fields=inline.fields only %}
                             {% if not forloop.last %}
                                 <hr>
                             {% endif %}

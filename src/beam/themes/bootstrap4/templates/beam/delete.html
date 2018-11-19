@@ -1,18 +1,27 @@
 {% extends "beam/base.html" %}
+{% load beam_tags %}
 {% load i18n %}
 
 
-{% block heading %}
-    <h1>{% trans "Delete object" %}</h1>
-{% endblock %}
-
 {% block content %}
-    <p>
-        {% trans "Are you sure you want to delete this object:" %} {{ object }}?
-    </p>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-danger">{% trans "Yes, I'm sure" %}</button>
-    </form>
+    <section>
+        <div class="container">
+            {% block heading %}
+                <h1>
+                    {% get_options viewset_context.model as options %}
+                    {% blocktrans %}Delete {{ object }}{% endblocktrans %}
+                    <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
+                </h1>
+            {% endblock %}
+
+            <p>
+                {% trans "Are you sure you want to delete this object:" %} {{ object }}?
+            </p>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-danger">{% trans "Yes, I'm sure" %}</button>
+            </form>
+        </div>
+    </section>
 {% endblock %}

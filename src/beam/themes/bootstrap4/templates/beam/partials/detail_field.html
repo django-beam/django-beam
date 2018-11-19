@@ -5,11 +5,7 @@
 {% if value|is_queryset %}
     {% for related in value %}
         {% get_url_for_related related "detail" as related_url %}
-        {% if related_url %}
-            <a href="{{ related_url }}">{{ related }}</a>
-        {% else %}
-            {{ related }}
-        {% endif %}
+        {% if related_url %}<a href="{{ related_url }}">{{ related }}</a>{% else %}{{ related }}{% endif %}{% if not forloop.last %}, {% endif %}
     {% endfor %}
 {% elif value.pk %}
     {% get_url_for_related value "detail" as related_url %}

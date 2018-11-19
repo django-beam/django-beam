@@ -1,0 +1,39 @@
+{% load beam_tags %}
+
+{% if not layout %}
+    {% fields_to_layout fields as layout %}
+{% endif %}
+
+{% for row in layout %}
+    <div class="row">
+    {% for col in row %}
+        {% if row|length_is:1 %}
+            <div class="col-md-12">
+        {% elif row|length_is:2 %}
+            <div class="col-md-6">
+        {% elif row|length_is:3 %}
+            <div class="col-md-4">
+        {% elif row|length_is:4 %}
+            <div class="col-md-3">
+        {% endif %}
+    <dl class="row">
+        {% for field in col %}
+            {% if field.is_html %}
+                <div class="col-sm-12">
+                    {{ field.content|safe }}
+                </div>
+            {% else %}
+                <dt class="col-sm-4 col-md-4 col-lg-3">
+                    {{ object|field_verbose_name:field|capfirst }}
+                </dt>
+                <dd class="col-sm-8 col-md-8 col-lg-9">
+                    {% include "beam/partials/detail_field.html" with object=object field_name=field %}
+                </dd>
+            {% endif %}
+        {% endfor %}
+    </dl>
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+

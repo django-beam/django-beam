@@ -5,7 +5,9 @@ class RelatedInline(object):
     model = None
     title = None
     foreign_key_field = None
+    layout = None
     fields = []
+    extra = 1
 
     def __init__(self, parent_instance=None, parent_model=None, request=None) -> None:
         super().__init__()
@@ -25,6 +27,7 @@ class RelatedInline(object):
             parent_model=self.parent_model,
             model=self.model,
             fk_name=self.foreign_key_field,
+            extra=self.extra,
             fields=self.fields,
         )(
             instance=self.parent_instance,

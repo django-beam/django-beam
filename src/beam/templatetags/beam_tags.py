@@ -32,6 +32,14 @@ def get_attribute(obj, field_name):
     return value
 
 
+@register.simple_tag
+def get_field(form, field_name):
+    try:
+        return form[field_name]
+    except KeyError:
+        return None
+
+
 @register.filter
 def is_queryset(value):
     return isinstance(value, QuerySet)
@@ -102,3 +110,8 @@ def render_navigation(context):
     navigation_template = get_template("beam/navigation.html")
     request = context.get("request", None)
     return navigation_template.render({"apps": grouped, "request": request})
+
+
+@register.simple_tag()
+def fields_to_layout(fields):
+    return [[fields]]

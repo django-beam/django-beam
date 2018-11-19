@@ -4,8 +4,16 @@
 {% load beam_tags %}
 
 {% block content %}
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="alert alert-block alert-danger">
+                <ul>
+                    {{ form.non_field_errors|unordered_list }}
+                </ul>
+            </div>
+        {% endif %}
+
         <section>
             <div class="container">
                 {% block links %}
@@ -20,8 +28,7 @@
                         {% blocktrans with verbose_name=options.verbose_name %}Create {{ verbose_name }}{% endblocktrans %}
                     </h1>
                 {% endblock %}
-
-                {{ form|crispy }}
+                {% include "beam/partials/form_layout.html" with form=form fields=viewset_context.fields layout=viewset_context.layout only %}
             </div>
         </section>
 
@@ -31,7 +38,20 @@
                     <div class="container">
                         {% block inline %}
                             <h2 class="pt-2">{{ inline.get_title|capfirst }}</h2>
-                            {{ inline.formset|crispy }}
+                            {{ inline.formset.management_form }}
+                            {% for form in inline.formset %}
+                                {% if form.non_field_errors %}
+                                    <div class="alert alert-block alert-danger">
+                                        <ul>
+                                            {{ form.non_field_errors|unordered_list }}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                                {% include "beam/partials/form_layout.html" with form=form fields=inline.fields layout=inline.layout only %}
+                            {% endfor %}
+                            <div class="d-none empty-form">
+                                {% include "beam/partials/form_layout.html" with form=inline.formset.empty_form fields=inline.fields layout=inline.layout only %}
+                            </div>
                         {% endblock %}
                     </div>
                 </section>
@@ -41,7 +61,7 @@
         <section>
             <div class="container">
                 {% block form_buttons %}
-                <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+                    <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
                 {% endblock %}
             </div>
         </section>
