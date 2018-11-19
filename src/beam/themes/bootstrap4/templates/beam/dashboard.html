@@ -8,18 +8,24 @@
 
 {% block content %}
     {% for entry in grouped_by_app %}
-        <div class="card w-50 mb-4">
-            <div class="card-header">
+        <section>
+            <div class="container">
                 <h2>{{ entry.app_config.verbose_name|capfirst }}</h2>
-            </div>
-            <div class="card-body">
+                <div class="card-columns">
                 {% for viewset in entry.viewsets %}
-                    {% get_options viewset.model as options %}
-                    <h3 class="card-title">{{ options.verbose_name_plural|capfirst }}</h3>
-                    <a class="btn btn-primary" href="{{ viewset.links.list.get_url }}">{% trans "List" %}</a>
-                    <a class="btn btn-secondary" href="{{ viewset.links.create.get_url }}">{% trans "Create" %}</a>
+                    <div class="card">
+                        <div class="card-header">
+                            {% get_options viewset.model as options %}
+                            <h3 class="card-title">{{ options.verbose_name_plural|capfirst }}</h3>
+                        </div>
+                        <div class="card-body">
+                            <a class="btn btn-primary" href="{{ viewset.links.list.get_url }}">{% trans "List" %}</a>
+                            <a class="btn btn-secondary" href="{{ viewset.links.create.get_url }}">{% trans "Create" %}</a>
+                        </div>
+                    </div>
                 {% endfor %}
+                </div>
             </div>
-        </div>
+        </section>
     {% endfor %}
 {% endblock %}

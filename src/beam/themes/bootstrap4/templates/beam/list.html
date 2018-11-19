@@ -2,40 +2,50 @@
 {% load i18n %}
 {% load beam_tags %}
 
-
-{% block heading %}
-    <h1>
-        {% get_options viewset_context.model as options %}
-        {{ options.verbose_name_plural|capfirst }}
-    </h1>
-{% endblock %}
-
 {% block content %}
-    {% if object_list %}
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                {% for field in viewset_context.fields %}
-                    <th scope="col">
-                        {{ viewset_context.model|field_verbose_name:field|capfirst }}
-                    </th>
-                {% endfor %}
-                <th>{% trans "Actions" %}</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for object in object_list %}
-                <tr>
-                    {% for field in viewset_context.fields %}
-                        <td>{% get_attribute object field as value %}{{ value|default:"&nbsp;" }}</td>
-                    {% endfor %}
-                    <td>
-                        {% get_link_url links.detail object as detail_url %}
-                        <a href="{{ detail_url }}" class="btn btn-sm btn-info">{{ links.detail.verbose_name }}</a>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+    <section>
+        <div class="container">
+            {% block links %}
+                <div class="float-right">
+                    {% include "beam/partials/links.html" %}
+                </div>
+            {% endblock %}
+            {% block heading %}
+                <h1>
+                    {% get_options viewset_context.model as options %}
+                    {{ options.verbose_name_plural|capfirst }}
+                </h1>
+            {% endblock %}
+
+            {% block table %}
+                {% if object_list %}
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            {% for field in viewset_context.fields %}
+                                <th scope="col">
+                                    {{ viewset_context.model|field_verbose_name:field|capfirst }}
+                                </th>
+                            {% endfor %}
+                            <th>{% trans "Actions" %}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for object in object_list %}
+                            <tr>
+                                {% for field in viewset_context.fields %}
+                                    <td>{% get_attribute object field as value %}{{ value|default:"&nbsp;" }}</td>
+                                {% endfor %}
+                                <td>
+                                    {% get_link_url links.detail object as detail_url %}
+                                    <a href="{{ detail_url }}" class="btn btn-sm btn-info">{{ links.detail.verbose_name }}</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            {% endblock %}
+        </div>
+    </section>
 {% endblock %}

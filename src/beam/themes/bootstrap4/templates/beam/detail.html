@@ -2,35 +2,64 @@
 {% load i18n %}
 {% load beam_tags %}
 
-{% block heading %}
-    <h1 class="border-bottom">{{ object }}</h1>
-{% endblock %}
-
 {% block content %}
-    <dl class="row">
-        {% for field_name in viewset_context.fields %}
-            <dt class="col-sm-4 col-md-3 col-lg-2">
-                {{ object|field_verbose_name:field_name|capfirst }}
-            </dt>
-            <dd class="col-sm-8 col-md-9 col-lg-10">
-                {% include "beam/partials/detail_field.html" with object=object field_name=field_name %}
-            </dd>
-        {% endfor %}
-    </dl>
+    <section>
+        <div class="container">
+            {% block links %}
+                <div class="float-right">
+                    {% include "beam/partials/links.html" %}
+                </div>
+            {% endblock %}
 
-    {% for inline in inlines %}
-        <h2 class="border-bottom">{{ inline.get_title|capfirst }}</h2>
-        {% for instance in inline.instances %}
-            <dl class="row border-bottom">
-            {% for field_name in inline.fields %}
-                    <dt class="col-sm-4 col-md-3 col-lg-2">
-                        {{ instance|field_verbose_name:field_name|capfirst }}
-                    </dt>
-                    <dd class="col-sm-8 col-md-9 col-lg-10">
-                        {% include "beam/partials/detail_field.html" with object=instance field_name=field_name %}
-                    </dd>
-            {% endfor %}
-            </dl>
+            {% block heading %}
+                <h1>
+                    {% get_options viewset_context.model as options %}
+                    {{ object }}
+                    <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
+                </h1>
+            {% endblock %}
+
+            {% block details %}
+                <dl class="row">
+                    {% for field_name in viewset_context.fields %}
+                        <dt class="col-sm-4 col-md-3 col-lg-2">
+                            {{ object|field_verbose_name:field_name|capfirst }}
+                        </dt>
+                        <dd class="col-sm-8 col-md-9 col-lg-10">
+                            {% include "beam/partials/detail_field.html" with object=object field_name=field_name %}
+                        </dd>
+                    {% endfor %}
+                </dl>
+            {% endblock %}
+        </div>
+    </section>
+
+    {% block inlines %}
+        {% for inline in inlines %}
+            <section class="border-top">
+                <div class="container">
+                    {% block inline %}
+                        <h2 class="pt-2">{{ inline.get_title|capfirst }}</h2>
+                        {% for instance in inline.instances %}
+                            <dl class="row">
+                                {% for field_name in inline.fields %}
+                                    <dt class="col-sm-4 col-md-3 col-lg-2">
+                                        {{ instance|field_verbose_name:field_name|capfirst }}
+                                    </dt>
+                                    <dd class="col-sm-8 col-md-9 col-lg-10">
+                                        {% include "beam/partials/detail_field.html" with object=instance field_name=field_name %}
+                                    </dd>
+                                {% endfor %}
+                            </dl>
+                            {% if not forloop.last %}
+                                <hr>
+                            {% endif %}
+                            {% empty %}
+                            <p>{% blocktrans with title=inline.get_title %}There are no {{ title }}{% endblocktrans %}.</p>
+                        {% endfor %}
+                    {% endblock %}
+                </div>
+            </section>
         {% endfor %}
-    {% endfor %}
+    {% endblock %}
 {% endblock %}

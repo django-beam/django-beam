@@ -1,22 +1,12 @@
-{% extends "beam/base.html" %}
+{% extends "beam/form.html" %}
 {% load i18n %}
 {% load crispy_forms_tags %}
-
+{% load beam_tags %}
 
 {% block heading %}
-    <h1>{% trans "Update object" %}</h1>
-{% endblock %}
-
-{% block content %}
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form|crispy }}
-
-        {% for inline in inlines %}
-            <h2>{{ inline.get_title|capfirst }}</h2>
-            {{ inline.formset|crispy }}
-        {% endfor %}
-
-        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-    </form>
+    <h1>
+        {% get_options viewset_context.model as options %}
+        {% blocktrans %}Update {{ object }}{% endblocktrans %}
+        <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
+    </h1>
 {% endblock %}

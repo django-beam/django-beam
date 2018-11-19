@@ -1,0 +1,49 @@
+{% extends "beam/base.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load beam_tags %}
+
+{% block content %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <section>
+            <div class="container">
+                {% block links %}
+                    <div class="float-right">
+                        {% include "beam/partials/links.html" %}
+                    </div>
+                {% endblock %}
+
+                {% block heading %}
+                    <h1>
+                        {% get_options viewset_context.model as options %}
+                        {% blocktrans with verbose_name=options.verbose_name %}Create {{ verbose_name }}{% endblocktrans %}
+                    </h1>
+                {% endblock %}
+
+                {{ form|crispy }}
+            </div>
+        </section>
+
+        {% block inlines %}
+            {% for inline in inlines %}
+                <section class="border-top">
+                    <div class="container">
+                        {% block inline %}
+                            <h2 class="pt-2">{{ inline.get_title|capfirst }}</h2>
+                            {{ inline.formset|crispy }}
+                        {% endblock %}
+                    </div>
+                </section>
+            {% endfor %}
+        {% endblock %}
+
+        <section>
+            <div class="container">
+                {% block form_buttons %}
+                <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+                {% endblock %}
+            </div>
+        </section>
+    </form>
+{% endblock %}
