@@ -12,7 +12,13 @@ class RelatedInline(object):
         self.parent_instance = parent_instance
         self.parent_model = parent_model
         self.request = request
-        self.formset = self.construct_formset()
+        self._formset = None
+
+    @property
+    def formset(self):
+        if self._formset is None:
+            self._formset = self.construct_formset()
+        return self._formset
 
     def construct_formset(self):
         return inlineformset_factory(
