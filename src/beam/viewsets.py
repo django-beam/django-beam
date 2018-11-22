@@ -1,10 +1,9 @@
 from collections import OrderedDict
 
-from beam.registry import RegistryMetaClass, default_registry
-from django.urls import path, reverse, NoReverseMatch
+from django.urls import path, reverse
 from django.utils.translation import ugettext_lazy as _
 
-
+from beam.registry import RegistryMetaClass, default_registry
 from .views import CreateView, UpdateView, DetailView, DeleteView, ListView
 
 
@@ -14,14 +13,6 @@ class ViewsetContext(dict):
 
 class ContextItemNotFound(Exception):
     pass
-
-
-class HTML:
-    is_html = True
-
-    def __init__(self, content):
-        self.content = content
-
 
 
 class BaseViewSet(metaclass=RegistryMetaClass):
