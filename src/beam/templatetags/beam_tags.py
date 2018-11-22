@@ -1,6 +1,6 @@
 from django import template
 from django.apps import apps
-from django.db.models import Model, QuerySet, Manager
+from django.db.models import Model, QuerySet, Manager, FieldDoesNotExist
 from django.db.models.fields.files import ImageFieldFile, FieldFile
 from django.template.loader import get_template
 from django.urls import NoReverseMatch
@@ -92,9 +92,13 @@ def get_options(instance_or_model):
 @register.filter
 def field_verbose_name(instance, field_name):
     options = get_options(instance)
-    field = options.get_field(field_name)
 
-    return getattr(field, "verbose_name", field_name.replace("_", ""))
+    try:
+        field = options.get_field(field_name)
+    except FieldDoesNotExist:
+        field = getattr(instance, field_name, None)
+
+    return getattr(field, "verbose_name", field_name.replace("_", " "))
 
 
 @register.simple_tag(takes_context=True)
