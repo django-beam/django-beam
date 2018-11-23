@@ -38,7 +38,7 @@
                                 {% endfor %}
                                 <td>
                                     {% get_link_url links.detail object as detail_url %}
-                                    <a href="{{ detail_url }}" class="btn btn-sm btn-info">{{ links.detail.verbose_name }}</a>
+                                    <a href="{{ detail_url }}" class="btn btn-sm btn-info">{{ links.detail.verbose_name|capfirst }}</a>
                                 </td>
                             </tr>
                         {% endfor %}

@@ -6,7 +6,7 @@
         {% for link in links.values %}
             {% get_link_url link object as url %}
             {% if url and viewset_context.view_type != link.view_type %}
-                <a href="{{ url }}" class="btn btn-{% if link.view_type == 'delete' %}danger{% elif link.view_type == 'list' %}info{% else %}secondary{% endif %} btn-type-{{ link.view_type }}">{{ link.verbose_name }}</a>
+                <a href="{{ url }}" class="btn btn-{% if link.view_type == 'delete' %}danger{% elif link.view_type == 'list' %}info{% else %}secondary{% endif %} btn-type-{{ link.view_type }}">{{ link.verbose_name|capfirst }}</a>
             {% endif %}
         {% endfor %}
     </div>
