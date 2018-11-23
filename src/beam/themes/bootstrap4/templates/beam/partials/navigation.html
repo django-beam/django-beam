@@ -12,6 +12,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
+            {% block navbar_nav %}
             <ul class="navbar-nav">
                 {% for app in apps %}
                     <li class="nav-item dropdown">
@@ -29,6 +30,7 @@
                     </li>
                 {% endfor %}
             </ul>
+            {% endblock %}
         </div>
     </div>
 </nav>
