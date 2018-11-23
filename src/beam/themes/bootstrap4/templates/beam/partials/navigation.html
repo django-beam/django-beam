@@ -2,10 +2,12 @@
 {% load beam_tags %}
 <nav class="navbar navbar-expand-md navbar-light bg-light mb-2">
     <div class="container">
-        {% url "dashboard" as dashboard_url %}
-        <a class="navbar-brand" href="{{ dashboard_url|default:'/' }}">
-            {% trans "Home" %}
-        </a>
+        {% block navbar_brand %}
+            {% url "dashboard" as dashboard_url %}
+            <a class="navbar-brand" href="{{ dashboard_url|default:'/' }}">
+                {% trans "Home" %}
+            </a>
+        {% endblock %}
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
