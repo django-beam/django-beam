@@ -13,23 +13,51 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             {% block navbar_nav %}
-            <ul class="navbar-nav">
-                {% for app in apps %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbar-link-{{ app.app_config.label }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{ app.app_config.verbose_name|capfirst }}
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbar-link-{{ app.app_config.label }}">
-                            {% for viewset in app.viewsets %}
-                                {% get_attribute viewset.model "_meta" as model_options %}
-                                <a class="dropdown-item" href="{% get_link_url viewset.links.list %}">
-                                    {{model_options.verbose_name_plural|capfirst }}
+                <ul class="navbar-nav mr-auto">
+                    {% for app in apps %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbar-link-{{ app.app_config.label }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{ app.app_config.verbose_name|capfirst }}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbar-link-{{ app.app_config.label }}">
+                                {% for viewset in app.viewsets %}
+                                    {% get_attribute viewset.model "_meta" as model_options %}
+                                    <a class="dropdown-item" href="{% get_link_url viewset.links.list %}">
+                                        {{model_options.verbose_name_plural|capfirst }}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% if request.user.is_authenticated %}
+                    <ul class="navbar-nav">
+                        {% url "logout" as logout_url %}
+                        {% url "password_change" as password_change_url %}
+                        {% if logout_url or password_change_url %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbar-user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {{ request.user }}
                                 </a>
-                            {% endfor %}
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
+                                <div class="dropdown-menu" aria-labelledby="navbar-user">
+                                    {% if password_change_url and request.user.has_usable_password %}
+                                        <a class="dropdown-item" href="{{ password_change_url }}">
+                                            {% trans "Change password" %}
+                                        </a>
+                                    {% endif %}
+                                    {% if logout_url %}
+                                        <a class="dropdown-item" href="{{ logout_url }}">
+                                            {% trans "Log out" %}
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% else %}
+                            <li class="nav-link">{{ request.user }}</li>
+
+                        {% endif %}
+                    </ul>
+                {% endif %}
             {% endblock %}
         </div>
     </div>
