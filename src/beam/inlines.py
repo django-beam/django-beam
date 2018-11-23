@@ -22,7 +22,9 @@ class RelatedInline(object):
         if self.can_delete and self.layout:
             assert layout_contains_fields(
                 self.layout, ["DELETE"]
-            ), "if you set can_delete you should place the delete field in the layout"
+            ), "if you set can_delete you should place the delete field in the layout for {}".format(
+                repr(self)
+            )
 
     @property
     def formset(self):
