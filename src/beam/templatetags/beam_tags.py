@@ -111,7 +111,7 @@ def render_navigation(context):
             "viewsets": viewsets_dict.values(),
         }
         grouped.append(group)
-    navigation_template = get_template("beam/navigation.html")
+    navigation_template = get_template("beam/partials/navigation.html")
     request = context.get("request", None)
     return navigation_template.render({"apps": grouped, "request": request})
 
