@@ -28,6 +28,17 @@
                         {% blocktrans with verbose_name=options.verbose_name %}Create {{ verbose_name }}{% endblocktrans %}
                     </h1>
                 {% endblock %}
+
+                {% block form_buttons_top %}
+                    <div class="container-fluid mb-2">
+                        <div class="row">
+                            <div class="btn-group ml-auto">
+                                <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endblock %}
+
                 {% include "beam/partials/form_layout.html" with form=form fields=viewset_context.fields layout=viewset_context.layout only %}
             </div>
         </section>
@@ -61,7 +72,13 @@
         <section>
             <div class="container">
                 {% block form_buttons %}
-                    <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+                    <div class="container-fluid mb-2">
+                        <div class="row">
+                            <div class="btn-group ml-auto">
+                                <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+                            </div>
+                        </div>
+                    </div>
                 {% endblock %}
             </div>
         </section>
