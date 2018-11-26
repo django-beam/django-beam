@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-23 11:55+0100\n"
+"POT-Creation-Date: 2018-11-26 09:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,74 +18,104 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: themes/bootstrap4/templates/beam/dashboard.html:18
+#: src/beam/themes/bootstrap4/templates/beam/dashboard.html:18
 msgid "List"
 msgstr "Liste"
 
-#: themes/bootstrap4/templates/beam/dashboard.html:19
+#: src/beam/themes/bootstrap4/templates/beam/dashboard.html:19
 msgid "Create"
 msgstr "Anlegen"
 
-#: themes/bootstrap4/templates/beam/delete.html:12
+#: src/beam/themes/bootstrap4/templates/beam/delete.html:12
 #, python-format
 msgid "Delete %(object)s"
 msgstr "Lösche %(object)s"
 
-#: themes/bootstrap4/templates/beam/delete.html:18
+#: src/beam/themes/bootstrap4/templates/beam/delete.html:18
 msgid "Are you sure you want to delete this object:"
 msgstr "Sind Sie sicher, dass sie dieses Objekt löschen wollen?"
 
-#: themes/bootstrap4/templates/beam/delete.html:23
+#: src/beam/themes/bootstrap4/templates/beam/delete.html:23
 msgid "Yes, I'm sure"
 msgstr "Ja, ich bin sicher"
 
-#: themes/bootstrap4/templates/beam/detail.html:40
+#: src/beam/themes/bootstrap4/templates/beam/detail.html:40
 #, python-format
 msgid "There are no %(title)s"
 msgstr "Es gibt keine(n) %(title)s"
 
-#: themes/bootstrap4/templates/beam/form.html:28
+#: src/beam/themes/bootstrap4/templates/beam/form.html:28
 #, python-format
 msgid "Create %(verbose_name)s"
 msgstr "%(verbose_name)s anlegen"
 
-#: themes/bootstrap4/templates/beam/form.html:64
+#: src/beam/themes/bootstrap4/templates/beam/form.html:64
 msgid "Save"
 msgstr "Speichern"
 
-#: themes/bootstrap4/templates/beam/list.html:30
+#: src/beam/themes/bootstrap4/templates/beam/list.html:24
+msgid "Search the list below"
+msgstr "Die Liste durchsuchen"
+
+#: src/beam/themes/bootstrap4/templates/beam/list.html:28
+msgid "Clear"
+msgstr "Zurücksetzen"
+
+#: src/beam/themes/bootstrap4/templates/beam/list.html:30
+msgid "Search"
+msgstr "Suchen"
+
+#: src/beam/themes/bootstrap4/templates/beam/list.html:46
 msgid "Actions"
 msgstr "Aktionen"
 
-#: themes/bootstrap4/templates/beam/navigation.html:7
-msgid "Home"
-msgstr "Home"
+#: src/beam/themes/bootstrap4/templates/beam/list.html:69
+#, python-format
+msgid "Could not find any %(name)s for query \"%(search_query)s\""
+msgstr "Keine %(name)s für Suche \"%(search_query)s\" gefunden"
 
-#: themes/bootstrap4/templates/beam/partials/detail_field.html:25
+#: src/beam/themes/bootstrap4/templates/beam/list.html:71
+#, python-format
+msgid "Could not find any %(name)s"
+msgstr "Keine %(name)s gefunden"
+
+#: src/beam/themes/bootstrap4/templates/beam/partials/detail_field.html:25
 msgid "download"
 msgstr "runterladen"
 
-#: themes/bootstrap4/templates/beam/update.html:9
+#: src/beam/themes/bootstrap4/templates/beam/partials/navigation.html:8
+msgid "Home"
+msgstr "Home"
+
+#: src/beam/themes/bootstrap4/templates/beam/partials/navigation.html:45
+msgid "Change password"
+msgstr ""
+
+#: src/beam/themes/bootstrap4/templates/beam/partials/navigation.html:50
+msgid "Log out"
+msgstr ""
+
+#: src/beam/themes/bootstrap4/templates/beam/update.html:9
 #, python-format
 msgid "Update %(object)s"
 msgstr "%(object)s bearbeiten"
 
-#: viewsets.py:126
+#: src/beam/viewsets.py:127
 msgid "list"
 msgstr "alle zeigen"
 
-#: viewsets.py:135
+#: src/beam/viewsets.py:141
 msgid "create"
 msgstr "anlegen"
 
-#: viewsets.py:145
+#: src/beam/viewsets.py:151
 msgid "detail"
 msgstr "ansehen"
 
-#: viewsets.py:155
+#: src/beam/viewsets.py:161
 msgid "update"
 msgstr "bearbeiten"
 
-#: viewsets.py:165
+#: src/beam/viewsets.py:171
 msgid "delete"
 msgstr "löschen"

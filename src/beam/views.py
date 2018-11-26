@@ -1,6 +1,7 @@
 from django.forms import all_valid
 from django.shortcuts import redirect
-from django.views.generic.detail import SingleObjectMixin
+from extra_views import SearchableListMixin
+from extra_views.contrib.mixins import VALID_STRING_LOOKUPS
 
 from beam.registry import register
 from beam.viewsets import default_registry
@@ -141,9 +142,25 @@ class UpdateView(ViewSetContextMixin, UpdateWithInlinesMixin, generic.UpdateView
         return self.links["detail"].get_url(obj=self.object)
 
 
-class ListView(ViewSetContextMixin, generic.ListView):
+class ListView(SearchableListMixin, ViewSetContextMixin, generic.ListView):
+    @property
+    def search_fields(self):
+        if self.viewset_context["list_search_fields"] is not None:
+            return self.viewset_context["list_search_fields"]
+        return None
+
+    def get_search_query(self):
+        if not self.search_fields:
+            return ""
+        return super().get_search_query()
+
     def get_template_names(self):
         return super().get_template_names() + ["beam/list.html"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.get_search_query()
+        return context
 
 
 class DetailView(ViewSetContextMixin, InlinesMixin, generic.DetailView):

@@ -13,4 +13,5 @@ class SightingInline(RelatedInline):
 class DragonflyViewSet(ViewSet):
     inline_classes = [SightingInline]
     model = Dragonfly
+    list_search_fields = ["name"]
     fields = ["name", "age"]

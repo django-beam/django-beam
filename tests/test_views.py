@@ -13,6 +13,15 @@ def test_list(client):
 
 
 @mark.django_db
+def test_list_search(client):
+    Dragonfly.objects.create(name="alpha", age=12)
+    Dragonfly.objects.create(name="omega", age=99)
+    response = client.get(DragonflyViewSet().links["list"].get_url() + "?q=alpha")
+    assert b"alpha" in response.content
+    assert b"omega" not in response.content
+
+
+@mark.django_db
 def test_detail(client):
     alpha = Dragonfly.objects.create(name="alpha", age=47)
     Sighting.objects.create(name="Berlin", dragonfly=alpha)

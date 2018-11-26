@@ -3,6 +3,7 @@
 {% load beam_tags %}
 
 {% block content %}
+    {% get_options viewset_context.model as options %}
     <section>
         <div class="container">
             {% block links %}
@@ -12,41 +13,67 @@
             {% endblock %}
             {% block heading %}
                 <h1>
-                    {% get_options viewset_context.model as options %}
                     {{ options.verbose_name_plural|capfirst }}
                 </h1>
             {% endblock %}
 
+            {% block search %}
+                {% if view.search_fields %}
+                    <form method="get" id="search-form">
+                        <div class="input-group">
+                            <input name="q" type="text" value="{{ search_query }}" class="form-control" placeholder="{% trans 'Search the list below' %}" aria-label="{% trans 'Search the list below' %}" aria-describedby="search-form-input">
+                            <div class="input-group-append">
+
+                                {% if search_query %}
+                                    <a href="{{ request.path }}" class="btn btn-outline-secondary">{% trans "Clear" %}</a>
+                                {% endif %}
+                                <input type="submit" class="btn btn-outline-primary" type="button" value="{% trans 'Search' %}"/>
+                            </div>
+                        </div>
+                    </form>
+                {% endif %}
+            {% endblock %}
+
             {% block table %}
-                {% if object_list %}
-                    <table class="table table-striped">
-                        <thead>
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        {% for field in viewset_context.fields %}
+                            <th scope="col">
+                                {{ viewset_context.model|field_verbose_name:field|capfirst }}
+                            </th>
+                        {% endfor %}
+                        <th>{% trans "Actions" %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for object in object_list %}
                         <tr>
                             {% for field in viewset_context.fields %}
-                                <th scope="col">
-                                    {{ viewset_context.model|field_verbose_name:field|capfirst }}
-                                </th>
-                            {% endfor %}
-                            <th>{% trans "Actions" %}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for object in object_list %}
-                            <tr>
-                                {% for field in viewset_context.fields %}
-                                    <td>
-                                        {% include "beam/partials/detail_field.html" with object=object field_name=field %}
-                                    </td>
-                                {% endfor %}
                                 <td>
-                                    {% get_link_url links.detail object as detail_url %}
-                                    <a href="{{ detail_url }}" class="btn btn-sm btn-info">{{ links.detail.verbose_name|capfirst }}</a>
+                                    {% include "beam/partials/detail_field.html" with object=object field_name=field %}
                                 </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                            {% endfor %}
+                            <td>
+                                {% get_link_url links.detail object as detail_url %}
+                                <a href="{{ detail_url }}" class="btn btn-sm btn-info">{{ links.detail.verbose_name|capfirst }}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% if not object_list %}
+                    {% block no_results %}
+                    <p class="alert alert-info" role="alert">
+                        {% if search_query %}
+                            {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }} for query "{{ search_query }}"{% endblocktrans %}.
+                        {% else %}
+                            {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }}{% endblocktrans %}.
+                        {% endif %}
+                        </p>
+                    {% endblock %}
                 {% endif %}
+
             {% endblock %}
         </div>
     </section>

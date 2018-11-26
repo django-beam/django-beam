@@ -68,7 +68,7 @@ class BaseViewSet(metaclass=RegistryMetaClass):
         viewset_context = ViewsetContext()
         viewset_context["view_type"] = view_type
         viewset_context["viewset"] = self
-        for item_name in self._get_with_generic_fallback(view_type, "context_items"):
+        for item_name in self.get_context_items():
             try:
                 viewset_context[item_name] = self._get_with_generic_fallback(
                     view_type, item_name
@@ -117,11 +117,19 @@ class BaseViewSet(metaclass=RegistryMetaClass):
     def get_view_types(self):
         return self.view_types
 
+    def get_context_items(self):
+        return self.context_items
+
 
 class ListMixin(BaseViewSet):
     list_view_class = ListView
     list_url = ""
     list_verbose_name = _("list")
+
+    list_search_fields = None
+
+    def get_context_items(self):
+        return super().get_context_items() + ["list_search_fields"]
 
     def get_view_types(self):
         return super().get_view_types() + ["list"]
