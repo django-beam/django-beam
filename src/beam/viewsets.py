@@ -127,9 +127,10 @@ class ListMixin(BaseViewSet):
     list_verbose_name = _("list")
 
     list_search_fields = None
+    list_paginate_by = 25
 
     def get_context_items(self):
-        return super().get_context_items() + ["list_search_fields"]
+        return super().get_context_items() + ["list_search_fields", "list_paginate_by"]
 
     def get_view_types(self):
         return super().get_view_types() + ["list"]

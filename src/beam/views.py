@@ -149,6 +149,11 @@ class ListView(SearchableListMixin, ViewSetContextMixin, generic.ListView):
             return self.viewset_context["list_search_fields"]
         return None
 
+    def get_paginate_by(self, queryset):
+        if self.viewset_context["list_paginate_by"] is not None:
+            return self.viewset_context["list_paginate_by"]
+        return super().get_paginate_by(queryset)
+
     def get_search_query(self):
         if not self.search_fields:
             return ""
@@ -159,7 +164,7 @@ class ListView(SearchableListMixin, ViewSetContextMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['search_query'] = self.get_search_query()
+        context["search_query"] = self.get_search_query()
         return context
 
 

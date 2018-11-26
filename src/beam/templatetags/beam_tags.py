@@ -4,6 +4,7 @@ from django.db.models import Model, QuerySet, Manager, FieldDoesNotExist
 from django.db.models.fields.files import ImageFieldFile, FieldFile
 from django.template.loader import get_template
 from django.urls import NoReverseMatch
+from django.utils.http import urlencode
 
 from beam.registry import default_registry, get_viewset_for_model
 
@@ -119,3 +120,22 @@ def render_navigation(context):
 @register.simple_tag()
 def fields_to_layout(fields):
     return [[fields]]
+
+
+@register.simple_tag(takes_context=True)
+def preserve_query_string(context, **kwargs):
+    if not "request" in context:
+        raise Exception(
+            "The query_string tag requires django.core.context_processors.request"
+        )
+    request = context["request"]
+
+    get = request.GET.copy()
+
+    for item, value in kwargs.items():
+        if value == "":
+            get.pop(item, None)
+        else:
+            get[item] = value
+
+    return "?{}".format(urlencode(get.items()))

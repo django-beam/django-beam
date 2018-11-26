@@ -74,6 +74,35 @@
                     {% endblock %}
                 {% endif %}
 
+                {% block pagination %}
+                    {% if is_paginated %}
+                        <nav aria-label="{% trans 'pagination' %}">
+                            <ul class="pagination">
+                                {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{% preserve_query_string page=page_obj.previous_page_number  %}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                        <span class="sr-only">{% trans "Previous" %}</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% for page_number in paginator.page_range %}
+                                    <li class="page-item {% if page_number == page_obj.number %}active{% endif %}">
+                                        <a class="page-link" href="{% preserve_query_string page=page_number %}">{{ page_number }}</a>
+                                    </li>
+                                {% endfor %}
+                                {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{% preserve_query_string page=page_obj.next_page_number  %}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                        <span class="sr-only">{% trans "Next" %}</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                {% endblock %}
             {% endblock %}
         </div>
     </section>
