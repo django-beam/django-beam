@@ -47,33 +47,31 @@ class BaseViewSet(metaclass=RegistryMetaClass):
             url_kwargs=url_kwargs,
         )
 
-    def _get_with_generic_fallback(self, view_type, item_name, request):
+    def _get_with_generic_fallback(self, view_type, item_name):
         specific_getter_name = "get_{}_{}".format(view_type, item_name)
         specific_attribute_name = "{}_{}".format(view_type, item_name)
         generic_getter_name = "get_{}".format(item_name)
         generic_attribute_name = item_name
 
         if hasattr(self, specific_getter_name):
-            return getattr(self, specific_getter_name)(request)
+            return getattr(self, specific_getter_name)()
         if hasattr(self, specific_attribute_name):
             return getattr(self, specific_attribute_name)
         if hasattr(self, generic_getter_name):
-            return getattr(self, generic_getter_name)(request)
+            return getattr(self, generic_getter_name)()
         if hasattr(self, generic_attribute_name):
             return getattr(self, generic_attribute_name)
 
         raise ContextItemNotFound
 
-    def _get_viewset_context(self, view_type, request):
+    def _get_viewset_context(self, view_type):
         viewset_context = ViewsetContext()
         viewset_context["view_type"] = view_type
         viewset_context["viewset"] = self
-        for item_name in self._get_with_generic_fallback(
-            view_type, "context_items", request
-        ):
+        for item_name in self._get_with_generic_fallback(view_type, "context_items"):
             try:
                 viewset_context[item_name] = self._get_with_generic_fallback(
-                    view_type, item_name, request
+                    view_type, item_name
                 )
             except ContextItemNotFound:
                 pass
@@ -91,7 +89,7 @@ class BaseViewSet(metaclass=RegistryMetaClass):
         if hasattr(view_class, "viewset_context"):
 
             def wrapped_view(request, *args, **kwargs):  # FIXME wrap better
-                viewset_context = self._get_viewset_context(view_type, request) or {}
+                viewset_context = self._get_viewset_context(view_type) or {}
                 view.view_initkwargs["viewset_context"] = viewset_context
                 return view(request, *args, **kwargs)
 
