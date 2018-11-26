@@ -81,32 +81,49 @@
                 {% endif %}
 
                 {% block pagination %}
-                    {% if is_paginated %}
-                        <nav aria-label="{% trans 'pagination' %}">
-                            <ul class="pagination">
-                                {% if page_obj.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="{% preserve_query_string page=page_obj.previous_page_number  %}" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
-                                        <span class="sr-only">{% trans "Previous" %}</span>
-                                    </a>
-                                </li>
-                                {% endif %}
-                                {% for page_number in paginator.page_range %}
-                                    <li class="page-item {% if page_number == page_obj.number %}active{% endif %}">
-                                        <a class="page-link" href="{% preserve_query_string page=page_number %}">{{ page_number }}</a>
-                                    </li>
-                                {% endfor %}
-                                {% if page_obj.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="{% preserve_query_string page=page_obj.next_page_number  %}" aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                        <span class="sr-only">{% trans "Next" %}</span>
-                                    </a>
-                                </li>
-                                {% endif %}
-                            </ul>
-                        </nav>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <p class="pt-2">
+                                    {% if object_list %}
+                                        {% if is_paginated %}
+                                            {% blocktrans with total=page_obj.paginator.count start=page_obj.start_index end=page_obj.end_index name=options.verbose_name_plural %}Showing {{ start }} to {{ end }} of {{ total }} {{ name }}{% endblocktrans %}
+                                        {% else %}
+                                            {% blocktrans with total=page_obj.paginator.count start=page_obj.start_index end=page_obj.end_index name=options.verbose_name_plural %}Showing {{ total }} {{ name }}{% endblocktrans %}
+                                        {% endif %}
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <nav class="col-sm-6" aria-label="{% trans 'pagination' %}">
+                                {% if is_paginated %}
+                                <ul class="pagination justify-content-end">
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{% preserve_query_string page=page_obj.previous_page_number  %}" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                                <span class="sr-only">{% trans "Previous" %}</span>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {% for page_number in paginator.page_range %}
+                                        <li class="page-item {% if page_number == page_obj.number %}active{% endif %}">
+                                            <a class="page-link" href="{% preserve_query_string page=page_number %}">{{ page_number }}</a>
+                                        </li>
+                                    {% endfor %}
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{% preserve_query_string page=page_obj.next_page_number  %}" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                                <span class="sr-only">{% trans "Next" %}</span>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+
+
+                        </div>
+
                     {% endif %}
                 {% endblock %}
             {% endblock %}
