@@ -33,6 +33,11 @@ class ViewSetContextMixin(ContextMixin):
             return self.viewset_context["queryset"]
         return super().get_queryset()
 
+    def get_form_class(self):
+        if self.viewset_context["form_class"] is not None:
+            return self.viewset_context["form_class"]
+        return super().get_form_class()
+
     @property
     def fields(self):
         if self.viewset_context["fields"] is not None:

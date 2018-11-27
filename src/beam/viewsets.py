@@ -18,13 +18,14 @@ class ContextItemNotFound(Exception):
 class BaseViewSet(metaclass=RegistryMetaClass):
     registry = default_registry
     view_types = []
-    context_items = ["model", "fields", "queryset", "inline_classes", "layout"]
+    context_items = ["model", "fields", "queryset", "inline_classes", "layout", "form_class"]
 
     model = None
     fields = None
     layout = None
     queryset = None
     inline_classes = None
+    form_class = None
 
     @property
     def links(self):
