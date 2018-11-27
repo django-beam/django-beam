@@ -24,13 +24,13 @@
                     {{ field.content|safe }}
                 </div>
             {% else %}
-                {% get_field form field as form_field %}
+                {% get_form_field form field as form_field %}
                 {% if form_field is None %}
                     <dt class="col-sm-4 col-md-4 col-lg-3">
                         {{ form.instance|field_verbose_name:field|capfirst }}
                     </dt>
                     <dd class="col-sm-8 col-md-8 col-lg-9">
-                        {% include "beam/partials/detail_field.html" with object=form.instance field_name=field %}
+                        {% include "beam/partials/detail_field.html" with object=form.instance field=field %}
                     </dd>
                 {% elif not form_field.is_hidden %}
                     <dt class="col-sm-4 col-md-4 col-lg-3">

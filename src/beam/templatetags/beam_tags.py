@@ -20,12 +20,17 @@ def get_link_url(link, obj=None):
 
 
 @register.simple_tag
-def get_attribute(obj, field_name):
-    if not hasattr(obj, field_name):
+def get_attribute(obj, field):
+    if getattr(field, 'is_virtual', False):
+        return field.get_value(obj)
+
+    if not hasattr(obj, field):
         return None
-    if hasattr(obj, "get_{}_display".format(field_name)):
-        return getattr(obj, "get_{}_display".format(field_name))
-    value = getattr(obj, field_name)
+
+    if hasattr(obj, "get_{}_display".format(field)):
+        return getattr(obj, "get_{}_display".format(field))
+
+    value = getattr(obj, field)
 
     if isinstance(value, Manager):
         return value.all()
@@ -34,9 +39,9 @@ def get_attribute(obj, field_name):
 
 
 @register.simple_tag
-def get_field(form, field_name):
+def get_form_field(form, field):
     try:
-        return form[field_name]
+        return form[field]
     except KeyError:
         return None
 
@@ -91,15 +96,18 @@ def get_options(instance_or_model):
 
 
 @register.filter
-def field_verbose_name(instance, field_name):
+def field_verbose_name(instance, field):
+    if hasattr(field, 'verbose_name'):
+        return field.verbose_name
+
     options = get_options(instance)
 
     try:
-        field = options.get_field(field_name)
+        model_field = options.get_field(field)
+        return model_field.verbose_name
     except FieldDoesNotExist:
-        field = getattr(instance, field_name, None)
-
-    return getattr(field, "verbose_name", field_name.replace("_", " "))
+        value = getattr(instance, field, None)
+        return getattr(value, "verbose_name", field.replace("_", " "))
 
 
 @register.simple_tag(takes_context=True)

@@ -51,7 +51,7 @@
                         <tr>
                             {% for field in viewset_context.fields %}
                                 <td>
-                                    {% include "beam/partials/detail_field.html" with object=object field_name=field %}
+                                    {% include "beam/partials/detail_field.html" with object=object field=field %}
                                 </td>
                             {% endfor %}
                             <td class="btn-group">

@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load beam_tags %}
 
-{% get_attribute object field_name as value %}
+{% get_attribute object field as value %}
 {% if value|is_queryset %}
     {% for related in value %}
         {% get_url_for_related related "detail" as related_url %}
