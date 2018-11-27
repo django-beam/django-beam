@@ -31,7 +31,9 @@ class BaseViewSet(metaclass=RegistryMetaClass):
     def links(self):
         links = OrderedDict()
         for view_type in self.get_view_types():
-            links[view_type] = self._get_link(view_type)
+            link = self._get_link(view_type)
+            if link:
+                links[view_type] = link
         return links
 
     def _get_url_kwargs(self, view_type):
@@ -111,6 +113,7 @@ class BaseViewSet(metaclass=RegistryMetaClass):
 
     def get_urls(self):
         urlpatterns = []
+        # FIXME maybe move patterns that contain wildcards to the end?
         for view_type in self.get_view_types():
             urlpatterns.append(self._get_url(view_type))
         return urlpatterns
