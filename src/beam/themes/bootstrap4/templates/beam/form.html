@@ -3,6 +3,9 @@
 {% load crispy_forms_tags %}
 {% load beam_tags %}
 
+{% block extra_script %}{{ block.super }}{{ form.media.js }}{% endblock %}
+{% block extra_styles %}{{ block.super }}{{ form.media.css }}{% endblock %}
+
 {% block content %}
     <form method="post" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
