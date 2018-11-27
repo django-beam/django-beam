@@ -3,7 +3,7 @@
 {% load crispy_forms_tags %}
 {% load beam_tags %}
 
-{% block extra_script %}{{ block.super }}{{ form.media.js }}{% endblock %}
+{% block extra_scripts %}{{ block.super }}{{ form.media.js }}{% endblock %}
 {% block extra_styles %}{{ block.super }}{{ form.media.css }}{% endblock %}
 
 {% block content %}
