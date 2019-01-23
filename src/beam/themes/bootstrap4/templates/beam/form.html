@@ -48,27 +48,46 @@
 
         {% block inlines %}
             {% for inline in inlines %}
-                <section class="border-top">
-                    <div class="container">
-                        {% block inline %}
+                {% block inline %}
+                    <section id="{{ inline.formset.prefix }}-group" class="border-top js-django-inlines inline-group">
+                        <div class="container">
                             <h2 class="pt-2">{{ inline.get_title|capfirst }}</h2>
                             {{ inline.formset.management_form }}
-                            {% for form in inline.formset %}
-                                {% if form.non_field_errors %}
-                                    <div class="alert alert-block alert-danger">
-                                        <ul>
-                                            {{ form.non_field_errors|unordered_list }}
-                                        </ul>
+
+                            <div class="inline-group">
+                                {% for form in inline.formset %}
+                                    <div id="{{ inline.formset.prefix }}-{{ forloop.counter0 }}" class="inline-related">
+                                        {% if form.non_field_errors %}
+                                            <div class="alert alert-block alert-danger">
+                                                <ul>
+                                                    {{ form.non_field_errors|unordered_list }}
+                                                </ul>
+                                            </div>
+                                        {% endif %}
+                                        {% if inline.formset.can_delete %}
+                                            <button class="btn btn-warning btn-sm js-remove-form pull-right">{% trans "delete" %}</button>
+                                        {% endif %}
+                                        {% include "beam/partials/form_layout.html" with form=form fields=inline.fields layout=inline.layout only %}
                                     </div>
-                                {% endif %}
-                                {% include "beam/partials/form_layout.html" with form=form fields=inline.fields layout=inline.layout only %}
-                            {% endfor %}
-                            <div class="d-none empty-form">
-                                {% include "beam/partials/form_layout.html" with form=inline.formset.empty_form fields=inline.fields layout=inline.layout only %}
+                                {% endfor %}
+                                <div class="inline-related empty-form d-none">
+                                    {% if inline.formset.can_delete %}
+                                        <button class="btn btn-warning btn-sm js-remove-form pull-right">{% trans "delete" %}</button>
+                                    {% endif %}
+                                    {% include "beam/partials/form_layout.html" with form=inline.formset.empty_form fields=inline.fields layout=inline.layout only %}
+                                </div>
                             </div>
-                        {% endblock %}
-                    </div>
-                </section>
+                            <div class="container-fluid mb-2">
+                                <div class="row">
+                                    <div class="btn-group ml-auto">
+                                        {% get_options inline.formset.model as inline_options %}
+                                        <button class="btn btn-secondary btn-sm js-add-form">{% blocktrans with name=inline_options.verbose_name %}add {{ name }}{% endblocktrans %}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                {% endblock %}
             {% endfor %}
         {% endblock %}
 

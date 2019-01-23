@@ -1,7 +1,5 @@
 from django.forms import inlineformset_factory
 
-from beam.utils import layout_contains_fields
-
 
 class RelatedInline(object):
     model = None
@@ -19,12 +17,6 @@ class RelatedInline(object):
         self.request = request
         self._formset = None
         assert self.foreign_key_field, "you must set a foreign key field"
-        if self.can_delete and self.layout:
-            assert layout_contains_fields(
-                self.layout, ["DELETE"]
-            ), "if you set can_delete you should place the delete field in the layout for {}".format(
-                repr(self)
-            )
 
     @property
     def formset(self):
