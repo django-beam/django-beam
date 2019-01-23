@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-26 19:06+0100\n"
+"POT-Creation-Date: 2019-01-23 17:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -50,9 +49,19 @@ msgid "Create %(verbose_name)s"
 msgstr "%(verbose_name)s anlegen"
 
 #: themes/bootstrap4/templates/beam/form.html:39
-#: themes/bootstrap4/templates/beam/form.html:81
+#: themes/bootstrap4/templates/beam/form.html:100
 msgid "Save"
 msgstr "Speichern"
+
+#: themes/bootstrap4/templates/beam/form.html:68
+#: themes/bootstrap4/templates/beam/form.html:75 viewsets.py:176
+msgid "delete"
+msgstr "löschen"
+
+#: themes/bootstrap4/templates/beam/form.html:84
+#, python-format
+msgid "add %(name)s"
+msgstr "%(name)s hinzufügen"
 
 #: themes/bootstrap4/templates/beam/list.html:24
 msgid "Search the list below"
@@ -80,25 +89,25 @@ msgstr "Keine %(name)s für Suche \"%(search_query)s\" gefunden"
 msgid "Could not find any %(name)s"
 msgstr "Keine %(name)s gefunden"
 
-#: themes/bootstrap4/templates/beam/list.html:90
+#: themes/bootstrap4/templates/beam/list.html:89
 #, python-format
 msgid "Showing %(start)s to %(end)s of %(total)s %(name)s"
 msgstr "%(start)s bis %(end)s von %(total)s %(name)s"
 
-#: themes/bootstrap4/templates/beam/list.html:92
+#: themes/bootstrap4/templates/beam/list.html:91
 #, python-format
 msgid "Showing %(total)s %(name)s"
 msgstr "%(total)s %(name)s"
 
-#: themes/bootstrap4/templates/beam/list.html:98
+#: themes/bootstrap4/templates/beam/list.html:97
 msgid "pagination"
 msgstr ""
 
-#: themes/bootstrap4/templates/beam/list.html:105
+#: themes/bootstrap4/templates/beam/list.html:104
 msgid "Previous"
 msgstr ""
 
-#: themes/bootstrap4/templates/beam/list.html:118
+#: themes/bootstrap4/templates/beam/list.html:117
 msgid "Next"
 msgstr ""
 
@@ -123,22 +132,24 @@ msgstr ""
 msgid "Update %(object)s"
 msgstr "%(object)s bearbeiten"
 
-#: viewsets.py:128
+#: viewsets.py:131
 msgid "list"
 msgstr "alle zeigen"
 
-#: viewsets.py:143
+#: viewsets.py:146
 msgid "create"
 msgstr "anlegen"
 
-#: viewsets.py:153
+#: viewsets.py:156
 msgid "detail"
 msgstr "ansehen"
 
-#: viewsets.py:163
+#: viewsets.py:166
 msgid "update"
 msgstr "bearbeiten"
 
-#: viewsets.py:173
-msgid "delete"
-msgstr "löschen"
+#~ msgid "remove"
+#~ msgstr "entfernen"
+
+#~ msgid "add another"
+#~ msgstr "hinzufügen"
