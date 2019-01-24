@@ -21,7 +21,7 @@ def get_link_url(link, obj=None):
 
 @register.simple_tag
 def get_attribute(obj, field):
-    if getattr(field, 'is_virtual', False):
+    if getattr(field, "is_virtual", False):
         return field.get_value(obj)
 
     if not hasattr(obj, field):
@@ -97,7 +97,7 @@ def get_options(instance_or_model):
 
 @register.filter
 def field_verbose_name(instance, field):
-    if hasattr(field, 'verbose_name'):
+    if hasattr(field, "verbose_name"):
         return field.verbose_name
 
     options = get_options(instance)

@@ -18,7 +18,14 @@ class ContextItemNotFound(Exception):
 class BaseViewSet(metaclass=RegistryMetaClass):
     registry = default_registry
     view_types = []
-    context_items = ["model", "fields", "queryset", "inline_classes", "layout", "form_class"]
+    context_items = [
+        "model",
+        "fields",
+        "queryset",
+        "inline_classes",
+        "layout",
+        "form_class",
+    ]
 
     model = None
     fields = None
