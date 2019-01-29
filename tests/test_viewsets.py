@@ -2,7 +2,6 @@ from beam.viewsets import ViewSet
 
 
 def test_context_items_are_passed_to_viewset_context():
-
     class TestViewSet(ViewSet):
         context_items = ["foo"]
         foo = "attr-foo"
@@ -12,7 +11,6 @@ def test_context_items_are_passed_to_viewset_context():
 
 
 def test_non_context_attributes_are_not_passed_to_viewset_context():
-
     class TestViewSet(ViewSet):
         context_items = []
         foo = "attr-foo"
@@ -22,7 +20,6 @@ def test_non_context_attributes_are_not_passed_to_viewset_context():
 
 
 def test_context_items_prefer_getter_over_attribute():
-
     class TestViewSet(ViewSet):
         context_items = ["foo"]
         foo = "attr-foo"
@@ -35,7 +32,6 @@ def test_context_items_prefer_getter_over_attribute():
 
 
 def test_context_items_prefer_specific_attribute_over_getter():
-
     class TestViewSet(ViewSet):
         context_items = ["foo"]
 
@@ -49,7 +45,6 @@ def test_context_items_prefer_specific_attribute_over_getter():
 
 
 def test_context_items_prefer_specific_getter_over_specific_attribute():
-
     class TestViewSet(ViewSet):
         context_items = ["foo"]
 
@@ -63,7 +58,6 @@ def test_context_items_prefer_specific_getter_over_specific_attribute():
 
 
 def test_missing_context_items_are_not_passed():
-
     class TestViewSet(ViewSet):
         context_items = ["foo", "bar"]
         foo = "foo"

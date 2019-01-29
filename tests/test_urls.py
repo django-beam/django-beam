@@ -5,7 +5,7 @@ from testapp.views import DragonflyViewSet
 
 
 def test_get_urls_produces_urls():
-    assert len(DragonflyViewSet().get_urls()) == 5
+    assert len(DragonflyViewSet().get_urls()) == 6
 
 
 expected_view_types = ["list", "detail", "update", "create", "delete"]
@@ -67,3 +67,11 @@ def test_get_link_urls_that_require_object(view_type, url):
     instance = Dragonfly(pk=123)
     link = dict(DragonflyViewSet().links)[view_type]
     assert get_link_url(link, instance) == url
+
+
+def test_link_type_with_extra_context():
+    instance = Dragonfly(pk=123)
+    link = DragonflyViewSet().links["extra"]
+    assert (
+        get_link_url(link, instance, special="param") == "/dragonfly/extra/123/param/"
+    )

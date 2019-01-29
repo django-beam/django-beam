@@ -199,14 +199,15 @@ class ViewLink:
         self.verbose_name = verbose_name
         self.url_kwargs = url_kwargs
 
-    def get_url(self, obj=None):
+    def get_url(self, obj=None, extra_kwargs=None):
         if not obj:
             return reverse(self.url_name)
 
         if not obj and self.url_kwargs:
             return
 
-        return reverse(
-            self.url_name,
-            kwargs={kwarg: getattr(obj, kwarg) for kwarg in self.url_kwargs},
-        )
+        kwargs = {kwarg: getattr(obj, kwarg) for kwarg in self.url_kwargs}
+        if extra_kwargs:
+            kwargs.update(extra_kwargs)
+
+        return reverse(self.url_name, kwargs=kwargs)
