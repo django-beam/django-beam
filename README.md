@@ -66,7 +66,7 @@ We currently ship only one theme.
   Using default Bootstrap v4 markup and include a basic Bootstrap CSS file.
 
   In order to use the bootstrap4 theme you have to install the optional dependency
-  `django-crispy-forms` and add it to your INSTALLED_APPS in settings.py:
+  `django-crispy-forms` and add it to your `INSTALLED_APPS` in settings.py:
   ```
   INSTALLED_APPS = (..., 'crispy_forms')
   ```
@@ -87,6 +87,13 @@ Add the mixin to your viewset, then use `django-autocomplete-light` as per the p
 example by overriding the widget dicts.
 
 ```python
+# settings.py
+INSTALLED_APPS = [
+    "dal",
+    "dal_select2",
+    ...
+]
+
 # views.py
 import beam
 from beam.contrib.autocomplete_light import AutocompleteMixin
