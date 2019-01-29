@@ -4,3 +4,4 @@ black
 recommonmark
 sphinx
 sphinx_rtd_theme
+django-reversion

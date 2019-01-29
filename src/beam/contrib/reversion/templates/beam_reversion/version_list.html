@@ -1,0 +1,41 @@
+{% extends "beam/detail.html" %}
+{% load i18n %}
+{% load beam_tags %}
+
+
+{% block heading %}
+    <h1>
+        {% get_options viewset_context.model as options %}
+        {{ object }}
+        <small class="text-muted">{% trans "history"|capfirst %}</small>
+    </h1>
+{% endblock %}
+
+{% block details %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>{% trans "date"|capfirst %}</th>
+            <th>{% trans "user"|capfirst %}</th>
+            <th>{% trans "action"|capfirst %}</th>
+        </tr>
+        </thead>
+        {% for version in versions %}
+            <tr>
+                {% get_link_url links.version_detail version.object version_id=version.pk as version_detail_url %}
+                <th scope="row"><a href="{{ version_detail_url }}">{{version.revision.date_created|date:"DATETIME_FORMAT"}}</a></th>
+                <td>
+                    {% if version.revision.user %}
+                        {{version.revision.user.get_username}}
+                        {% if version.revision.user.get_full_name %} ({{version.revision.user.get_full_name}}){% endif %}
+                    {% else %}
+                        &mdash;
+                    {% endif %}
+                </td>
+                <td>
+                    {{version.revision.get_comment|linebreaksbr|default:""}}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

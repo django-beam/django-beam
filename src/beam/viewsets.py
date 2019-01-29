@@ -7,7 +7,7 @@ from beam.registry import RegistryMetaClass, default_registry
 from .views import CreateView, UpdateView, DetailView, DeleteView, ListView
 
 
-class ViewsetContext(dict):
+class ViewSetContext(dict):
     pass
 
 
@@ -75,7 +75,7 @@ class BaseViewSet(metaclass=RegistryMetaClass):
         raise ContextItemNotFound
 
     def _get_viewset_context(self, view_type):
-        viewset_context = ViewsetContext()
+        viewset_context = ViewSetContext()
         viewset_context["view_type"] = view_type
         viewset_context["viewset"] = self
         for item_name in self.get_context_items():

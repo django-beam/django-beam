@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-23 17:45+0100\n"
+"POT-Creation-Date: 2019-01-29 12:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,44 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: contrib/autocomplete_light.py:67
+msgid "autocomplete"
+msgstr "Auto-Vervollständigung"
+
+#: contrib/reversion/templates/beam_reversion/version_detail.html:8
+#, python-format
+msgid "Version as of %(date)s"
+msgstr "Version von %(date)s"
+
+#: contrib/reversion/templates/beam_reversion/version_detail.html:17
+msgid "Revert to this version"
+msgstr "Auf diese Version zurücksetzen"
+
+#: contrib/reversion/templates/beam_reversion/version_list.html:10
+#: contrib/reversion/viewsets.py:34
+msgid "history"
+msgstr "Verlauf"
+
+#: contrib/reversion/templates/beam_reversion/version_list.html:18
+msgid "date"
+msgstr "Datum"
+
+#: contrib/reversion/templates/beam_reversion/version_list.html:19
+msgid "user"
+msgstr "Benutzer"
+
+#: contrib/reversion/templates/beam_reversion/version_list.html:20
+msgid "action"
+msgstr "Aktion"
+
+#: contrib/reversion/views.py:44
+msgid "revert to version {}"
+msgstr "Zurücksetzen auf Version {}"
+
+#: contrib/reversion/viewsets.py:24
+msgid "show version"
+msgstr "Version zeigen"
 
 #: themes/bootstrap4/templates/beam/dashboard.html:18
 msgid "List"
@@ -54,7 +92,7 @@ msgid "Save"
 msgstr "Speichern"
 
 #: themes/bootstrap4/templates/beam/form.html:68
-#: themes/bootstrap4/templates/beam/form.html:75 viewsets.py:176
+#: themes/bootstrap4/templates/beam/form.html:75 viewsets.py:183
 msgid "delete"
 msgstr "löschen"
 
@@ -132,21 +170,25 @@ msgstr ""
 msgid "Update %(object)s"
 msgstr "%(object)s bearbeiten"
 
-#: viewsets.py:131
+#: viewsets.py:138
 msgid "list"
 msgstr "alle zeigen"
 
-#: viewsets.py:146
+#: viewsets.py:153
 msgid "create"
 msgstr "anlegen"
 
-#: viewsets.py:156
+#: viewsets.py:163
 msgid "detail"
-msgstr "ansehen"
+msgstr "Detail-Ansicht"
 
-#: viewsets.py:166
+#: viewsets.py:173
 msgid "update"
 msgstr "bearbeiten"
+
+#~| msgid "detail"
+#~ msgid "version detail"
+#~ msgstr "Versions-Details"
 
 #~ msgid "remove"
 #~ msgstr "entfernen"

@@ -76,6 +76,20 @@ We currently ship only one theme.
 
 We include a `beam.contrib` package that provides integration with several third party django apps.
 
+### beam.contrib.reversion
+
+Provides a base viewset for integration with `django-reversion`.
+
+#### Usage
+First add `reversion` and `beam.contrib.reversion` to your installed apps.
+Either use `beam.contrib.reversion.VersionViewSet` as the base class for the 
+models where you want reversion or use the `VersionViewSetMixin`.
+
+By default create and update views are tracked. You can use the `versioned_view_types` 
+class attribute to control which view types are tracked.
+
+If you do not manually register your models with reversion then `VersionViewSet.model` is registered
+following all the inlines specified for the `versioned_view_types`.
 
 ### beam.contrib.autocomplete_light
 
