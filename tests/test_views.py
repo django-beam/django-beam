@@ -27,11 +27,21 @@ def test_detail(client):
     Sighting.objects.create(name="Berlin", dragonfly=alpha)
     Sighting.objects.create(name="Paris", dragonfly=alpha)
 
-    response_content = client.get(f"/dragonfly/{alpha.pk}/").content
-    assert b"alpha" in response_content
-    assert b"Title of sightings"
-    assert b"Berlin" in response_content
-    assert b"Paris" in response_content
+    links = DragonflyViewSet().links
+
+    response_content = client.get(links["detail"].get_url(alpha)).content.decode(
+        "utf-8"
+    )
+
+    assert "alpha" in response_content
+    assert "Title of sightings"
+    assert "Berlin" in response_content
+    assert "Paris" in response_content
+
+    assert 'href="{}"'.format(links["list"].get_url(alpha)) in response_content
+    assert 'href="{}"'.format(links["update"].get_url(alpha)) in response_content
+    assert 'href="{}"'.format(links["detail"].get_url(alpha)) not in response_content
+    assert 'href="{}"'.format(links["delete"].get_url(alpha)) not in response_content
 
 
 @mark.django_db

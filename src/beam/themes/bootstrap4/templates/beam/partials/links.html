@@ -4,9 +4,11 @@
 {% if links %}
     <div class="btn-group" role="group" aria-label="Actions">
         {% for link in links.values %}
-            {% get_link_url link object as url %}
-            {% if url and viewset_context.view_type != link.view_type %}
-                <a href="{{ url }}" class="btn btn-{% if link.view_type == 'delete' %}danger{% elif link.view_type == 'list' %}info{% else %}secondary{% endif %} btn-type-{{ link.view_type }}">{{ link.verbose_name|capfirst }}</a>
+            {% if not visible_links and link.view_type not in hidden_links|default:"" or link.view_type in visible_links and link.view_type not in hidden_links|default:"" %}
+                {% get_link_url link object as url %}
+                {% if url %}
+                    <a href="{{ url }}" class="btn btn-{% if link.view_type == 'delete' %}danger{% elif link.view_type == 'list' %}info{% else %}secondary{% endif %} btn-type-{{ link.view_type }}">{{ link.verbose_name|capfirst }}</a>
+                {% endif %}
             {% endif %}
         {% endfor %}
     </div>
