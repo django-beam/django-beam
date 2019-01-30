@@ -1,0 +1,22 @@
+{% extends "beam/detail.html" %}
+{% load i18n %}
+{% load beam_tags %}
+
+{% block heading %}
+    <h1>
+        {{ version }}
+        <small>{% blocktrans with date=version.revision.date_created %}Version as of {{ date }}{% endblocktrans %}</small>
+    </h1>
+{% endblock %}
+
+{% block below_inlines %}
+    <section class="border-top">
+        <div class="container">
+            <form method="post">
+                {% csrf_token %}
+                <input class="btn btn-danger float-right" type="submit" value="{% trans "Revert to this version" %}">
+            </form>
+        </div>
+    </section>
+{% endblock %}
+

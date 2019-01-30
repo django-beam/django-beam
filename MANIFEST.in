@@ -1,1 +1,7 @@
 recursive-include src/beam/themes *.html
+recursive-include src/beam/themes *.js
+recursive-include src/beam/themes *.css
+
+recursive-include src/beam/contrib *.html
+recursive-include src/beam/contrib *.js
+recursive-include src/beam/contrib *.css

@@ -12,9 +12,9 @@ register = template.Library()
 
 
 @register.simple_tag
-def get_link_url(link, obj=None):
+def get_link_url(link, obj=None, **extra_kwargs):
     try:
-        return link.get_url(obj)
+        return link.get_url(obj, extra_kwargs)
     except NoReverseMatch:
         return None
 

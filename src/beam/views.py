@@ -13,6 +13,8 @@ from django.views.generic.base import ContextMixin, TemplateView
 class ViewSetContextMixin(ContextMixin):
     viewset_context = None
     links = None
+    hidden_links = None
+    visible_links = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -20,7 +22,17 @@ class ViewSetContextMixin(ContextMixin):
             context["viewset_context"] = self.viewset_context
         if "links" not in context:
             context["links"] = self.links
+        if "hidden_links" not in context:
+            context["hidden_links"] = self.get_hidden_links()
+        if "visible_links" not in context:
+            context["visible_links"] = self.visible_links
         return context
+
+    def get_hidden_links(self):
+        # default to hiding link to self
+        if self.hidden_links is not None:
+            return self.hidden_links
+        return [self.viewset_context["view_type"]]
 
     @property
     def model(self):
@@ -140,6 +152,8 @@ class CreateView(ViewSetContextMixin, CreateWithInlinesMixin, generic.CreateView
 
 
 class UpdateView(ViewSetContextMixin, UpdateWithInlinesMixin, generic.UpdateView):
+    hidden_links = ["create", "update"]
+
     def get_template_names(self):
         return super().get_template_names() + ["beam/update.html"]
 
@@ -174,6 +188,8 @@ class ListView(SearchableListMixin, ViewSetContextMixin, generic.ListView):
 
 
 class DetailView(ViewSetContextMixin, InlinesMixin, generic.DetailView):
+    hidden_links = ["detail", "delete"]
+
     def get_template_names(self):
         return super().get_template_names() + ["beam/detail.html"]
 

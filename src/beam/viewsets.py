@@ -7,7 +7,7 @@ from beam.registry import RegistryMetaClass, default_registry
 from .views import CreateView, UpdateView, DetailView, DeleteView, ListView
 
 
-class ViewsetContext(dict):
+class ViewSetContext(dict):
     pass
 
 
@@ -75,7 +75,7 @@ class BaseViewSet(metaclass=RegistryMetaClass):
         raise ContextItemNotFound
 
     def _get_viewset_context(self, view_type):
-        viewset_context = ViewsetContext()
+        viewset_context = ViewSetContext()
         viewset_context["view_type"] = view_type
         viewset_context["viewset"] = self
         for item_name in self.get_context_items():
@@ -199,14 +199,15 @@ class ViewLink:
         self.verbose_name = verbose_name
         self.url_kwargs = url_kwargs
 
-    def get_url(self, obj=None):
+    def get_url(self, obj=None, extra_kwargs=None):
         if not obj:
             return reverse(self.url_name)
 
         if not obj and self.url_kwargs:
             return
 
-        return reverse(
-            self.url_name,
-            kwargs={kwarg: getattr(obj, kwarg) for kwarg in self.url_kwargs},
-        )
+        kwargs = {kwarg: getattr(obj, kwarg) for kwarg in self.url_kwargs}
+        if extra_kwargs:
+            kwargs.update(extra_kwargs)
+
+        return reverse(self.url_name, kwargs=kwargs)
