@@ -1,4 +1,5 @@
 from dal import autocomplete
+from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 
@@ -82,3 +83,44 @@ class AutocompleteMixin(BaseViewSet):
         if view_type == "autocomplete":
             return None
         return super()._get_link(view_type)
+
+
+class BeamSelect2StyleMixin(object):
+    """
+    A mixin that makes select2 play nicely with the bootstrap theme.
+    """
+
+    @property
+    def media(self):
+        # override media to remove the autocomplete light css customizations because they look broken with
+        # the bootstrap theme
+        media = super().media
+        media._css["screen"] = tuple(
+            style
+            for style in media._css["screen"]
+            if style != "autocomplete_light/select2.css"
+        )
+        return media
+
+    def build_attrs(self, *args, **kwargs):
+        # default to width 100%
+        attrs = super().build_attrs(*args, **kwargs)
+
+        if "data-width" not in attrs:
+            attrs["data-width"] = "100%"
+
+        return attrs
+
+
+class BeamModelSelect2(BeamSelect2StyleMixin, autocomplete.ModelSelect2):
+    pass
+
+
+class BeamModelSelect2Multiple(
+    BeamSelect2StyleMixin, autocomplete.ModelSelect2Multiple
+):
+    pass
+
+
+class BeamListSelect2(BeamSelect2StyleMixin, autocomplete.ListSelect2):
+    pass

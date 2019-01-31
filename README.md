@@ -8,8 +8,7 @@
 django-beam provides you with a set of views, templates and integrations for the most common CRUD
 applications.
 
-The goal is having the functionality provided by django's own admin, but in a way that integrates
-with your other frontend code.
+The goal is having the functionality provided by django's own admin, but in a way that integrates with your other frontend code.
 
 ## Features
 - CRUD operations based on class based views
@@ -94,6 +93,9 @@ following all the inlines specified for the `versioned_view_types`.
 ### beam.contrib.autocomplete_light
 
 Provides a viewset mixin for integration with `django-autocomplete-light`.
+It also comes with a `BeamSelect2StyleMixin` for the select2 widgets that makes it play nicely with the bootstrap theme.
+as well as the `BeamModelSelect2` and `BeamModelSelect2Multiple` widgets which already have that
+mixin applied.
 
 #### Usage
 
@@ -120,14 +122,14 @@ class GroupViewSet(AutocompleteMixin, beam.ViewSet):
 from django import forms
 from people.models import Person
 
-from dal import autocomplete
+from beam.contrib.autocomplete_light import BeamModelSelect2Multiple
 
 class PersonForm(forms.ModelForm):
     class Meta:
         model = Person
         fields = ["name", "email", "groups"]
         widgets = {
-            "groups": autocomplete.ModelSelect2Multiple(
+            "groups": BeamModelSelect2Multiple(
                 url="people_group_autocomplete"
             ),
         }
