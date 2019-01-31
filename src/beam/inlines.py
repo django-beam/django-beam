@@ -1,4 +1,4 @@
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, ModelForm
 
 
 class RelatedInline(object):
@@ -9,6 +9,7 @@ class RelatedInline(object):
     fields = []
     extra = 1
     can_delete = True
+    form_class = ModelForm
 
     def __init__(self, parent_instance=None, parent_model=None, request=None) -> None:
         super().__init__()
@@ -27,6 +28,7 @@ class RelatedInline(object):
     def construct_formset(self):
         return inlineformset_factory(
             parent_model=self.parent_model,
+            form=self.form_class,
             model=self.model,
             fk_name=self.foreign_key_field,
             extra=self.extra,
