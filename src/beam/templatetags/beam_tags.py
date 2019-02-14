@@ -13,6 +13,8 @@ register = template.Library()
 
 @register.simple_tag
 def get_link_url(link, obj=None, **extra_kwargs):
+    if not link:
+        return None
     try:
         return link.get_url(obj, extra_kwargs)
     except NoReverseMatch:
