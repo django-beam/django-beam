@@ -1,8 +1,10 @@
 {% load beam_tags %}
 {% load crispy_forms_tags %}
 
-{% if not layout %}
-    {% fields_to_layout fields as layout %}
+{% if fields and not layout %}
+    {% fields_to_layout form.fields as layout %}
+{% elif not fields and not layout %}
+    {% fields_to_layout form.fields as layout %}
 {% endif %}
 
 {% for row in layout %}
