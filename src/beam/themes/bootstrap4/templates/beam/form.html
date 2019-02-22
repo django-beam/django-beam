@@ -8,13 +8,7 @@
 {% block content %}
     <form method="post" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
-        {% if form.non_field_errors %}
-            <div class="alert alert-block alert-danger">
-                <ul>
-                    {{ form.non_field_errors|unordered_list }}
-                </ul>
-            </div>
-        {% endif %}
+
 
         <section>
             <div class="container">
@@ -39,6 +33,16 @@
                             </div>
                         </div>
                     </div>
+                {% endblock %}
+
+                {% block form_errors %}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-block alert-danger">
+                            <ul>
+                                {{ form.non_field_errors|unordered_list }}
+                            </ul>
+                        </div>
+                    {% endif %}
                 {% endblock %}
 
                 {% include "beam/partials/form_layout.html" with form=form fields=viewset_context.fields layout=viewset_context.layout only %}
