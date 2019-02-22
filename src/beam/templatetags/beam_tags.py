@@ -1,7 +1,8 @@
 from django import template
 from django.apps import apps
-from django.db.models import Model, QuerySet, Manager, FieldDoesNotExist
+from django.db.models import Model, QuerySet, Manager, FieldDoesNotExist, ManyToManyRel
 from django.db.models.fields.files import ImageFieldFile, FieldFile
+from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.template.loader import get_template
 from django.urls import NoReverseMatch
 from django.utils.http import urlencode
@@ -106,10 +107,20 @@ def field_verbose_name(instance, field):
 
     try:
         model_field = options.get_field(field)
-        return model_field.verbose_name
     except FieldDoesNotExist:
-        value = getattr(instance, field, None)
-        return getattr(value, "verbose_name", field.replace("_", " "))
+        model_field = None
+
+    if hasattr(model_field, "verbose_name"):
+        return model_field.verbose_name
+
+    if isinstance(model_field, ForeignObjectRel):
+        if model_field.multiple:
+            return model_field.related_model._meta.verbose_name_plural
+        else:
+            return model_field.related_model._meta.verbose_name
+
+    value = getattr(instance, field, None)
+    return getattr(value, "verbose_name", field.replace("_", " "))
 
 
 @register.simple_tag(takes_context=True)
