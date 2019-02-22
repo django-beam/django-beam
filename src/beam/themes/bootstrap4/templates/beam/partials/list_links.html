@@ -1,15 +1,14 @@
 {% load beam_tags %}
 
-{% get_visible_links links visible_links hidden_links as visible_not_hidden_links %}
 
-{% if visible_not_hidden_links %}
+{% if links %}
     <div class="btn-group" role="group" aria-label="Actions">
-        {% for link in visible_not_hidden_links %}
+        {% for link in links %}
             {% get_link_url link object as url %}
             {% if url %}
-                <a href="{{ url }}" class="btn btn-type-{{ link.view_type }}
+                <a href="{{ url }}" class="btn btn-sm btn-type-{{ link.view_type }}
                         {% if link.view_type == 'delete' %}btn-outline-danger
-                        {% elif link.view_type == 'create' or link.view_type == 'update' %}btn-primary
+                        {% elif link.view_type == 'detail' %}btn-outline-primary
                         {% else %}btn-outline-secondary{% endif %}
                       ">{{ link.verbose_name|capfirst }}</a>
             {% endif %}

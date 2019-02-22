@@ -181,6 +181,7 @@ class ListView(SearchableListMixin, ViewSetContextMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["search_query"] = self.get_search_query()
+        context["list_item_links"] = self.viewset_context.get("list_item_links", [])
         return context
 
 

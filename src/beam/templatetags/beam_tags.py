@@ -6,8 +6,10 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.template.loader import get_template
 from django.urls import NoReverseMatch
 from django.utils.http import urlencode
+from typing import Dict, List
 
 from beam.registry import default_registry, get_viewset_for_model
+from beam.viewsets import ViewLink
 
 register = template.Library()
 
@@ -160,3 +162,20 @@ def preserve_query_string(context, **kwargs):
             get[item] = value
 
     return "?{}".format(urlencode(get.items()))
+
+
+@register.simple_tag()
+def get_visible_links(
+    links: Dict[str, ViewLink],
+    visible_link_types: List[str],
+    hidden_link_types: List[str] = (),
+) -> List[ViewLink]:
+    links = links or {}
+    visible_link_types = visible_link_types or links.keys()
+    hidden_link_types = hidden_link_types
+
+    visible_links = []
+    for view_type in visible_link_types:
+        if view_type in links and view_type not in hidden_link_types:
+            visible_links.append(links[view_type])
+    return visible_links

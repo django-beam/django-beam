@@ -2,7 +2,9 @@
 {% load i18n %}
 {% load beam_tags %}
 
+
 {% block content %}
+    {% get_visible_links links list_item_links as visible_list_links %}
     {% get_options viewset_context.model as options %}
     <section>
         <div class="container">
@@ -43,7 +45,9 @@
                                 {{ viewset_context.model|field_verbose_name:field|capfirst }}
                             </th>
                         {% endfor %}
+                        {% if visible_list_links %}
                         <th>{% trans "Actions" %}</th>
+                        {% endif %}
                     </tr>
                     </thead>
                     <tbody>
@@ -54,16 +58,13 @@
                                     {% include "beam/partials/detail_field.html" with object=object field=field %}
                                 </td>
                             {% endfor %}
-                            <td class="btn-group">
-                                {% get_link_url links.update object as update_url %}
-                                {% if update_url %}
-                                <a href="{{ update_url }}" class="btn btn-sm btn-outline-secondary">{{ links.update.verbose_name|capfirst }}</a>
+                            {% block list_item_links %}
+                                {% if visible_list_links %}
+                                    <td class="btn-group">
+                                        {% include "beam/partials/list_links.html" with links=visible_list_links %}
+                                    </td>
                                 {% endif %}
-                                {% get_link_url links.detail object as detail_url %}
-                                {% if detail_url %}
-                                <a href="{{ detail_url }}" class="btn btn-sm btn-outline-primary">{{ links.detail.verbose_name|capfirst }}</a>
-                                {% endif %}
-                            </td>
+                            {% endblock %}
                         </tr>
                     {% endfor %}
                     </tbody>
