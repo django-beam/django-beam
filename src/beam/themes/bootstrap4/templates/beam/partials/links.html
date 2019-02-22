@@ -1,9 +1,10 @@
 {% load beam_tags %}
+{% load i18n %}
 
 {% get_visible_links links visible_links hidden_links as visible_not_hidden_links %}
 
 {% if visible_not_hidden_links %}
-    <div class="btn-group" role="group" aria-label="Actions">
+    <div class="btn-group" role="group" aria-label="{% trans "Actions" %}">
         {% for link in visible_not_hidden_links %}
             {% get_link_url link object as url %}
             {% if url %}

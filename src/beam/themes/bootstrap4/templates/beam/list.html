@@ -54,13 +54,13 @@
                     {% for object in object_list %}
                         <tr>
                             {% for field in viewset_context.fields %}
-                                <td>
+                                <td class="align-middle">
                                     {% include "beam/partials/detail_field.html" with object=object field=field %}
                                 </td>
                             {% endfor %}
                             {% block list_item_links %}
                                 {% if visible_list_links %}
-                                    <td class="btn-group">
+                                    <td>
                                         {% include "beam/partials/list_links.html" with links=visible_list_links %}
                                     </td>
                                 {% endif %}

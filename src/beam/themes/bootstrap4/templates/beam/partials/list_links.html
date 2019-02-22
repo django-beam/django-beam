@@ -1,8 +1,9 @@
 {% load beam_tags %}
+{% load i18n %}
 
 
 {% if links %}
-    <div class="btn-group" role="group" aria-label="Actions">
+    <div class="btn-group" role="group" aria-label="{% trans "Actions" %}">
         {% for link in links %}
             {% get_link_url link object as url %}
             {% if url %}
