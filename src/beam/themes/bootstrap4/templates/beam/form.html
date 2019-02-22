@@ -1,6 +1,5 @@
 {% extends "beam/base.html" %}
 {% load i18n %}
-{% load crispy_forms_tags %}
 {% load beam_tags %}
 
 {% block extra_scripts %}{{ block.super }}{{ form.media.js }}{% for inline in inlines %}{{ inline.formset.media.js }}{% endfor %}{% endblock %}
@@ -65,14 +64,14 @@
                                             </div>
                                         {% endif %}
                                         {% if inline.formset.can_delete %}
-                                            <button class="btn btn-outline-danger btn-sm js-remove-form pull-right">{% trans "delete" %}</button>
+                                            <button class="btn btn-outline-danger js-remove-form pull-right">{% trans "delete" %}</button>
                                         {% endif %}
                                         {% include "beam/partials/form_layout.html" with form=form fields=inline.fields layout=inline.layout only %}
                                     </div>
                                 {% endfor %}
                                 <div class="inline-related empty-form d-none">
                                     {% if inline.formset.can_delete %}
-                                        <button class="btn btn-outline-danger btn-sm js-remove-form pull-right">{% trans "delete" %}</button>
+                                        <button class="btn btn-outline-danger js-remove-form pull-right">{% trans "delete" %}</button>
                                     {% endif %}
                                     {% include "beam/partials/form_layout.html" with form=inline.formset.empty_form fields=inline.fields layout=inline.layout only %}
                                 </div>
@@ -82,7 +81,7 @@
                                     <div class="btn-group ml-auto">
                                         {% block inline_add_button %}
                                         {% get_options inline.formset.model as inline_options %}
-                                        <button class="btn btn-outline-primary btn-sm js-add-form">{% blocktrans with name=inline_options.verbose_name %}add {{ name }}{% endblocktrans %}</button>
+                                        <button class="btn btn-outline-primary js-add-form">{% blocktrans with name=inline_options.verbose_name %}add {{ name }}{% endblocktrans %}</button>
                                         {% endblock %}
                                     </div>
                                 </div>

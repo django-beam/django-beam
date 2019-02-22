@@ -1,5 +1,4 @@
 {% load beam_tags %}
-{% load crispy_forms_tags %}
 
 {% if fields and not layout %}
     {% fields_to_layout form.fields as layout %}
@@ -35,12 +34,14 @@
                         {% include "beam/partials/detail_field.html" with object=form.instance field=field %}
                     </dd>
                 {% elif not form_field.is_hidden %}
-                    <dt class="col-sm-4 col-md-4 col-lg-3">
-                        <label for="{{ form_field.auto_id }}">{{ form_field.label }}</label>
-                    </dt>
-                    <dd class="col-sm-8 col-md-8 col-lg-9">
+                    <div class="col-sm-4 col-md-4 col-lg-3 text-right">
+                        <label class="col-form-label col-form-label" for="{{ form_field.auto_id }}">
+                            {{ form_field.label }}<span class="text-muted small">{% if form_field.field.required %}*{% else %}&nbsp;{% endif %}</span>
+                        </label>
+                    </div>
+                    <div class="col-sm-8 col-md-8 col-lg-9">
                         {% include "bootstrap4/field.html" with field=form_field form_show_errors=True %}
-                    </dd>
+                    </div>
                 {% endif %}
             {% endif %}
         {% endfor %}
