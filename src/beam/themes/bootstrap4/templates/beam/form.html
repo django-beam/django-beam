@@ -80,8 +80,10 @@
                             <div class="container-fluid mb-2">
                                 <div class="row">
                                     <div class="btn-group ml-auto">
+                                        {% block inline_add_button %}
                                         {% get_options inline.formset.model as inline_options %}
                                         <button class="btn btn-secondary btn-sm js-add-form">{% blocktrans with name=inline_options.verbose_name %}add {{ name }}{% endblocktrans %}</button>
+                                        {% endblock %}
                                     </div>
                                 </div>
                             </div>
