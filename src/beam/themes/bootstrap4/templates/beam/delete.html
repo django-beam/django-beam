@@ -20,8 +20,9 @@
             <form method="post">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit" class="btn btn-danger">{% trans "Yes, I'm sure" %}</button>
+                <button type="submit" class="btn btn-danger float-left">{% trans "Yes, I'm sure" %}</button>
             </form>
+            <button class="btn btn-default float-left" onclick="window.history.back()">{% trans "No, go back." %}</button>
         </div>
     </section>
 {% endblock %}
