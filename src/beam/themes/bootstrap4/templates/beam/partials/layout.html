@@ -16,22 +16,22 @@
         {% elif row|length_is:4 %}
             <div class="col-md-3">
         {% endif %}
-    <dl class="row">
+    <div class="row">
         {% for field in col %}
             {% if field.is_html %}
                 <div class="col-sm-12">
                     {{ field.content|safe }}
                 </div>
             {% else %}
-                <dt class="col-sm-4 col-md-4 col-lg-3">
+                <div class="col-sm-4 col-md-4 col-lg-3 text-right font-weight-bold text-nowrap">
                     {{ object|field_verbose_name:field|capfirst }}
-                </dt>
-                <dd class="col-sm-8 col-md-8 col-lg-9">
+                </div>
+                <div class="col-sm-8 col-md-8 col-lg-9">
                     {% include "beam/partials/detail_field.html" with object=object field=field %}
-                </dd>
+                </div>
             {% endif %}
         {% endfor %}
-    </dl>
+    </div>
     </div>
     {% endfor %}
 </div>

@@ -19,27 +19,38 @@
                 </h1>
             {% endblock %}
 
-            {% block details %}
-                {% include "beam/partials/layout.html" with object=object layout=viewset_context.layout fields=viewset_context.fields %}
-            {% endblock %}
+            <div class="card bg-light mb-4">
+                <div class="card-body">
+                <div class="card-text">
+                    {% block details %}
+                        {% include "beam/partials/layout.html" with object=object layout=viewset_context.layout fields=viewset_context.fields %}
+                    {% endblock %}
+                </div>
+                </div>
+            </div>
         </div>
     </section>
 
     {% block inlines %}
         {% for inline in inlines %}
-            <section class="border-top">
+            <section>
                 <div class="container">
-                    {% block inline %}
-                        <h2 class="pt-2">{{ inline.get_title|capfirst }}</h2>
-                        {% for instance in inline.instances %}
-                            {% include "beam/partials/layout.html" with object=instance layout=inline.layout fields=inline.fields only %}
-                            {% if not forloop.last %}
-                                <hr>
-                            {% endif %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h2 class="mb-0">{{ inline.get_title|capfirst }}</h2>
+
+                    </div>
+                    <ul class="list-group list-group-flush mb-0">
+                            {% for instance in inline.instances %}
+                                <li class="list-group-item">
+                                {% include "beam/partials/layout.html" with object=instance layout=inline.layout fields=inline.fields only %}
+                                </li>
                             {% empty %}
-                            <p>{% blocktrans with title=inline.get_title %}There are no {{ title }}{% endblocktrans %}.</p>
-                        {% endfor %}
-                    {% endblock %}
+                                <p>{% blocktrans with title=inline.get_title %}There are no {{ title }}{% endblocktrans %}.</p>
+                            {% endfor %}
+                        </li>
+                    </ul>
+                </div>
                 </div>
             </section>
         {% endfor %}
