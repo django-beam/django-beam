@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-22 18:02+0100\n"
+"POT-Creation-Date: 2019-02-22 18:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -80,7 +80,7 @@ msgstr "Ja, ich bin sicher"
 msgid "No, go back."
 msgstr "Nein, zurück gehen."
 
-#: beam/themes/bootstrap4/templates/beam/detail.html:40
+#: beam/themes/bootstrap4/templates/beam/detail.html:46
 #, python-format
 msgid "There are no %(title)s"
 msgstr "Es gibt keine(n) %(title)s"
@@ -136,22 +136,27 @@ msgstr "Keine %(name)s gefunden"
 #: beam/themes/bootstrap4/templates/beam/list.html:90
 #, python-format
 msgid "Showing %(start)s to %(end)s of %(total)s %(name)s"
-msgstr "%(start)s bis %(end)s von %(total)s %(name)s"
+msgstr "%(name)s %(start)s bis %(end)s von %(total)s"
 
 #: beam/themes/bootstrap4/templates/beam/list.html:92
 #, python-format
-msgid "Showing %(total)s %(name)s"
-msgstr "%(total)s %(name)s"
+msgid "Showing %(total)s %(name_singular)s"
+msgstr "%(total)s %(name_singular)s"
 
-#: beam/themes/bootstrap4/templates/beam/list.html:98
+#: beam/themes/bootstrap4/templates/beam/list.html:94
+#, python-format
+msgid "Showing %(total)s %(name_plural)s"
+msgstr "%(total)s %(name_plural)s"
+
+#: beam/themes/bootstrap4/templates/beam/list.html:100
 msgid "pagination"
 msgstr ""
 
-#: beam/themes/bootstrap4/templates/beam/list.html:105
+#: beam/themes/bootstrap4/templates/beam/list.html:107
 msgid "Previous"
 msgstr ""
 
-#: beam/themes/bootstrap4/templates/beam/list.html:118
+#: beam/themes/bootstrap4/templates/beam/list.html:120
 msgid "Next"
 msgstr ""
 
@@ -191,13 +196,3 @@ msgstr "Detail-Ansicht"
 #: beam/viewsets.py:178
 msgid "update"
 msgstr "bearbeiten"
-
-#~| msgid "detail"
-#~ msgid "version detail"
-#~ msgstr "Versions-Details"
-
-#~ msgid "remove"
-#~ msgstr "entfernen"
-
-#~ msgid "add another"
-#~ msgstr "hinzufügen"
