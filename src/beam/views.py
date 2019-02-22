@@ -185,7 +185,7 @@ class ListView(SearchableListMixin, ViewSetContextMixin, generic.ListView):
 
 
 class DetailView(ViewSetContextMixin, InlinesMixin, generic.DetailView):
-    hidden_links = ["detail", "delete"]
+    hidden_links = ["detail", "delete", "create"]
 
     def get_template_names(self):
         return super().get_template_names() + ["beam/detail.html"]

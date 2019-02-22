@@ -57,11 +57,11 @@
                             <td class="btn-group">
                                 {% get_link_url links.update object as update_url %}
                                 {% if update_url %}
-                                <a href="{{ update_url }}" class="btn btn-sm btn-secondary">{{ links.update.verbose_name|capfirst }}</a>
+                                <a href="{{ update_url }}" class="btn btn-sm btn-outline-secondary">{{ links.update.verbose_name|capfirst }}</a>
                                 {% endif %}
                                 {% get_link_url links.detail object as detail_url %}
                                 {% if detail_url %}
-                                <a href="{{ detail_url }}" class="btn btn-sm btn-info">{{ links.detail.verbose_name|capfirst }}</a>
+                                <a href="{{ detail_url }}" class="btn btn-sm btn-outline-primary">{{ links.detail.verbose_name|capfirst }}</a>
                                 {% endif %}
                             </td>
                         </tr>

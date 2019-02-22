@@ -7,7 +7,11 @@
             {% if not visible_links and link.view_type not in hidden_links|default:"" or link.view_type in visible_links and link.view_type not in hidden_links|default:"" %}
                 {% get_link_url link object as url %}
                 {% if url %}
-                    <a href="{{ url }}" class="btn btn-{% if link.view_type == 'delete' %}danger{% elif link.view_type == 'list' %}info{% else %}secondary{% endif %} btn-type-{{ link.view_type }}">{{ link.verbose_name|capfirst }}</a>
+                    <a href="{{ url }}" class="btn btn-type-{{ link.view_type }}
+                        {% if link.view_type == 'delete' %}btn-outline-danger
+                        {% elif link.view_type == 'create' or link.view_type == 'update' %}btn-primary
+                        {% else %}btn-outline-secondary{% endif %}
+                      ">{{ link.verbose_name|capfirst }}</a>
                 {% endif %}
             {% endif %}
         {% endfor %}
