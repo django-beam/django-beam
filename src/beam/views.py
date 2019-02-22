@@ -68,12 +68,12 @@ class InlinesMixin(ContextMixin):
     def get_inline_classes(self):
         return self.inline_classes
 
-    def get_inlines(self):
+    def get_inlines(self, object=None):
         inlines = []
         for inline_class in self.get_inline_classes():
             inlines.append(
                 inline_class(
-                    parent_instance=self.object,
+                    parent_instance=object if object is not None else self.object,
                     parent_model=self.model,
                     request=self.request,
                 )
@@ -88,26 +88,23 @@ class InlinesMixin(ContextMixin):
 
 class CreateWithInlinesMixin(InlinesMixin):
     def post(self, request, *args, **kwargs):
+        self.object = None
         form_class = self.get_form_class()
         form = self.get_form(form_class)
 
-        # we update self.object here to ensure self.get_inlines uses the correct instance
         if form.is_valid():
-            self.object = form.save(commit=False)
-            form_validated = True
+            # we have to make sure that the same instance is used for form and inlines
+            inlines = self.get_inlines(object=form.save(commit=False))
         else:
-            self.object = form.instance
-            form_validated = False
+            inlines = self.get_inlines()
 
-        inlines = self.get_inlines()
-
-        if all_valid(inline.formset for inline in inlines) and form_validated:
+        if all_valid(inline.formset for inline in inlines) and form.is_valid():
             return self.form_valid(form, inlines)
 
         return self.form_invalid(form, inlines)
 
     def form_valid(self, form, inlines):
-        form.save()
+        self.object = form.save()
         for inline in inlines:
             inline.formset.save()
         return redirect(self.get_success_url())
@@ -132,7 +129,7 @@ class UpdateWithInlinesMixin(InlinesMixin):
         return self.form_invalid(form, inlines)
 
     def form_valid(self, form, inlines):
-        form.save()
+        self.object = form.save()
         for inline in inlines:
             inline.formset.save()
         return redirect(self.get_success_url())
