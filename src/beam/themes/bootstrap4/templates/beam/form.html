@@ -14,13 +14,13 @@
             <div class="container">
                 {% block links %}
                     <div class="float-right">
-                        {% include "beam/partials/links.html" %}
+                        {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
                     </div>
                 {% endblock %}
 
                 {% block heading %}
                     <h1>
-                        {% get_options viewset_context.model as options %}
+                        {% get_options component.model as options %}
                         {% blocktrans with verbose_name=options.verbose_name %}Create {{ verbose_name }}{% endblocktrans %}
                     </h1>
                 {% endblock %}
@@ -45,7 +45,7 @@
                     {% endif %}
                 {% endblock %}
 
-                {% include "beam/partials/form_layout.html" with form=form fields=viewset_context.fields layout=viewset_context.layout only %}
+                {% include "beam/partials/form_layout.html" with form=form fields=component.fields layout=component.layout only %}
             </div>
         </section>
 

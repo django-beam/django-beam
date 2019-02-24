@@ -8,12 +8,12 @@ def test_get_urls_produces_urls():
     assert len(DragonflyViewSet().get_urls()) == 6
 
 
-expected_view_types = ["list", "detail", "update", "create", "delete"]
+expected_component_names = ["list", "detail", "update", "create", "delete"]
 
 
-@mark.parametrize("view_type", expected_view_types)
-def test_get_links_contains_all_view_types(view_type):
-    assert view_type in DragonflyViewSet().links
+@mark.parametrize("component_name", expected_component_names)
+def test_get_links_contains_all_view_types(component_name):
+    assert component_name in DragonflyViewSet().links
 
 
 urls = {
@@ -69,7 +69,7 @@ def test_get_link_urls_that_require_object(view_type, url):
     assert get_link_url(link, instance) == url
 
 
-def test_link_type_with_extra_context():
+def test_component_url_with_extra_context():
     instance = Dragonfly(pk=123)
     link = DragonflyViewSet().links["extra"]
     assert (

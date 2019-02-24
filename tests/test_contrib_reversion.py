@@ -49,7 +49,9 @@ def test_unrelated_models_are_not_registered():
 @mark.django_db
 def test_using_create_view_creates_a_revision():
     user = get_user_model().objects.create()
-    create_view = VersionedDragonflyViewSet()._get_view("create")
+    create_view = VersionedDragonflyViewSet()._get_view(
+        VersionedDragonflyViewSet().components["create"]
+    )
 
     request = RequestFactory().post(
         "/dragonfly/create/",
@@ -88,7 +90,9 @@ def test_using_update_view_creates_a_revision():
     alpha = Dragonfly.objects.create(name="alpha", age=47)
 
     user = get_user_model().objects.create()
-    update_view = VersionedDragonflyViewSet()._get_view("update")
+    update_view = VersionedDragonflyViewSet()._get_view(
+        VersionedDragonflyViewSet().components["update"]
+    )
 
     request = RequestFactory().post(
         "/dragonfly/update/{}/".format(alpha.pk),
@@ -138,7 +142,9 @@ def test_revision_is_visible_in_list():
 
     assert Version.objects.get_for_object_reference(Dragonfly, alpha.pk).count() == 3
 
-    view = VersionedDragonflyViewSet()._get_view("version_list")
+    view = VersionedDragonflyViewSet()._get_view(
+        VersionedDragonflyViewSet().components["version_list"]
+    )
 
     response = view(request, pk=alpha.pk)
     response_content = response.rendered_content
@@ -170,13 +176,17 @@ def test_show_detail_from_previous_version():
     sighting.name = "Tokyo"
     sighting.save()
 
-    detail_view = VersionedDragonflyViewSet()._get_view("detail")
+    detail_view = VersionedDragonflyViewSet()._get_view(
+        VersionedDragonflyViewSet().components["detail"]
+    )
     detail_content = detail_view(request, pk=alpha.pk).rendered_content
 
     assert "beta" in detail_content
     assert "Tokyo" in detail_content
 
-    version_view = VersionedDragonflyViewSet()._get_view("version_detail")
+    version_view = VersionedDragonflyViewSet()._get_view(
+        VersionedDragonflyViewSet().components["version_detail"]
+    )
 
     version_content = version_view(
         request, pk=alpha.pk, version_id=version.pk
@@ -213,7 +223,9 @@ def test_revert_to_previous_version():
     sighting.name = "Tokyo"
     sighting.save()
 
-    version_view = VersionedDragonflyViewSet()._get_view("version_detail")
+    version_view = VersionedDragonflyViewSet()._get_view(
+        VersionedDragonflyViewSet().components["version_detail"]
+    )
     response = version_view(request, pk=alpha.pk, version_id=version.pk)
 
     assert response.status_code == 302

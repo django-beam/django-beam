@@ -6,20 +6,21 @@ from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.template.loader import get_template
 from django.urls import NoReverseMatch
 from django.utils.http import urlencode
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
+from beam.layouts import layout_links
 from beam.registry import default_registry, get_viewset_for_model
-from beam.viewsets import ViewLink
+from beam.components import BaseComponent
 
 register = template.Library()
 
 
 @register.simple_tag
-def get_link_url(link, obj=None, **extra_kwargs):
-    if not link:
+def get_link_url(component: BaseComponent, obj=None, **extra_kwargs):
+    if not component:
         return None
     try:
-        return link.get_url(obj, extra_kwargs)
+        return component.reverse(obj, extra_kwargs)
     except NoReverseMatch:
         return None
 
@@ -57,7 +58,7 @@ def is_queryset(value):
 
 
 @register.simple_tag(takes_context=True)
-def get_url_for_related(context, instance, view_type):
+def get_url_for_related(context, instance, component_name):
     opts = get_options(instance)
 
     viewset = context.get("viewset", None)
@@ -71,7 +72,7 @@ def get_url_for_related(context, instance, view_type):
     except KeyError:
         return None
 
-    return viewset().links[view_type].get_url(instance)
+    return viewset().components[component_name].reverse(instance)
 
 
 @register.filter
@@ -166,16 +167,21 @@ def preserve_query_string(context, **kwargs):
 
 @register.simple_tag()
 def get_visible_links(
-    links: Dict[str, ViewLink],
-    visible_link_types: List[str],
-    hidden_link_types: List[str] = (),
-) -> List[ViewLink]:
-    links = links or {}
-    visible_link_types = visible_link_types or links.keys()
-    hidden_link_types = hidden_link_types
+    links: Dict[str, BaseComponent],
+    link_layout: List[str],
+    obj: Model = None,
+    **extra_kwargs
+) -> List[Tuple[BaseComponent, str]]:
 
+    links = layout_links(links, link_layout)
     visible_links = []
-    for view_type in visible_link_types:
-        if view_type in links and view_type not in hidden_link_types:
-            visible_links.append(links[view_type])
+
+    for link in links:
+        try:
+            url = link.reverse(obj, extra_kwargs=extra_kwargs)
+        except NoReverseMatch:
+            url = None
+
+        if url:
+            visible_links.append((link, url))
     return visible_links

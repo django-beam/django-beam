@@ -5,7 +5,7 @@
 
 {% block heading %}
     <h1>
-        {% get_options viewset_context.model as options %}
+        {% get_options component.model as options %}
         {{ object }}
         <small class="text-muted">{% trans "history"|capfirst %}</small>
     </h1>

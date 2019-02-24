@@ -1,18 +1,16 @@
 {% load beam_tags %}
 {% load i18n %}
 
+{% get_visible_links links link_layout object as link_urls %}
 
-{% if links %}
+{% if link_urls %}
     <div class="btn-group" role="group" aria-label="{% trans "Actions" %}">
-        {% for link in links %}
-            {% get_link_url link object as url %}
-            {% if url %}
-                <a href="{{ url }}" class="btn btn-sm btn-type-{{ link.view_type }}
-                        {% if link.view_type == 'delete' %}btn-outline-danger
-                        {% elif link.view_type == 'detail' %}btn-outline-primary
-                        {% else %}btn-outline-secondary{% endif %}
-                      ">{{ link.verbose_name|capfirst }}</a>
-            {% endif %}
+        {% for link, url in link_urls %}
+        <a href="{{ url }}" class="btn btn-type-{{ link.name }} btn-sm
+                {% if link.name == 'delete' %}btn-outline-danger
+                {% elif link.name == 'create' or link.name == 'update' %}btn-outline-primary
+                {% else %}btn-outline-secondary{% endif %}
+              ">{{ link.verbose_name|capfirst }}</a>
         {% endfor %}
     </div>
 {% endif %}

@@ -8,7 +8,7 @@
         <div class="container">
             {% block heading %}
                 <h1>
-                    {% get_options viewset_context.model as options %}
+                    {% get_options component.model as options %}
                     {% blocktrans %}Delete {{ object }}{% endblocktrans %}
                     <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
                 </h1>

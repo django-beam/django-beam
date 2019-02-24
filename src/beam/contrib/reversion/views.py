@@ -18,8 +18,6 @@ class _RollBackRevisionView(Exception):
 
 
 class VersionDetailView(DetailView):
-    visible_links = ["version_list"]
-
     def get_context_data(self, **kwargs):
         kwargs["version"] = self.version
         return super().get_context_data(**kwargs)
@@ -40,12 +38,12 @@ class VersionDetailView(DetailView):
             with transaction.atomic(using=self.version.db):
                 # Revert the revision.
                 if request.method == "POST":
-                    with self.viewset_context["viewset"].create_revision(request):
+                    with self.viewset.create_revision(request):
                         set_comment(_("revert to version {}".format(self.version.pk)))
                         self.version.revision.revert(delete=True)
                         messages.success(request, "Reverted")
                         return HttpResponseRedirect(
-                            self.links["detail"].get_url(self.version.object)
+                            self.viewset.links["detail"].reverse(self.version.object)
                         )
                 else:
                     self.version.revision.revert(delete=True)
@@ -58,7 +56,7 @@ class VersionDetailView(DetailView):
         except RevertError as ex:
             messages.error(request, force_text(ex))
             return HttpResponseRedirect(
-                self.links["detail"].get_url(self.version.object)
+                self.viewset.links["detail"].reverse(self.version.object)
             )
         except _RollBackRevisionView as ex:
             return ex.response
@@ -68,8 +66,6 @@ class VersionDetailView(DetailView):
 
 
 class VersionListView(ViewSetContextMixin, generic.DetailView):
-    visible_links = ["detail"]
-
     def get_template_names(self):
         return ["beam_reversion/version_list.html"]
 

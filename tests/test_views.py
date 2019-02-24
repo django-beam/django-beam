@@ -7,7 +7,7 @@ from testapp.views import DragonflyViewSet
 def test_list(client):
     Dragonfly.objects.create(name="alpha", age=12)
     Dragonfly.objects.create(name="omega", age=99)
-    response = client.get(DragonflyViewSet().links["list"].get_url())
+    response = client.get(DragonflyViewSet().links["list"].reverse())
     assert b"alpha" in response.content
     assert b"omega" in response.content
 
@@ -16,7 +16,7 @@ def test_list(client):
 def test_list_search(client):
     Dragonfly.objects.create(name="alpha", age=12)
     Dragonfly.objects.create(name="omega", age=99)
-    response = client.get(DragonflyViewSet().links["list"].get_url() + "?q=alpha")
+    response = client.get(DragonflyViewSet().links["list"].reverse() + "?q=alpha")
     assert b"alpha" in response.content
     assert b"omega" not in response.content
 
@@ -29,7 +29,7 @@ def test_detail(client):
 
     links = DragonflyViewSet().links
 
-    response_content = client.get(links["detail"].get_url(alpha)).content.decode(
+    response_content = client.get(links["detail"].reverse(alpha)).content.decode(
         "utf-8"
     )
 
@@ -38,16 +38,16 @@ def test_detail(client):
     assert "Berlin" in response_content
     assert "Paris" in response_content
 
-    assert 'href="{}"'.format(links["list"].get_url(alpha)) in response_content
-    assert 'href="{}"'.format(links["update"].get_url(alpha)) in response_content
-    assert 'href="{}"'.format(links["detail"].get_url(alpha)) not in response_content
-    assert 'href="{}"'.format(links["delete"].get_url(alpha)) not in response_content
+    assert 'href="{}"'.format(links["list"].reverse(alpha)) in response_content
+    assert 'href="{}"'.format(links["update"].reverse(alpha)) in response_content
+    assert 'href="{}"'.format(links["detail"].reverse(alpha)) not in response_content
+    assert 'href="{}"'.format(links["delete"].reverse(alpha)) in response_content
 
 
 @mark.django_db
 def test_update(client):
     alpha = Dragonfly.objects.create(name="alpha", age=47)
-    response = client.get(DragonflyViewSet().links["update"].get_url(alpha))
+    response = client.get(DragonflyViewSet().links["update"].reverse(alpha))
     assert b"alpha" in response.content
     assert "form" in response.context
     assert response.context["form"]["name"].value() == "alpha"
@@ -71,7 +71,7 @@ def test_create_with_inlines(client):
     dragonfly = Dragonfly.objects.get(name="foobar")
 
     assert response.status_code == 302
-    assert response["location"] == DragonflyViewSet().links["detail"].get_url(dragonfly)
+    assert response["location"] == DragonflyViewSet().links["detail"].reverse(dragonfly)
 
     assert dragonfly.age == 81
     assert dragonfly.sighting_set.get().name == "Tokyo"
