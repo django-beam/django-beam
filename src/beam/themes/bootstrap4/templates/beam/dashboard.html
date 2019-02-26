@@ -15,11 +15,11 @@
                             <h3 class="card-title">{{ options.verbose_name_plural|capfirst }}</h3>
                         </div>
                         <div class="card-body">
-                            {% if viewset.links.list.get_url %}
-                            <a class="btn btn-primary" href="{{ viewset.links.list.get_url }}">{% trans "List" %}</a>
+                            {% if viewset.links.list.reverse %}
+                            <a class="btn btn-primary" href="{{ viewset.links.list.reverse }}">{% trans "List" %}</a>
                             {% endif %}
-                            {% if viewset.links.create.get_url %}
-                            <a class="btn btn-secondary" href="{{ viewset.links.create.get_url }}">{% trans "Create" %}</a>
+                            {% if viewset.links.create.reverse %}
+                            <a class="btn btn-secondary" href="{{ viewset.links.create.reverse }}">{% trans "Create" %}</a>
                             {% endif %}
                         </div>
                     </div>

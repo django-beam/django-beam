@@ -1,65 +1,46 @@
+from django.apps import apps
 from django.forms import all_valid
 from django.shortcuts import redirect
+from django.views import generic
+from django.views.generic.base import ContextMixin, TemplateView
 from extra_views import SearchableListMixin
-from extra_views.contrib.mixins import VALID_STRING_LOOKUPS
 
 from beam.registry import register
 from beam.viewsets import default_registry
-from django.apps import apps
-from django.views import generic
-from django.views.generic.base import ContextMixin, TemplateView
 
 
 class ViewSetContextMixin(ContextMixin):
-    viewset_context = None
-    links = None
-    hidden_links = None
-    visible_links = None
+    component = None
+    viewset = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if "viewset_context" not in context:
-            context["viewset_context"] = self.viewset_context
-        if "links" not in context:
-            context["links"] = self.links
-        if "hidden_links" not in context:
-            context["hidden_links"] = self.get_hidden_links()
-        if "visible_links" not in context:
-            context["visible_links"] = self.visible_links
-        return context
 
-    def get_hidden_links(self):
-        # default to hiding link to self
-        if self.hidden_links is not None:
-            return self.hidden_links
-        return [self.viewset_context["view_type"]]
+        context["viewset"] = self.viewset
+        context["component"] = self.component
+
+        return context
 
     @property
     def model(self):
-        if self.viewset_context["model"] is not None:
-            return self.viewset_context["model"]
-        return super().model
+        return self.component.model
 
     def get_queryset(self):
-        if self.viewset_context["queryset"] is not None:
-            return self.viewset_context["queryset"]
-        return super().get_queryset()
+        return self.component.queryset
 
     def get_form_class(self):
-        if self.viewset_context["form_class"] is not None:
-            return self.viewset_context["form_class"]
+        if self.component.form_class:
+            return self.component.form_class
         return super().get_form_class()
 
     @property
     def fields(self):
-        if self.viewset_context["fields"] is not None:
-            return self.viewset_context["fields"]
+        if self.component.fields:
+            return self.component.fields
         return super().fields
 
     def get_inline_classes(self):
-        if self.viewset_context["inline_classes"] is not None:
-            return self.viewset_context["inline_classes"]
-        return super().get_inline_classes()
+        return self.component.inline_classes
 
 
 class InlinesMixin(ContextMixin):
@@ -145,30 +126,24 @@ class CreateView(ViewSetContextMixin, CreateWithInlinesMixin, generic.CreateView
         return super().get_template_names() + ["beam/create.html"]
 
     def get_success_url(self):
-        return self.links["detail"].get_url(obj=self.object)
+        return self.viewset.links["detail"].reverse(obj=self.object)
 
 
 class UpdateView(ViewSetContextMixin, UpdateWithInlinesMixin, generic.UpdateView):
-    hidden_links = ["create", "update"]
-
     def get_template_names(self):
         return super().get_template_names() + ["beam/update.html"]
 
     def get_success_url(self):
-        return self.links["detail"].get_url(obj=self.object)
+        return self.viewset.links["detail"].reverse(obj=self.object)
 
 
 class ListView(SearchableListMixin, ViewSetContextMixin, generic.ListView):
     @property
     def search_fields(self):
-        if self.viewset_context["list_search_fields"] is not None:
-            return self.viewset_context["list_search_fields"]
-        return None
+        return self.component.list_search_fields
 
     def get_paginate_by(self, queryset):
-        if self.viewset_context["list_paginate_by"] is not None:
-            return self.viewset_context["list_paginate_by"]
-        return super().get_paginate_by(queryset)
+        return self.component.list_paginate_by
 
     def get_search_query(self):
         if not self.search_fields:
@@ -181,13 +156,11 @@ class ListView(SearchableListMixin, ViewSetContextMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["search_query"] = self.get_search_query()
-        context["list_item_links"] = self.viewset_context.get("list_item_links", [])
+        context["list_item_link_layout"] = self.component.list_item_link_layout
         return context
 
 
 class DetailView(ViewSetContextMixin, InlinesMixin, generic.DetailView):
-    hidden_links = ["detail", "delete", "create"]
-
     def get_template_names(self):
         return super().get_template_names() + ["beam/detail.html"]
 
@@ -197,7 +170,7 @@ class DeleteView(ViewSetContextMixin, InlinesMixin, generic.DeleteView):
         return super().get_template_names() + ["beam/delete.html"]
 
     def get_success_url(self):
-        return self.links["list"].get_url()
+        return self.viewset.links["list"].reverse()
 
 
 class DashboardView(TemplateView):

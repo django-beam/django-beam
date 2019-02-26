@@ -1,14 +1,28 @@
 from collections import OrderedDict
+from functools import wraps
+from logging import getLogger
+from typing import List, Tuple, Dict
 
-from django.urls import path, reverse
+from django.db.models import Model, QuerySet
+from django.forms import ModelForm
+from django.urls import path
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
+from django.views import View
 
 from beam.registry import RegistryMetaClass, default_registry
+from .components import BaseComponent, Component, FormComponent, ListComponent
+from .inlines import RelatedInline
 from .views import CreateView, UpdateView, DetailView, DeleteView, ListView
 
+logger = getLogger(__name__)
 
-class ViewSetContext(dict):
-    pass
+
+undefined = (
+    object()
+)  # sentinel value for attributes not defined or overwritten on the viewset
+
+LayoutType = List[List[List[str]]]
 
 
 class ContextItemNotFound(Exception):
@@ -17,202 +31,193 @@ class ContextItemNotFound(Exception):
 
 class BaseViewSet(metaclass=RegistryMetaClass):
     registry = default_registry
-    view_types = []
-    context_items = [
-        "model",
-        "fields",
-        "queryset",
-        "inline_classes",
-        "layout",
-        "form_class",
-    ]
 
-    model = None
+    model: Model = None
     fields = None
     layout = None
     queryset = None
-    inline_classes = None
+    inline_classes = []
     form_class = None
+    link_layout = None
+
+    def get_component_classes(self) -> List[Tuple[str, type(Component)]]:
+        return []
+
+    def _get_components(self) -> Dict[str, Component]:
+        components = OrderedDict()
+        for name, component in self.get_component_classes():
+            kwargs = self._resolve_component_kwargs(name, component.get_arguments())
+            components[name] = component(**kwargs)
+        return components
+
+    def _resolve_component_kwargs(self, component_name, arguments: List[str]):
+        component_kwargs = {}
+
+        specific_prefix = "{}_".format(component_name)
+        for name in arguments:
+            if name in ["name", "viewset"]:  # those are set below
+                continue
+            specific_value = getattr(self, specific_prefix + name, undefined)
+
+            if specific_value is not undefined:
+                component_kwargs[name] = specific_value
+                continue
+
+            value = getattr(self, name, undefined)
+            if value is not undefined:
+                component_kwargs[name] = value
+                continue
+
+            # FIXME validate that all context items appear on the viewset
+            logger.warning(
+                "missing value for {} in component {} of {}".format(
+                    name, component_name, self
+                )
+            )
+
+        component_kwargs["name"] = component_name
+        component_kwargs["viewset"] = self
+
+        return component_kwargs
+
+    @cached_property
+    def components(self) -> Dict[str, Component]:
+        return self._get_components()
 
     @property
-    def links(self):
-        links = OrderedDict()
-        for view_type in self.get_view_types():
-            link = self._get_link(view_type)
-            if link:
-                links[view_type] = link
-        return links
+    def links(self) -> Dict[str, BaseComponent]:
+        """A list of components that can be linked from within the ui"""
+        return self.components
 
-    def _get_url_kwargs(self, view_type):
-        return getattr(self, "{}_url_kwargs".format(view_type), [])
-
-    def _get_link(self, view_type):
-        url_name = self._get_url_name(view_type)
-        url_kwargs = self._get_url_kwargs(view_type)
-        verbose_name = getattr(self, "{}_verbose_name".format(view_type), view_type)
-        return ViewLink(
-            view_type=view_type,
-            url_name=url_name,
-            verbose_name=verbose_name,
-            url_kwargs=url_kwargs,
-        )
-
-    def _get_with_generic_fallback(self, view_type, item_name):
-        specific_getter_name = "get_{}_{}".format(view_type, item_name)
-        specific_attribute_name = "{}_{}".format(view_type, item_name)
-        generic_getter_name = "get_{}".format(item_name)
-        generic_attribute_name = item_name
-
-        if hasattr(self, specific_getter_name):
-            return getattr(self, specific_getter_name)()
-        if hasattr(self, specific_attribute_name):
-            return getattr(self, specific_attribute_name)
-        if hasattr(self, generic_getter_name):
-            return getattr(self, generic_getter_name)()
-        if hasattr(self, generic_attribute_name):
-            return getattr(self, generic_attribute_name)
-
-        raise ContextItemNotFound
-
-    def _get_viewset_context(self, view_type):
-        viewset_context = ViewSetContext()
-        viewset_context["view_type"] = view_type
-        viewset_context["viewset"] = self
-        for item_name in self.get_context_items():
-            try:
-                viewset_context[item_name] = self._get_with_generic_fallback(
-                    view_type, item_name
-                )
-            except ContextItemNotFound:
-                pass
-        return viewset_context
-
-    def _get_view(self, view_type):
+    def _get_view(self, component: Component):
         # FIXME handle function based views?
-        view_class = getattr(self, "{}_view_class".format(view_type))
+        view_class = component.view_class
         view_kwargs = {}
 
-        if hasattr(view_class, "links"):
-            view_kwargs["links"] = self.links
-
         view = view_class.as_view(**view_kwargs)
-        if hasattr(view_class, "viewset_context"):
+        if hasattr(view_class, "viewset"):
 
-            def wrapped_view(request, *args, **kwargs):  # FIXME wrap better
-                viewset_context = self._get_viewset_context(view_type) or {}
-                view.view_initkwargs["viewset_context"] = viewset_context
+            @wraps(view)
+            def wrapped_view(request, *args, **kwargs):
+                view.view_initkwargs["viewset"] = self
+                view.view_initkwargs["component"] = component
                 return view(request, *args, **kwargs)
 
             return wrapped_view
         else:
             return view
 
-    def _get_url_name(self, view_type):
-        return "{}_{}_{}".format(
-            self.model._meta.app_label, self.model._meta.model_name, view_type
-        )
-
-    def _get_url(self, view_type):
-        view = self._get_view(view_type)
-        url = getattr(self, "{}_url".format(view_type))
-        url_name = self._get_url_name(view_type)
+    def _get_url_pattern(self, component):
+        view = self._get_view(component)
+        url = component.url
+        url_name = component.url_name
         return path(url, view, name=url_name)
 
     def get_urls(self):
         urlpatterns = []
         # FIXME maybe move patterns that contain wildcards to the end?
-        for view_type in self.get_view_types():
-            urlpatterns.append(self._get_url(view_type))
+        for component in self.components.values():
+            urlpatterns.append(self._get_url_pattern(component))
         return urlpatterns
-
-    def get_view_types(self):
-        return self.view_types
-
-    def get_context_items(self):
-        return self.context_items
 
 
 class ListMixin(BaseViewSet):
     list_view_class = ListView
     list_url = ""
+    list_url_name = None
+    list_url_kwargs = []
     list_verbose_name = _("list")
 
     list_search_fields = None
     list_paginate_by = 25
-    list_item_links = ["update", "detail"]
+    list_item_link_layout = ["update", "detail"]
 
-    def get_context_items(self):
-        return super().get_context_items() + [
-            "list_search_fields",
-            "list_paginate_by",
-            "list_item_links",
-        ]
+    list_model: Model = undefined
+    list_fields: List[str] = undefined
+    list_layout: LayoutType = undefined
+    list_queryset: QuerySet = undefined
+    list_inline_classes: List[RelatedInline] = undefined
+    list_form_class: ModelForm = undefined
 
-    def get_view_types(self):
-        return super().get_view_types() + ["list"]
+    def get_component_classes(self):
+        return super().get_component_classes() + [("list", ListComponent)]
 
 
 class CreateMixin(BaseViewSet):
     create_view_class = CreateView
     create_url = "create/"
+    create_url_kwargs = []
+    create_url_name = None
     create_verbose_name = _("create")
 
-    def get_view_types(self):
-        return super().get_view_types() + ["create"]
+    create_model: Model = undefined
+    create_fields: List[str] = undefined
+    create_layout: LayoutType = undefined
+    create_queryset: QuerySet = undefined
+    create_inline_classes: List[RelatedInline] = undefined
+    create_form_class: ModelForm = undefined
+    create_link_layout = ["!create", "!update", "..."]
 
-
-class DetailMixin(BaseViewSet):
-    detail_view_class = DetailView
-    detail_url = "<str:pk>/"
-    detail_url_kwargs = ["pk"]
-    detail_verbose_name = _("detail")
-
-    def get_view_types(self):
-        return super().get_view_types() + ["detail"]
+    def get_component_classes(self):
+        return super().get_component_classes() + [("create", FormComponent)]
 
 
 class UpdateMixin(BaseViewSet):
     update_view_class = UpdateView
     update_url = "<str:pk>/update/"
     update_url_kwargs = ["pk"]
+    update_url_name = None
     update_verbose_name = _("update")
 
-    def get_view_types(self):
-        return super().get_view_types() + ["update"]
+    update_model: Model = undefined
+    update_fields: List[str] = undefined
+    update_layout: LayoutType = undefined
+    update_queryset: QuerySet = undefined
+    update_inline_classes: List[RelatedInline] = undefined
+    update_form_class: ModelForm = undefined
+    update_link_layout = ["!create", "!update", "list", "...", "detail"]
+
+    def get_component_classes(self):
+        return super().get_component_classes() + [("update", FormComponent)]
+
+
+class DetailMixin(BaseViewSet):
+    detail_view_class: View = DetailView
+    detail_url: str = "<str:pk>/"
+    detail_url_name = None
+    detail_url_kwargs: List[str] = ["pk"]
+    detail_verbose_name = _("detail")
+
+    detail_model: Model = undefined
+    detail_fields: List[str] = undefined
+    detail_layout: LayoutType = undefined
+    detail_queryset: QuerySet = undefined
+    detail_inline_classes: List[RelatedInline] = undefined
+    detail_link_layout = ["!detail", "...", "update"]
+
+    def get_component_classes(self):
+        return super().get_component_classes() + [("detail", Component)]
 
 
 class DeleteMixin(BaseViewSet):
     delete_view_class = DeleteView
     delete_url = "<str:pk>/delete/"
+    delete_url_name = None
     delete_url_kwargs = ["pk"]
     delete_verbose_name = _("delete")
 
-    def get_view_types(self):
-        return super().get_view_types() + ["delete"]
+    delete_model: Model = undefined
+    delete_fields: List[str] = undefined
+    delete_layout: LayoutType = undefined
+    delete_queryset: QuerySet = undefined
+    delete_inline_classes: List[RelatedInline] = undefined
+    delete_link_layout = ["!delete", "..."]
+
+    def get_component_classes(self):
+        return super().get_component_classes() + [("delete", Component)]
 
 
 class ViewSet(
     DeleteMixin, UpdateMixin, DetailMixin, CreateMixin, ListMixin, BaseViewSet
 ):
     pass
-
-
-class ViewLink:
-    def __init__(self, view_type, url_name, verbose_name, url_kwargs):
-        self.view_type = view_type
-        self.url_name = url_name
-        self.verbose_name = verbose_name
-        self.url_kwargs = url_kwargs
-
-    def get_url(self, obj=None, extra_kwargs=None):
-        if not obj:
-            return reverse(self.url_name)
-
-        if not obj and self.url_kwargs:
-            return
-
-        kwargs = {kwarg: getattr(obj, kwarg) for kwarg in self.url_kwargs}
-        if extra_kwargs:
-            kwargs.update(extra_kwargs)
-
-        return reverse(self.url_name, kwargs=kwargs)

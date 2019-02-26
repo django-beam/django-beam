@@ -13,7 +13,7 @@ from reversion import (
 
 from beam import RelatedInline
 from beam import ViewSet
-from beam.viewsets import BaseViewSet
+from beam.viewsets import BaseViewSet, Component
 from .views import VersionDetailView, VersionListView
 
 
@@ -22,9 +22,11 @@ class VersionDetailMixin(BaseViewSet):
     version_detail_url = "<str:pk>/versions/<str:version_id>/"
     version_detail_url_kwargs = ["pk"]
     version_detail_verbose_name = _("show version")
+    version_detail_url_name = None
+    version_detail_link_layout = ["version_list"]
 
-    def get_view_types(self):
-        return super().get_view_types() + ["version_detail"]
+    def get_component_classes(self):
+        return super().get_component_classes() + [("version_detail", Component)]
 
 
 class VersionListMixin(BaseViewSet):
@@ -32,19 +34,15 @@ class VersionListMixin(BaseViewSet):
     version_list_url = "<str:pk>/versions/"
     version_list_url_kwargs = ["pk"]
     version_list_verbose_name = _("history")
+    version_list_url_name = None
+    version_list_link_layout = ["detail"]
 
-    def get_view_types(self):
-        view_types = super().get_view_types()
-        try:
-            index = view_types.index("delete")
-        except ValueError:
-            index = -1
-        view_types.insert(index, "version_list")
-        return view_types
+    def get_component_classes(self):
+        return super().get_component_classes() + [("version_list", Component)]
 
 
 class VersionViewSetMixin(VersionDetailMixin, VersionListMixin):
-    versioned_view_types = ["create", "update"]
+    versioned_component_names = ["create", "update"]
 
     def __init__(self) -> None:
         super().__init__()
@@ -58,11 +56,8 @@ class VersionViewSetMixin(VersionDetailMixin, VersionListMixin):
         """
         return {
             inline_class
-            for view_type in self.get_view_types()
-            for inline_class in self._get_with_generic_fallback(
-                view_type, "inline_classes"
-            )
-            or ()
+            for component in self.components.values()
+            for inline_class in component.inline_classes
         }
 
     def _register_model_with_parents(self, model, follow=()):
@@ -118,25 +113,25 @@ class VersionViewSetMixin(VersionDetailMixin, VersionListMixin):
                 set_user(request.user)
             yield
 
-    def _set_revision_comment(self, view_type, request, *args, **kwargs):
+    def _set_revision_comment(self, component, request, *args, **kwargs):
         """
-        Sets the revision comment according to the view type and parameters.
+        Sets the revision comment according to component and parameters.
         """
         if not get_comment():
-            comment = getattr(self, "{}_verbose_name".format(view_type), view_type)
+            comment = component.verbose_name
             set_comment(comment)
 
-    def _get_view(self, view_type):
+    def _get_view(self, component):
         """
-        Ensure that the views in `self.versioned_view_types` are wrapped with the create_revision context_manager
+        Ensure that the views in `self.versioned_component_names` are wrapped with the create_revision context_manager
         """
-        view = super()._get_view(view_type)
-        if view_type not in self.versioned_view_types:
+        view = super()._get_view(component)
+        if component.name not in self.versioned_component_names:
             return view
 
         def wrapped_view(request, *args, **kwargs):
             with self.create_revision(request):
-                self._set_revision_comment(view_type, request, *args, **kwargs)
+                self._set_revision_comment(component, request, *args, **kwargs)
                 return view(request, *args, **kwargs)
 
         return wrapped_view

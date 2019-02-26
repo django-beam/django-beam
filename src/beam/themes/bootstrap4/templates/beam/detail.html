@@ -7,13 +7,13 @@
         <div class="container">
             {% block links %}
                 <div class="float-right">
-                    {% include "beam/partials/links.html" %}
+                    {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
                 </div>
             {% endblock %}
 
             {% block heading %}
                 <h1>
-                    {% get_options viewset_context.model as options %}
+                    {% get_options component.model as options %}
                     {{ object }}
                     <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
                 </h1>
@@ -23,7 +23,7 @@
                 <div class="card-body">
                 <div class="card-text">
                     {% block details %}
-                        {% include "beam/partials/layout.html" with object=object layout=viewset_context.layout fields=viewset_context.fields %}
+                        {% include "beam/partials/layout.html" with object=object layout=component.layout fields=component.fields %}
                     {% endblock %}
                 </div>
                 </div>

@@ -4,13 +4,12 @@
 
 
 {% block content %}
-    {% get_visible_links links list_item_links as visible_list_links %}
-    {% get_options viewset_context.model as options %}
+    {% get_options component.model as options %}
     <section>
         <div class="container">
             {% block links %}
                 <div class="float-right">
-                    {% include "beam/partials/links.html" %}
+                    {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
                 </div>
             {% endblock %}
             {% block heading %}
@@ -40,30 +39,26 @@
                 <table class="table table-striped">
                     <thead>
                     <tr>
-                        {% for field in viewset_context.fields %}
+                        {% for field in component.fields %}
                             <th scope="col">
-                                {{ viewset_context.model|field_verbose_name:field|capfirst }}
+                                {{ component.model|field_verbose_name:field|capfirst }}
                             </th>
                         {% endfor %}
-                        {% if visible_list_links %}
                         <th>{% trans "Actions" %}</th>
-                        {% endif %}
                     </tr>
                     </thead>
                     <tbody>
                     {% for object in object_list %}
                         <tr>
-                            {% for field in viewset_context.fields %}
+                            {% for field in component.fields %}
                                 <td class="align-middle">
                                     {% include "beam/partials/detail_field.html" with object=object field=field %}
                                 </td>
                             {% endfor %}
                             {% block list_item_links %}
-                                {% if visible_list_links %}
-                                    <td>
-                                        {% include "beam/partials/list_links.html" with links=visible_list_links %}
-                                    </td>
-                                {% endif %}
+                                <td>
+                                    {% include "beam/partials/list_links.html" with links=viewset.links link_layout=component.list_item_link_layout object=object %}
+                                </td>
                             {% endblock %}
                         </tr>
                     {% endfor %}
