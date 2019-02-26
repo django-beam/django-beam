@@ -44,7 +44,7 @@ view_types_which_require_no_object_to_link = {
 
 
 @mark.parametrize("view_type, url", view_types_which_require_no_object_to_link.items())
-def test_get_link_urls_that_require_object(view_type, url):
+def test_get_link_urls_that_require_object_without_object(view_type, url):
     link = dict(DragonflyViewSet().links)[view_type]
     assert get_link_url(link, None) == url
 
@@ -56,7 +56,7 @@ def test_get_link_urls_with_missing_object(view_type):
 
 
 @mark.parametrize("view_type, url", view_types_which_require_object_to_link.items())
-def test_get_link_urls_that_require_object(view_type, url):
+def test_get_link_urls_that_require_object_with_object(view_type, url):
     instance = Dragonfly(pk=123)
     link = dict(DragonflyViewSet().links)[view_type]
     assert get_link_url(link, instance) == url

@@ -46,3 +46,19 @@ def test_component_requires_a_view_class():
     with pytest.raises(ValueError):
         Component(name="foo", model=Mock())
     Component(name="foo", model=Mock(), view_class=Mock())
+
+
+def test_arguments_are_collected():
+    class SubComponent(Component):
+        def __init__(self, new_arg_1=None, **kwargs):
+            super().__init__(**kwargs)
+
+    class SubSubComponent(SubComponent):
+        def __init__(self, new_arg_2=None, **kwargs):
+            super().__init__(**kwargs)
+
+    assert "new_arg_1" in SubComponent.get_arguments()
+    assert "new_arg_2" not in SubComponent.get_arguments()
+
+    assert "new_arg_1" in SubSubComponent.get_arguments()
+    assert "new_arg_2" in SubSubComponent.get_arguments()

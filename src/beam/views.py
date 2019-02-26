@@ -1,3 +1,5 @@
+from typing import List, Type
+
 from django.apps import apps
 from django.forms import all_valid
 from django.shortcuts import redirect
@@ -5,8 +7,8 @@ from django.views import generic
 from django.views.generic.base import ContextMixin, TemplateView
 from extra_views import SearchableListMixin
 
-from beam.registry import register
-from beam.viewsets import default_registry
+from beam.registry import register, default_registry
+from .inlines import RelatedInline
 
 
 class ViewSetContextMixin(ContextMixin):
@@ -44,7 +46,7 @@ class ViewSetContextMixin(ContextMixin):
 
 
 class InlinesMixin(ContextMixin):
-    inline_classes = []
+    inline_classes: List[Type[RelatedInline]] = []
 
     def get_inline_classes(self):
         return self.inline_classes

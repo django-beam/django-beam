@@ -1,12 +1,14 @@
+from django.db.models import Model
 from django.forms import inlineformset_factory, ModelForm
+from typing import List
 
 
 class RelatedInline(object):
-    model = None
-    title = None
-    foreign_key_field = None
+    model: Model
+    title: str = ""
+    foreign_key_field: str
     layout = None
-    fields = []
+    fields: List[str] = []
     extra = 1
     can_delete = True
     form_class = ModelForm

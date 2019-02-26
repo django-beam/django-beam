@@ -11,7 +11,7 @@ def test_get_components():
         model = Mock()
         view_class = Mock()
 
-        def get_component_classes(self) -> List[Tuple[str, type(Component)]]:
+        def get_component_classes(self):
             return super().get_component_classes() + [("test", Component)]
 
     assert len(ViewSet().components) == 1
@@ -22,7 +22,7 @@ def test_links():
         model = Mock()
         view_class = Mock()
 
-        def get_component_classes(self) -> List[Tuple[str, type(Component)]]:
+        def get_component_classes(self):
             return super().get_component_classes() + [("test", Component)]
 
         @property
@@ -42,7 +42,7 @@ def test_get_urls():
         model = Mock()
         view_class = Mock()
 
-        def get_component_classes(self) -> List[Tuple[str, type(Component)]]:
+        def get_component_classes(self):
             return super().get_component_classes() + [("test", Component)]
 
         url = "foo/<pk>"
@@ -58,7 +58,7 @@ def test_get_view():
         model = Mock()
         view_class = Mock()
 
-        def get_component_classes(self) -> List[Tuple[str, type(Component)]]:
+        def get_component_classes(self):
             return super().get_component_classes() + [("test", Component)]
 
         url = "foo/<pk>"

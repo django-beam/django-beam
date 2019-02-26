@@ -1,4 +1,16 @@
-def register(registry, viewset):
+from typing import Dict, TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from .viewsets import BaseViewSet
+else:
+    BaseViewSet = type
+
+
+RegistryType = Dict[str, Dict[str, BaseViewSet]]
+
+
+def register(registry: RegistryType, viewset: BaseViewSet):
     model = viewset.model
     app_label = model._meta.app_label
     model_name = model._meta.model_name
@@ -42,10 +54,10 @@ class RegistryMetaClass(type):
     def __new__(cls, name, bases, namespace, **kwds):
         result = type.__new__(cls, name, bases, dict(namespace))
 
-        if result.registry is not None and result.model is not None:
+        if result.registry is not None and getattr(result, "model", None) is not None:
             register(result.registry, result)
 
         return result
 
 
-default_registry = {}
+default_registry: RegistryType = {}

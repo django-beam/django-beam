@@ -9,7 +9,7 @@ from django.utils.http import urlencode
 from typing import Dict, List, Tuple
 
 from beam.layouts import layout_links
-from beam.registry import default_registry, get_viewset_for_model
+from beam.registry import get_viewset_for_model, default_registry
 from beam.components import BaseComponent
 
 register = template.Library()
@@ -173,10 +173,8 @@ def get_visible_links(
     **extra_kwargs
 ) -> List[Tuple[BaseComponent, str]]:
 
-    links = layout_links(links, link_layout)
     visible_links = []
-
-    for link in links:
+    for link in layout_links(links, link_layout):
         try:
             url = link.reverse(obj, extra_kwargs=extra_kwargs)
         except NoReverseMatch:

@@ -7,4 +7,5 @@ env/
 build/
 dist/
 .tox
+.mypy_cache
 .pytest_cache

@@ -9,10 +9,11 @@ from reversion import is_registered, set_comment
 
 from beam import RelatedInline
 from beam.contrib.reversion.viewsets import VersionViewSet
+from beam.registry import RegistryType
 from testapp.models import Dragonfly, Petaluridae, Sighting
 
 
-registry = {}
+registry: RegistryType = {}
 
 
 class SightingInline(RelatedInline):

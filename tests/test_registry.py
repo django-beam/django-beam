@@ -1,6 +1,6 @@
 import pytest
 from beam.viewsets import ViewSet
-from beam.registry import default_registry, unregister
+from beam.registry import unregister, default_registry
 
 from testapp.models import Dragonfly, Petaluridae
 from testapp.views import DragonflyViewSet

@@ -1,5 +1,5 @@
 import inspect
-from typing import Set
+from typing import Set, TypeVar
 
 from django.urls import reverse
 
@@ -32,7 +32,7 @@ class BaseComponent:
         """
         arguments = set()
         for class_ in inspect.getmro(cls):
-            for arg in inspect.getfullargspec(class_.__init__).args[1:]:
+            for arg in inspect.getfullargspec(class_).args[1:]:
                 arguments.add(arg)
         return arguments
 

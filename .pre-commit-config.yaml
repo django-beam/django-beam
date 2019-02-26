@@ -1,5 +1,12 @@
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 'master'
+    hooks:
+    -   id: mypy
+        language_version: python3.6
+
 -   repo: https://github.com/ambv/black
     rev: stable
     hooks:
     - id: black
       language_version: python3.6
+

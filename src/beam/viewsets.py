@@ -1,10 +1,10 @@
 from collections import OrderedDict
 from functools import wraps
 from logging import getLogger
-from typing import List, Tuple, Dict
+from typing import Any, List, Tuple, Dict, Type, Iterable, Sequence
 
 from django.db.models import Model, QuerySet
-from django.forms import ModelForm
+from django.forms import ModelForm, Form
 from django.urls import path
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -22,35 +22,32 @@ undefined = (
     object()
 )  # sentinel value for attributes not defined or overwritten on the viewset
 
+
 LayoutType = List[List[List[str]]]
-
-
-class ContextItemNotFound(Exception):
-    pass
 
 
 class BaseViewSet(metaclass=RegistryMetaClass):
     registry = default_registry
 
-    model: Model = None
-    fields = None
-    layout = None
-    queryset = None
-    inline_classes = []
-    form_class = None
-    link_layout = None
+    model: Model
+    fields: List[str]
+    layout: LayoutType
+    queryset: QuerySet
+    inline_classes: List[Type[RelatedInline]] = []
+    form_class: Form
+    link_layout: List[str]
 
-    def get_component_classes(self) -> List[Tuple[str, type(Component)]]:
+    def get_component_classes(self) -> Sequence[Tuple[str, Type[Component]]]:
         return []
 
     def _get_components(self) -> Dict[str, Component]:
-        components = OrderedDict()
+        components: Dict[str, Component] = OrderedDict()
         for name, component in self.get_component_classes():
             kwargs = self._resolve_component_kwargs(name, component.get_arguments())
             components[name] = component(**kwargs)
         return components
 
-    def _resolve_component_kwargs(self, component_name, arguments: List[str]):
+    def _resolve_component_kwargs(self, component_name, arguments: Iterable[str]):
         component_kwargs = {}
 
         specific_prefix = "{}_".format(component_name)
@@ -92,7 +89,7 @@ class BaseViewSet(metaclass=RegistryMetaClass):
     def _get_view(self, component: Component):
         # FIXME handle function based views?
         view_class = component.view_class
-        view_kwargs = {}
+        view_kwargs: Dict[str, Any] = {}
 
         view = view_class.as_view(**view_kwargs)
         if hasattr(view_class, "viewset"):
@@ -124,20 +121,20 @@ class BaseViewSet(metaclass=RegistryMetaClass):
 class ListMixin(BaseViewSet):
     list_view_class = ListView
     list_url = ""
-    list_url_name = None
-    list_url_kwargs = []
+    list_url_name: str
+    list_url_kwargs: List[str] = []
     list_verbose_name = _("list")
 
-    list_search_fields = None
+    list_search_fields: List[str] = []
     list_paginate_by = 25
     list_item_link_layout = ["update", "detail"]
 
-    list_model: Model = undefined
-    list_fields: List[str] = undefined
-    list_layout: LayoutType = undefined
-    list_queryset: QuerySet = undefined
-    list_inline_classes: List[RelatedInline] = undefined
-    list_form_class: ModelForm = undefined
+    list_model: Model
+    list_fields: List[str]
+    list_layout: LayoutType
+    list_queryset: QuerySet
+    list_inline_classes: List[RelatedInline]
+    list_form_class: ModelForm
 
     def get_component_classes(self):
         return super().get_component_classes() + [("list", ListComponent)]
@@ -146,16 +143,16 @@ class ListMixin(BaseViewSet):
 class CreateMixin(BaseViewSet):
     create_view_class = CreateView
     create_url = "create/"
-    create_url_kwargs = []
-    create_url_name = None
+    create_url_kwargs: List[str] = []
+    create_url_name: str
     create_verbose_name = _("create")
 
-    create_model: Model = undefined
-    create_fields: List[str] = undefined
-    create_layout: LayoutType = undefined
-    create_queryset: QuerySet = undefined
-    create_inline_classes: List[RelatedInline] = undefined
-    create_form_class: ModelForm = undefined
+    create_model: Model
+    create_fields: List[str]
+    create_layout: LayoutType
+    create_queryset: QuerySet
+    create_inline_classes: List[RelatedInline]
+    create_form_class: ModelForm
     create_link_layout = ["!create", "!update", "..."]
 
     def get_component_classes(self):
@@ -166,15 +163,15 @@ class UpdateMixin(BaseViewSet):
     update_view_class = UpdateView
     update_url = "<str:pk>/update/"
     update_url_kwargs = ["pk"]
-    update_url_name = None
+    update_url_name: str
     update_verbose_name = _("update")
 
-    update_model: Model = undefined
-    update_fields: List[str] = undefined
-    update_layout: LayoutType = undefined
-    update_queryset: QuerySet = undefined
-    update_inline_classes: List[RelatedInline] = undefined
-    update_form_class: ModelForm = undefined
+    update_model: Model
+    update_fields: List[str]
+    update_layout: LayoutType
+    update_queryset: QuerySet
+    update_inline_classes: List[RelatedInline]
+    update_form_class: ModelForm
     update_link_layout = ["!create", "!update", "list", "...", "detail"]
 
     def get_component_classes(self):
@@ -184,15 +181,15 @@ class UpdateMixin(BaseViewSet):
 class DetailMixin(BaseViewSet):
     detail_view_class: View = DetailView
     detail_url: str = "<str:pk>/"
-    detail_url_name = None
+    detail_url_name: str
     detail_url_kwargs: List[str] = ["pk"]
     detail_verbose_name = _("detail")
 
-    detail_model: Model = undefined
-    detail_fields: List[str] = undefined
-    detail_layout: LayoutType = undefined
-    detail_queryset: QuerySet = undefined
-    detail_inline_classes: List[RelatedInline] = undefined
+    detail_model: Model
+    detail_fields: List[str]
+    detail_layout: LayoutType
+    detail_queryset: QuerySet
+    detail_inline_classes: List[RelatedInline]
     detail_link_layout = ["!detail", "...", "update"]
 
     def get_component_classes(self):
@@ -202,15 +199,15 @@ class DetailMixin(BaseViewSet):
 class DeleteMixin(BaseViewSet):
     delete_view_class = DeleteView
     delete_url = "<str:pk>/delete/"
-    delete_url_name = None
+    delete_url_name: str
     delete_url_kwargs = ["pk"]
     delete_verbose_name = _("delete")
 
-    delete_model: Model = undefined
-    delete_fields: List[str] = undefined
-    delete_layout: LayoutType = undefined
-    delete_queryset: QuerySet = undefined
-    delete_inline_classes: List[RelatedInline] = undefined
+    delete_model: Model
+    delete_fields: List[str]
+    delete_layout: LayoutType
+    delete_queryset: QuerySet
+    delete_inline_classes: List[RelatedInline]
     delete_link_layout = ["!delete", "..."]
 
     def get_component_classes(self):
@@ -221,3 +218,16 @@ class ViewSet(
     DeleteMixin, UpdateMixin, DetailMixin, CreateMixin, ListMixin, BaseViewSet
 ):
     pass
+
+
+__all__ = [
+    "LayoutType",
+    "undefined",
+    "BaseViewSet",
+    "ListMixin",
+    "CreateView",
+    "UpdateMixin",
+    "DetailMixin",
+    "DeleteMixin",
+    "ViewSet",
+]

@@ -1,11 +1,12 @@
-from typing import List, Tuple
+from typing import List
 
 from dal import autocomplete
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
+from beam.components import Component
 from beam.views import ViewSetContextMixin
-from beam.viewsets import BaseViewSet, Component
+from beam.viewsets import BaseViewSet
 
 
 class BaseAutocomplete(ViewSetContextMixin, autocomplete.Select2QuerySetView):
@@ -70,14 +71,14 @@ class AutocompleteMixin(BaseViewSet):
 
     autocomplete_view_class = BaseAutocomplete
     autocomplete_url = "autocomplete/"
-    autocomplete_url_kwargs = []
+    autocomplete_url_kwargs: List[str] = []
     autocomplete_url_name = None
     autocomplete_verbose_name = _("autocomplete")
 
     autocomplete_search_fields = None
     autocomplete_result_label = None
 
-    def get_component_classes(self) -> List[Tuple[str, type(Component)]]:
+    def get_component_classes(self):
         return [
             ("autocomplete", AutocompleteComponent)
         ] + super().get_component_classes()
