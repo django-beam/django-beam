@@ -51,12 +51,12 @@
                     {% for object in object_list %}
                         <tr>
                             {% for field in component.fields %}
-                                <td class="align-middle">
+                                <td>
                                     {% include "beam/partials/detail_field.html" with object=object field=field %}
                                 </td>
                             {% endfor %}
                             {% block list_item_links %}
-                                <td>
+                                <td class="pt-2">
                                     {% include "beam/partials/list_links.html" with links=viewset.links link_layout=component.list_item_link_layout object=object %}
                                 </td>
                             {% endblock %}
