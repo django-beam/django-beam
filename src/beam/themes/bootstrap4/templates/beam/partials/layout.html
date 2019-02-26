@@ -23,10 +23,10 @@
                     {{ field.content|safe }}
                 </div>
             {% else %}
-                <div class="col-sm-4 col-md-4 col-lg-3 text-right font-weight-bold text-nowrap">
+                <div class="col-sm-4 col-md-4 col-lg-4 text-right font-weight-bold text-nowrap">
                     {{ object|field_verbose_name:field|capfirst }}
                 </div>
-                <div class="col-sm-8 col-md-8 col-lg-9">
+                <div class="col-sm-8 col-md-8 col-lg-8">
                     {% include "beam/partials/detail_field.html" with object=object field=field %}
                 </div>
             {% endif %}
