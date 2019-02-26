@@ -68,7 +68,7 @@
                             <div class="card mb-4">
                             <ul class="inline-group list-group list-group-flush mb-0">
                                 {% for form in inline.formset %}
-                                    <li id="{{ inline.formset.prefix }}-{{ forloop.counter0 }}" class="inline-related list-group-item pt-4">
+                                    <li id="{{ inline.formset.prefix }}-{{ forloop.counter0 }}" class="inline-related list-group-item bg-light pt-4">
                                         {% if form.non_field_errors %}
                                             <div class="alert alert-block alert-danger">
                                                 <ul>
@@ -82,7 +82,7 @@
                                         {% include "beam/partials/form_layout.html" with form=form fields=inline.fields layout=inline.layout only %}
                                     </li>
                                 {% endfor %}
-                                <li class="inline-related list-group-item pt-4 empty-form d-none">
+                                <li class="inline-related list-group-item bg-light pt-4 empty-form d-none">
                                     {% if inline.formset.can_delete %}
                                         <button class="btn btn-outline-danger js-remove-form pull-right">{% trans "delete" %}</button>
                                     {% endif %}
