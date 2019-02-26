@@ -45,21 +45,30 @@
                     {% endif %}
                 {% endblock %}
 
-                {% include "beam/partials/form_layout.html" with form=form fields=component.fields layout=component.layout only %}
+                <div class="card bg-light mb-4">
+                    <div class="card-body">
+                        <div class="card-text">
+                            {% block details %}
+                                {% include "beam/partials/form_layout.html" with form=form fields=component.fields layout=component.layout only %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
         {% block inlines %}
             {% for inline in inlines %}
                 {% block inline %}
-                    <section id="{{ inline.formset.prefix }}-group" class="border-top js-django-inlines inline-group">
+                    <section id="{{ inline.formset.prefix }}-group" class="js-django-inlines inline-group">
                         <div class="container">
                             <h2 class="pt-2">{{ inline.get_title|capfirst }}</h2>
                             {{ inline.formset.management_form }}
 
-                            <div class="inline-group">
+                            <div class="card mb-4">
+                            <ul class="inline-group list-group list-group-flush mb-0">
                                 {% for form in inline.formset %}
-                                    <div id="{{ inline.formset.prefix }}-{{ forloop.counter0 }}" class="inline-related">
+                                    <li id="{{ inline.formset.prefix }}-{{ forloop.counter0 }}" class="inline-related list-group-item pt-4">
                                         {% if form.non_field_errors %}
                                             <div class="alert alert-block alert-danger">
                                                 <ul>
@@ -71,14 +80,16 @@
                                             <button class="btn btn-outline-danger js-remove-form pull-right">{% trans "delete" %}</button>
                                         {% endif %}
                                         {% include "beam/partials/form_layout.html" with form=form fields=inline.fields layout=inline.layout only %}
-                                    </div>
+                                    </li>
                                 {% endfor %}
-                                <div class="inline-related empty-form d-none">
+                                <li class="inline-related list-group-item pt-4 empty-form d-none">
                                     {% if inline.formset.can_delete %}
                                         <button class="btn btn-outline-danger js-remove-form pull-right">{% trans "delete" %}</button>
                                     {% endif %}
                                     {% include "beam/partials/form_layout.html" with form=inline.formset.empty_form fields=inline.fields layout=inline.layout only %}
-                                </div>
+                                </li>
+                            </ul>
+
                             </div>
                             <div class="container-fluid mb-2">
                                 <div class="row">
