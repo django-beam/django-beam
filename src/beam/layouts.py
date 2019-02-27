@@ -24,6 +24,9 @@ class VirtualField:
 def layout_links(
     links: Dict[str, BaseComponent], link_layout: List[str]
 ) -> List[BaseComponent]:
+    if not links:
+        return []
+
     link_layout = link_layout or list(links.keys())
     hidden_names = {name[1:] for name in link_layout if name.startswith("!")}
     other_names = [
