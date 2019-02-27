@@ -4,8 +4,10 @@
 
 {% block heading %}
     <h1>
+        {% if heading %}{{ heading }}{% else %}
         {% get_options component.model as options %}
         {% blocktrans %}Update {{ object }}{% endblocktrans %}
         <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
+        {% endif %}
     </h1>
 {% endblock %}

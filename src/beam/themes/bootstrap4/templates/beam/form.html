@@ -20,8 +20,10 @@
 
                 {% block heading %}
                     <h1>
+                        {% if heading %}{{ heading }}{% else %}
                         {% get_options component.model as options %}
                         {% blocktrans with verbose_name=options.verbose_name %}Create {{ verbose_name }}{% endblocktrans %}
+                        {% endif %}
                     </h1>
                 {% endblock %}
 

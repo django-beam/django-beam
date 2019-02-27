@@ -14,7 +14,9 @@
             {% endblock %}
             {% block heading %}
                 <h1>
+                    {% if heading %}{{ heading }}{% else %}
                     {{ options.verbose_name_plural|capfirst }}
+                    {% endif %}
                 </h1>
             {% endblock %}
 
