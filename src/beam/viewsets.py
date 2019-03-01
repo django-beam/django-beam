@@ -65,13 +65,6 @@ class BaseViewSet(metaclass=RegistryMetaClass):
                 component_kwargs[name] = value
                 continue
 
-            # FIXME validate that all context items appear on the viewset
-            logger.warning(
-                "missing value for {} in component {} of {}".format(
-                    name, component_name, self
-                )
-            )
-
         component_kwargs["name"] = component_name
         component_kwargs["viewset"] = self
 
