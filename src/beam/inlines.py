@@ -11,6 +11,9 @@ class RelatedInline(object):
     fields: List[str] = []
     extra = 1
     can_delete = True
+    can_order = False
+    order_field: str = ""
+
     form_class = ModelForm
 
     def __init__(self, parent_instance=None, parent_model=None, request=None) -> None:
@@ -20,6 +23,9 @@ class RelatedInline(object):
         self.request = request
         self._formset = None
         assert self.foreign_key_field, "you must set a foreign key field"
+        assert (
+            not self.can_order or self.order_field
+        ), "you must set order_field when using can_order=True"
 
     @property
     def formset(self):

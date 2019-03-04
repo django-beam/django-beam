@@ -8,49 +8,41 @@
 
 {% for row in layout %}
     <div class="row">
-    {% for col in row %}
-        {% if row|length_is:1 %}
-            <div class="col-md-12">
-        {% elif row|length_is:2 %}
-            <div class="col-md-6">
-        {% elif row|length_is:3 %}
-            <div class="col-md-4">
-        {% elif row|length_is:4 %}
-            <div class="col-md-3">
-        {% endif %}
-    <div class="row">
-        {% for field in col %}
-            {% if field.is_html %}
-                <div class="col-sm-12">
-                    {{ field.content|safe }}
-                </div>
-            {% else %}
-                {% get_form_field form field as form_field %}
-                {% if form_field is None %}
-                    <div class="col-sm-4 col-md-4 col-lg-4">
-                        <label class="col-form-label col-form-label">
-                        {{ form.instance|field_verbose_name:field|capfirst }}
-                        </label>
+        {% for col in row %}
+            <div class="{% if row|length_is:1 %}col-md-12{% elif row|length_is:2 %}col-md-6{% elif row|length_is:3 %}col-md-4{% elif row|length_is:4 %}col-md-3{% endif %}">
+                {% for field in col %}
+                    <div class="row field-group">
+                        {% if field.is_html %}
+                            <div class="col-sm-12">
+                                {{ field.content|safe }}
+                            </div>
+                        {% else %}
+                            {% get_form_field form field as form_field %}
+                            {% if form_field is None %}
+                                <div class="col-sm-4 col-md-4 col-lg-4">
+                                    <label class="col-form-label col-form-label">
+                                        {{ form.instance|field_verbose_name:field|capfirst }}
+                                    </label>
+                                </div>
+                                <div class="col-sm-8 col-md-8 col-lg-8">
+                                    {% include "beam/partials/detail_field.html" with object=form.instance field=field %}
+                                </div>
+                            {% elif not form_field.is_hidden %}
+                                <div class="col-sm-4 col-md-4 col-lg-4 text-right">
+                                    <label class="col-form-label col-form-label" for="{{ form_field.auto_id }}">
+                                        {{ form_field.label }}<span class="text-muted small">{% if form_field.field.required %}*{% else %}&nbsp;{% endif %}</span>
+                                    </label>
+                                </div>
+                                <div class="col-sm-8 col-md-8 col-lg-8">
+                                    {% include "bootstrap4/field.html" with field=form_field form_show_errors=True %}
+                                </div>
+                            {% endif %}
+                        {% endif %}
                     </div>
-                    <div class="col-sm-8 col-md-8 col-lg-8">
-                        {% include "beam/partials/detail_field.html" with object=form.instance field=field %}
-                    </div>
-                {% elif not form_field.is_hidden %}
-                    <div class="col-sm-4 col-md-4 col-lg-4 text-right">
-                        <label class="col-form-label col-form-label" for="{{ form_field.auto_id }}">
-                            {{ form_field.label }}<span class="text-muted small">{% if form_field.field.required %}*{% else %}&nbsp;{% endif %}</span>
-                        </label>
-                    </div>
-                    <div class="col-sm-8 col-md-8 col-lg-8">
-                        {% include "bootstrap4/field.html" with field=form_field form_show_errors=True %}
-                    </div>
-                {% endif %}
-            {% endif %}
+                {% endfor %}
+            </div>
         {% endfor %}
+        {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
     </div>
-    </div>
-    {% endfor %}
-    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
-</div>
 {% endfor %}
 

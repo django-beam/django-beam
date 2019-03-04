@@ -1,0 +1,74 @@
+{% load i18n %}
+{% load beam_tags  %}
+<section id="{{ inline.formset.prefix }}-related-inline" class="related-inline"
+         data-related-inline-js
+         {% if inline.can_order %}data-can-order="true" data-order-field="{{ inline.order_field }}"{% endif %}
+         {% if inline.can_delete %}data-can-delete="true"{% endif %}
+         {% if inline.can_delete %}data-prefix="{{ inline.formset.prefix }}"{% endif %}
+>
+    <div class="container">
+        <h2 class="pt-2">{{ inline.get_title|capfirst }}</h2>
+        {{ inline.formset.management_form }}
+        {{ inline.formset.non_field_errors }}
+        {% if inline.formset.non_field_errors %}
+            <div class="alert alert-block alert-danger">
+                <ul>
+                    {{ inline.formset.non_field_errors|unordered_list }}
+                </ul>
+            </div>
+        {% endif %}
+
+        <div class="card mb-4">
+            <ul class="related-inline-group list-group list-group-flush mb-0">
+                {% for form in inline.formset %}
+                    <li data-inline-id="{{ forloop.counter0 }}" id="{{ inline.formset.prefix }}-{{ forloop.counter0 }}" class="related-inline-item list-group-item bg-light pt-4">
+
+                        {% if inline.can_order  %}
+                            <div class="field-group float-left">
+                                {% get_form_field form inline.order_field as order_field %}
+                                <div class="d-none">{{ order_field }}</div>
+                            </div>
+                        {% endif %}
+
+                        {% if form.non_field_errors %}
+                            {{ form.non_field_errors }}
+                            <div class="alert alert-block alert-danger">
+                                <ul>
+                                    {{ form.non_field_errors|unordered_list }}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        {% if inline.formset.can_delete %}
+                            <button class="btn btn-outline-danger related-inline-item-remove d-none float-right">{% trans "delete" %}</button>
+                        {% endif %}
+                        {% include "beam/partials/form_layout.html" with form=form fields=inline.fields layout=inline.layout only %}
+                    </li>
+                {% endfor %}
+            </ul>
+            <ul class="d-none">
+                <li data-inline-id="__prefix__" id="{{ inline.formset.prefix }}-__prefix__" class="related-inline-item list-group-item bg-light pt-4 empty-form">
+                    {% if inline.can_order  %}
+                        <div class="field-group float-left">
+                            {% get_form_field inline.formset.empty_form inline.order_field as order_field %}
+                            <div class="d-none">{{ order_field }}</div>
+                        </div>
+                    {% endif %}
+                    {% if inline.formset.can_delete %}
+                        <button class="btn btn-outline-danger related-inline-item-remove float-right d-none">{% trans "delete" %}</button>
+                    {% endif %}
+                    {% include "beam/partials/form_layout.html" with form=inline.formset.empty_form fields=inline.fields layout=inline.layout only %}
+                </li>
+            </ul>
+        </div>
+        <div class="container-fluid mb-2">
+            <div class="row">
+                <div class="btn-group ml-auto">
+                    {% block inline_add_button %}
+                        {% get_options inline.formset.model as inline_options %}
+                        <button class="btn btn-outline-primary related-inline-item-add d-none">{% blocktrans with name=inline_options.verbose_name %}add {{ name }}{% endblocktrans %}</button>
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
