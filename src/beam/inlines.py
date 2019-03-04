@@ -9,7 +9,7 @@ class RelatedInline(object):
     foreign_key_field: str
     layout = None
     fields: List[str] = []
-    extra = 1
+    extra = None
     can_delete = True
     can_order = False
     order_field: str = ""
@@ -34,12 +34,19 @@ class RelatedInline(object):
         return self._formset
 
     def construct_formset(self):
+        if self.extra is not None:
+            extra = self.extra
+        elif self.parent_instance:
+            extra = 0
+        else:
+            extra = 1
+
         return inlineformset_factory(
             parent_model=self.parent_model,
             form=self.form_class,
             model=self.model,
             fk_name=self.foreign_key_field,
-            extra=self.extra,
+            extra=extra,
             can_delete=self.can_delete,
             fields=self.fields,
         )(
