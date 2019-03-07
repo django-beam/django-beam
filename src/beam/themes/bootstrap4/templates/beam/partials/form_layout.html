@@ -20,7 +20,7 @@
                             {% get_form_field form field as form_field %}
                             {% if form_field is None %}
                                 <div class="col-sm-4 col-md-4 col-lg-4 text-right">
-                                    <label class="col-form-label col-form-label">
+                                    <label class="col-form-label">
                                         {{ form.instance|field_verbose_name:field|capfirst }}
                                     </label>
                                 </div>
@@ -29,7 +29,7 @@
                                 </div>
                             {% elif not form_field.is_hidden %}
                                 <div class="col-sm-4 col-md-4 col-lg-4 text-right">
-                                    <label class="col-form-label col-form-label" for="{{ form_field.auto_id }}">
+                                    <label class="col-form-label" for="{{ form_field.auto_id }}">
                                         {{ form_field.label }}<span class="text-muted small">{% if form_field.field.required %}*{% else %}&nbsp;{% endif %}</span>
                                     </label>
                                 </div>
