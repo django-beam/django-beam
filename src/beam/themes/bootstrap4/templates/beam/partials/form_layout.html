@@ -19,7 +19,7 @@
                         {% else %}
                             {% get_form_field form field as form_field %}
                             {% if form_field is None %}
-                                <div class="col-sm-4 col-md-4 col-lg-4">
+                                <div class="col-sm-4 col-md-4 col-lg-4 text-right">
                                     <label class="col-form-label col-form-label">
                                         {{ form.instance|field_verbose_name:field|capfirst }}
                                     </label>
