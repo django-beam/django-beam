@@ -40,7 +40,7 @@
                 {% block form_errors %}
                     {% if form.non_field_errors %}
                         <div class="alert alert-block alert-danger">
-                            <ul>
+                            <ul class="mb-0">
                                 {{ form.non_field_errors|unordered_list }}
                             </ul>
                         </div>

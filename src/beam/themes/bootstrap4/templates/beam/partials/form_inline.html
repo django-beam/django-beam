@@ -12,7 +12,7 @@
         {{ inline.formset.non_field_errors }}
         {% if inline.formset.non_field_errors %}
             <div class="alert alert-block alert-danger">
-                <ul>
+                <ul class="mb-0">
                     {{ inline.formset.non_field_errors|unordered_list }}
                 </ul>
             </div>
@@ -33,7 +33,7 @@
                         {% if form.non_field_errors %}
                             {{ form.non_field_errors }}
                             <div class="alert alert-block alert-danger">
-                                <ul>
+                                <ul class="mb-0">
                                     {{ form.non_field_errors|unordered_list }}
                                 </ul>
                             </div>
