@@ -9,7 +9,6 @@
     <div class="container">
         <h2 class="pt-2">{{ inline.get_title|capfirst }}</h2>
         {{ inline.formset.management_form }}
-        {{ inline.formset.non_field_errors }}
         {% if inline.formset.non_field_errors %}
             <div class="alert alert-block alert-danger">
                 <ul class="mb-0">
@@ -31,7 +30,6 @@
                         {% endif %}
 
                         {% if form.non_field_errors %}
-                            {{ form.non_field_errors }}
                             <div class="alert alert-block alert-danger">
                                 <ul class="mb-0">
                                     {{ form.non_field_errors|unordered_list }}
