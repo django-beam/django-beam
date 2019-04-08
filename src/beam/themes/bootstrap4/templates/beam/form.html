@@ -59,11 +59,15 @@
             </div>
         </section>
 
+        {% block above_inlines %}{% endblock %}
+
         {% block inlines %}
             {% for inline in inlines %}
                 {% include "beam/partials/form_inline.html" %}
             {% endfor %}
         {% endblock %}
+
+        {% block below_inlines %}{% endblock %}
 
         <section>
             <div class="container">
