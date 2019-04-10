@@ -11,6 +11,10 @@ from beam.viewsets import BaseViewSet
 
 class BaseAutocomplete(ViewSetContextMixin, autocomplete.Select2QuerySetView):
     @property
+    def lookup_type(self):
+        return self.component.autocomplete_lookup_type
+
+    @property
     def search_fields(self):
         return self.component.autocomplete_search_fields
 
@@ -42,7 +46,7 @@ class BaseAutocomplete(ViewSetContextMixin, autocomplete.Select2QuerySetView):
 
             q = Q()
             for field in self.search_fields:
-                q |= Q(**{"{}__istartswith".format(field): word})
+                q |= Q(**{"{}__{}".format(field, self.lookup_type): word})
 
             qs_filter &= q
 
@@ -51,10 +55,15 @@ class BaseAutocomplete(ViewSetContextMixin, autocomplete.Select2QuerySetView):
 
 class AutocompleteComponent(Component):
     def __init__(
-        self, autocomplete_search_fields=None, autocomplete_result_label=None, **kwargs
+        self,
+        autocomplete_search_fields=None,
+        autocomplete_result_label=None,
+        autocomplete_lookup_type="istartswith",
+        **kwargs
     ):
         self.autocomplete_search_fields = autocomplete_search_fields
         self.autocomplete_result_label = autocomplete_result_label
+        self.autocomplete_lookup_type = autocomplete_lookup_type
         super().__init__(**kwargs)
         self.show_link = False
 
@@ -75,6 +84,7 @@ class AutocompleteMixin(BaseViewSet):
     autocomplete_url_name = None
     autocomplete_verbose_name = _("autocomplete")
 
+    autocomplete_lookup_type = "istartswith"
     autocomplete_search_fields = None
     autocomplete_result_label = None
 
