@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load beam_tags %}
 
+{% block body_classes %}{{ block.super }} beam-list{% if component.model %}{% get_options component.model as options %} beam-list-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
 
 {% block content %}
     {% get_options component.model as options %}

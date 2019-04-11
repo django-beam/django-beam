@@ -2,6 +2,8 @@
 {% load i18n %}
 {% load beam_tags %}
 
+{% block body_classes %}{{ block.super }} beam-detail{% if component.model %}{% get_options component.model as options %} beam-detail-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
+
 {% block content %}
     <section>
         <div class="container">
@@ -37,7 +39,7 @@
 
     {% block inlines %}
         {% for inline in inlines %}
-            <section>
+            <section id="{%  if inline.formset %}{{ inline.formset.prefix }}-related-inline{% endif %}" class="related-inline">
                 <div class="container">
                     <h2>{{ inline.get_title|capfirst }}</h2>
                 <div class="card mb-4">

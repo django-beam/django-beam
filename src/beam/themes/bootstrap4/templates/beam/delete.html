@@ -2,6 +2,7 @@
 {% load beam_tags %}
 {% load i18n %}
 
+{% block body_classes %}{{ block.super }} beam-delete{% if component.model %}{% get_options component.model as options %} beam-delete-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
 
 {% block content %}
     <section>

@@ -14,7 +14,7 @@
     <title>Hello, world!</title>
 </head>
 
-<body>
+<body class="{% block body_classes %}{% endblock %}">
 {% block layout %}
     {% block navigation %}
         {% render_navigation %}
