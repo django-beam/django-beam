@@ -25,7 +25,11 @@
                                     </label>
                                 </div>
                                 <div class="col-sm-8 col-md-8 col-lg-8">
-                                    {% include "beam/partials/detail_field.html" with object=form.instance field=field %}
+                                    <div class="form-group">
+                                        <div class="form-control-plaintext">
+                                            {% include "beam/partials/detail_field.html" with object=form.instance field=field %}
+                                        </div>
+                                    </div>
                                 </div>
                             {% elif not form_field.is_hidden %}
                                 <div class="col-sm-4 col-md-4 col-lg-4 text-right">
