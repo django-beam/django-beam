@@ -93,9 +93,8 @@ following all the inlines specified for the `versioned_component_names`.
 ### beam.contrib.autocomplete_light
 
 Provides a viewset mixin for integration with `django-autocomplete-light`.
-It also comes with a `BeamSelect2StyleMixin` for the select2 widgets that makes it play nicely with the bootstrap theme.
-as well as the `BeamModelSelect2` and `BeamModelSelect2Multiple` widgets which already have that
-mixin applied.
+It also provides some bootstrap compatible css to override django-autocomplete-light defaults. To use those
+you'll have to add `beam.contrib.autocomplete_light` to your installed apps *before* `django-autocomplete-light`.
 
 #### Usage
 
@@ -106,6 +105,7 @@ example by overriding the widget dicts.
 # settings.py
 INSTALLED_APPS = [
     "dal",
+    "beam.contrib.autocomplete_light",
     "dal_select2",
     ...
 ]
@@ -122,14 +122,14 @@ class GroupViewSet(AutocompleteMixin, beam.ViewSet):
 from django import forms
 from people.models import Person
 
-from beam.contrib.autocomplete_light import BeamModelSelect2Multiple
+from dal_select2.widgets import ModelSelect2Multiple
 
 class PersonForm(forms.ModelForm):
     class Meta:
         model = Person
         fields = ["name", "email", "groups"]
         widgets = {
-            "groups": BeamModelSelect2Multiple(
+            "groups": ModelSelect2Multiple(
                 url="people_group_autocomplete"
             ),
         }
