@@ -13,18 +13,18 @@
                 {% for field in col %}
                     <div class="row field-group">
                         {% if field.is_html %}
-                            <div class="col-sm-12">
+                            <div class="col-sm-12 beam-field-{{ field }}">
                                 {{ field.content|safe }}
                             </div>
                         {% else %}
                             {% get_form_field form field as form_field %}
                             {% if form_field is None %}
-                                <div class="col-sm-4 col-md-4 col-lg-4 text-right">
+                                <div class="col-sm-4 col-md-4 col-lg-4 text-right beam-field-label-{{ field }} ">
                                     <label class="col-form-label">
                                         {{ form.instance|field_verbose_name:field|capfirst }}
                                     </label>
                                 </div>
-                                <div class="col-sm-8 col-md-8 col-lg-8">
+                                <div class="col-sm-8 col-md-8 col-lg-8 beam-field-{{ field }} ">
                                     <div class="form-group">
                                         <div class="form-control-plaintext">
                                             {% include "beam/partials/detail_field.html" with object=form.instance field=field %}
@@ -32,12 +32,12 @@
                                     </div>
                                 </div>
                             {% elif not form_field.is_hidden %}
-                                <div class="col-sm-4 col-md-4 col-lg-4 text-right">
+                                <div class="col-sm-4 col-md-4 col-lg-4 text-right beam-field-label-{{ field }}">
                                     <label class="col-form-label" for="{{ form_field.auto_id }}">
                                         {{ form_field.label }}<span class="text-muted small">{% if form_field.field.required %}*{% else %}&nbsp;{% endif %}</span>
                                     </label>
                                 </div>
-                                <div class="col-sm-8 col-md-8 col-lg-8">
+                                <div class="col-sm-8 col-md-8 col-lg-8 beam-field-{{ field }}">
                                     {% include "bootstrap4/field.html" with field=form_field form_show_errors=True %}
                                 </div>
                             {% endif %}
