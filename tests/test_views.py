@@ -40,7 +40,7 @@ def test_detail(client):
 
     assert 'href="{}"'.format(links["list"].reverse(alpha)) in response_content
     assert 'href="{}"'.format(links["update"].reverse(alpha)) in response_content
-    assert 'href="{}"'.format(links["detail"].reverse(alpha)) not in response_content
+    assert 'href="{}"'.format(links["detail"].reverse(alpha)) in response_content
     assert 'href="{}"'.format(links["delete"].reverse(alpha)) in response_content
 
 
