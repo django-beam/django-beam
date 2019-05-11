@@ -10,7 +10,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views import View
 
-from beam.registry import RegistryMetaClass, default_registry
+from beam.registry import ViewsetMetaClass, default_registry
 from .components import BaseComponent, Component, FormComponent, ListComponent
 from .inlines import RelatedInline
 from .views import CreateView, UpdateView, DetailView, DeleteView, ListView
@@ -26,7 +26,7 @@ undefined = (
 LayoutType = List[List[List[str]]]
 
 
-class BaseViewSet(metaclass=RegistryMetaClass):
+class BaseViewSet(metaclass=ViewsetMetaClass):
     registry = default_registry
 
     model: Model
@@ -36,9 +36,10 @@ class BaseViewSet(metaclass=RegistryMetaClass):
     inline_classes: List[Type[RelatedInline]] = []
     form_class: Form
     link_layout: List[str]
+    _component_classes: Sequence[Tuple[str, Type[Component]]] = []
 
     def get_component_classes(self) -> Sequence[Tuple[str, Type[Component]]]:
-        return []
+        return self._component_classes
 
     def _get_components(self) -> Dict[str, Component]:
         components: Dict[str, Component] = OrderedDict()
@@ -112,6 +113,7 @@ class BaseViewSet(metaclass=RegistryMetaClass):
 
 
 class ListMixin(BaseViewSet):
+    list_component = ListComponent
     list_view_class = ListView
     list_url = ""
     list_url_name: str
@@ -129,11 +131,9 @@ class ListMixin(BaseViewSet):
     list_inline_classes: List[RelatedInline]
     list_form_class: ModelForm
 
-    def get_component_classes(self):
-        return super().get_component_classes() + [("list", ListComponent)]
-
 
 class CreateMixin(BaseViewSet):
+    create_component = FormComponent
     create_view_class = CreateView
     create_url = "create/"
     create_url_kwargs: List[str] = []
@@ -148,11 +148,9 @@ class CreateMixin(BaseViewSet):
     create_form_class: ModelForm
     create_link_layout = ["!create", "!update", "..."]
 
-    def get_component_classes(self):
-        return super().get_component_classes() + [("create", FormComponent)]
-
 
 class UpdateMixin(BaseViewSet):
+    update_component = FormComponent
     update_view_class = UpdateView
     update_url = "<str:pk>/update/"
     update_url_kwargs = ["pk"]
@@ -167,11 +165,9 @@ class UpdateMixin(BaseViewSet):
     update_form_class: ModelForm
     update_link_layout = ["!create", "!update", "list", "...", "detail"]
 
-    def get_component_classes(self):
-        return super().get_component_classes() + [("update", FormComponent)]
-
 
 class DetailMixin(BaseViewSet):
+    detail_component = Component
     detail_view_class: View = DetailView
     detail_url: str = "<str:pk>/"
     detail_url_name: str
@@ -185,11 +181,9 @@ class DetailMixin(BaseViewSet):
     detail_inline_classes: List[RelatedInline]
     detail_link_layout = ["!detail", "...", "update"]
 
-    def get_component_classes(self):
-        return super().get_component_classes() + [("detail", Component)]
-
 
 class DeleteMixin(BaseViewSet):
+    delete_component = Component
     delete_view_class = DeleteView
     delete_url = "<str:pk>/delete/"
     delete_url_name: str
@@ -202,9 +196,6 @@ class DeleteMixin(BaseViewSet):
     delete_queryset: QuerySet
     delete_inline_classes: List[RelatedInline]
     delete_link_layout = ["!delete", "..."]
-
-    def get_component_classes(self):
-        return super().get_component_classes() + [("delete", Component)]
 
 
 class ViewSet(

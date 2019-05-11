@@ -1,5 +1,5 @@
+from collections import OrderedDict
 from typing import Dict, TYPE_CHECKING
-
 
 if TYPE_CHECKING:
     from .viewsets import BaseViewSet
@@ -50,14 +50,39 @@ def get_viewset_for_model(registry, model):
     return registry[app_label][model_name]
 
 
-class RegistryMetaClass(type):
-    def __new__(cls, name, bases, namespace, **kwds):
-        result = type.__new__(cls, name, bases, dict(namespace))
+class ViewsetMetaClass(type):
+    def __new__(mcs, name, bases, attrs):
+        # Collect components from current class.
+        current_component_classes = []
+        for key, value in list(attrs.items()):
+            if key.endswith("_component"):
+                current_component_classes.append((key[: -len("_component")], value))
+        attrs["_declared_component_classes"] = OrderedDict(current_component_classes)
 
-        if result.registry is not None and getattr(result, "model", None) is not None:
-            register(result.registry, result)
+        new_class: BaseViewSet = super().__new__(mcs, name, bases, attrs)
 
-        return result
+        # Walk through the MRO.
+        declared_component_classes = OrderedDict()
+        for base in reversed(new_class.__mro__):
+            # Collect fields from base class.
+            if hasattr(base, "_declared_component_classes"):
+                declared_component_classes.update(base._declared_component_classes)
+
+            # Field shadowing.
+            for attr, value in base.__dict__.items():
+                if value is None and attr in declared_component_classes:
+                    declared_component_classes.pop(attr)
+
+        new_class._component_classes = list(declared_component_classes.items())
+        new_class._declared_component_classes = declared_component_classes
+
+        if (
+            new_class.registry is not None
+            and getattr(new_class, "model", None) is not None
+        ):
+            register(new_class.registry, new_class)
+
+        return new_class
 
 
 default_registry: RegistryType = {}
