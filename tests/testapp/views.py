@@ -27,9 +27,7 @@ class DragonflyViewSet(ViewSet):
     list_search_fields = ["name"]
     fields = ["name", "age"]
 
+    extra_component = ExtraComponent
     extra_view_class = ExtraView
     extra_url = "extra/<str:id>/<str:special>/"
     extra_url_kwargs = ["id"]
-
-    def get_component_classes(self):
-        return super().get_component_classes() + [("extra", ExtraComponent)]
