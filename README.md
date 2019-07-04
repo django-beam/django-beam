@@ -12,52 +12,128 @@ The goal is having the functionality provided by django's own admin, but in a wa
 
 ## Features
 - CRUD operations based on class based views
-- Default templates with multiple themes (bootstrap 4, ...)
-- Extensions for common use cases, e.g. export as csv, ...
-- Support for related models (autocompletion, linking, ...)
-- Familiar interfaces
+- Easily extensible
+- Extensions for common use cases and popular third party packages
 
 ## Documentation
-See https://django-beam.readthedocs.io/en/latest/
+Should end up at  https://django-beam.readthedocs.io/en/latest/
 
 ## Example
 ```
-# people/models.py
-class Group(models.Model):
-    name = models.TextField()
+    # people/models.py
+    class Group(models.Model):
+        name = models.TextField()
 
 
-class Person(models.Model):
-    name = models.TextField()
-    email = models.EmailField()
+    class Person(models.Model):
+        name = models.TextField()
+        email = models.EmailField()
 
-    groups = models.ManyToManyField(Group)
-
-
-# people/views.py
-import beam
-
-class PersonViewSet(beam.ViewSet):
-    fields = ['name', 'groups']
+        groups = models.ManyToManyField(Group)
 
 
-class GroupViewSet(beam.ViewSet):
-    fields = ['name']
+    # people/views.py
+    import beam
+
+    class PersonViewSet(beam.ViewSet):
+        fields = ['name', 'groups']
 
 
-# urls.py
-urlpatterns += [
-    path('person/', include(PersonViewSet().get_urls())),
-    path('group/', include(GroupViewSet().get_urls())),
-]
+    class GroupViewSet(beam.ViewSet):
+        fields = ['name']
 
 
-# settings.py
-INSTALLED_APPS += [
-    "beam",
-    "beam.themes.bootstrap4",  # or choose any theme you like
+    # urls.py
+    urlpatterns += [
+        path('person/', include(PersonViewSet().get_urls())),
+        path('group/', include(GroupViewSet().get_urls())),
+    ]
+
+
+    # settings.py
+    INSTALLED_APPS += [
+        "beam",
+        "beam.themes.bootstrap4",  # or choose any theme you like
+    ]
+```
+
+## Core concepts
+There are a few pieces beyond standard django that you need to understand to use beams.
+The first one are **ViewSets**. They are used to group and configure several views for a single model (similar to
+`django-rest-framework`). Specifying e.g. `fields = ["name", "age"]` will pass those fields to all views for the specified model. They also allow you to specify and override configuration for single views, by setting e.g. `update_fields = ["name"]` the update view will be restricted to just the name.
+
+The next concept are **Components**. Components are used to group and pass relevant attributes from
+the viewset to the individual views. A view is only passed data that it's component expects in 
+`__init__`. 
+
+The viewset figures out which attributes should be passed to a component and also takes into account
+the specificiy. If you specify both `fields` and `detail_fields`, the detail component will receive
+the latter, while all other components will be passed the former.
+
+### Example of using a custom component 
+Below you can see an example of adding a custom view 
+```
+class CustomerCallView(beam.views.ComponentMixin, MyBaseView):
+    phone = None
+    # your custom view code goes here ...
+
+class CustomerViewSet(beam.ViewSet):
+    model = Customer
+    fields = ["first_name", "last_name", "email", "phone"]
+
+    call_component = Component
+    call_url = "call/{phone}/"
+    call_url_kwargs = ["phone"]
+```
+
+## Layouts
+
+### Form layouts
+Beam layouts are a simple way to give forms and detail views 
+some structure without the use of custom templates.
+By specifying a tripple nested list on the viewset, fields can be grouped into 
+rows and columns. The default theme supports up to 4 columns per row.
+
+```
+layout = [
+    [ # first row
+        ["name", "age",],   # first column
+        ["phone", "email",],   # second column
+    ]
+    [ # second row
+        ["a", "b",],   # first column
+        ["c", "d",],   # second column
+    ]
 ]
 ```
+
+FIXME IMAGE
+
+### Link layouts
+Beam shows links to other views in the viewset both at the top of all pages
+as well as next to items in the list page.
+In order to specify which links should be visible at the top of the detail page,
+you can e.g. specify `detail_links = ["update", "...", "delete", "!create"]`.
+This would cause create to be hidden, the first link to be to the update view, the last one to
+the delete view and all other components would show up in between those two.
+
+If you e.g. want the create view to be the only one shown at the top of the list view, set
+`list_links = ["create"]`. To specify the links shown next to list items, set `list_item_links`.
+
+## Inlines
+
+```
+class ContactDataInline(beam.RelatedInline):
+    fields = ["medium", "value"]
+    fk_field_name = 'person'
+
+
+class PersonViewSet(beam.ViewSet):
+    create_inline_viewset_classes = []
+    inline_viewset_classes = [ContactDataInline]
+
+```
+
 
 ## Themes
 We currently ship only one theme.
@@ -90,7 +166,7 @@ class attribute to control which components are tracked.
 If you do not manually register your models with reversion then `VersionViewSet.model` is registered
 following all the inlines specified for the `versioned_component_names`.
 
-### beam.contrib.autocomplete_light
+### beam.contrib.autocomplete\_light
 
 Provides a viewset mixin for integration with `django-autocomplete-light`.
 It also provides some bootstrap compatible css to override django-autocomplete-light defaults. To use those
