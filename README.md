@@ -3,12 +3,14 @@
 
 # django-beam
 
-## This project is currently in alpha and not ready for use in production
-
 django-beam provides you with a set of views, templates and integrations for the most common CRUD
 applications.
 
 The goal is having the functionality provided by django's own admin, but in a way that integrates with your other frontend code.
+
+## This project is still in early development. 
+Most of the core concepts have stabilized and it is being used in production. However there may
+still be breaking changes gonig forward
 
 ## Features
 - CRUD operations based on class based views
