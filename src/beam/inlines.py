@@ -1,6 +1,7 @@
+from typing import List
+
 from django.db.models import Model
 from django.forms import inlineformset_factory, ModelForm
-from typing import List
 
 
 class RelatedInline(object):
@@ -33,6 +34,15 @@ class RelatedInline(object):
             self._formset = self.construct_formset()
         return self._formset
 
+    @property
+    def prefix(self):
+        # same implementation as default InlineFormset
+        return (
+            self.model._meta.get_field(self.foreign_key_field)
+            .remote_field.get_accessor_name(model=self.model)
+            .replace("+", "")
+        )
+
     def construct_formset(self):
         if self.extra is not None:
             extra = self.extra
@@ -51,8 +61,9 @@ class RelatedInline(object):
             fields=self.fields[:],
         )(
             instance=self.parent_instance,
-            data=self.request.POST or None,
-            files=self.request.FILES or None,
+            data=self.request.POST if self.request and self.request.POST else None,
+            files=self.request.FILES if self.request and self.request.FILES else None,
+            prefix=self.prefix,
         )
 
     def get_title(self):

@@ -1,10 +1,10 @@
 {% load i18n %}
 {% load beam_tags  %}
-<section id="{{ inline.formset.prefix }}-related-inline" class="related-inline"
+<section id="{{ inline.prefix }}-related-inline" class="related-inline"
          data-related-inline-js
          {% if inline.can_order %}data-can-order="true" data-order-field="{{ inline.order_field }}"{% endif %}
          {% if inline.can_delete %}data-can-delete="true"{% endif %}
-         {% if inline.can_delete %}data-prefix="{{ inline.formset.prefix }}"{% endif %}
+         {% if inline.can_delete %}data-prefix="{{ inline.prefix }}"{% endif %}
 >
     <div class="container">
         <h2 class="pt-2">{{ inline.get_title|capfirst }}</h2>
@@ -20,7 +20,7 @@
         <div class="card mb-4">
             <ul class="related-inline-group list-group list-group-flush mb-0">
                 {% for form in inline.formset %}
-                    <li data-inline-id="{{ forloop.counter0 }}" id="{{ inline.formset.prefix }}-{{ forloop.counter0 }}" class="related-inline-item list-group-item bg-light pt-4">
+                    <li data-inline-id="{{ forloop.counter0 }}" id="{{ inline.prefix }}-{{ forloop.counter0 }}" class="related-inline-item list-group-item bg-light pt-4">
 
                         {% if inline.can_order  %}
                             <div class="field-group float-left">
@@ -44,7 +44,7 @@
                 {% endfor %}
             </ul>
             <ul class="d-none">
-                <li data-inline-id="__prefix__" id="{{ inline.formset.prefix }}-__prefix__" class="related-inline-item list-group-item bg-light pt-4 empty-form">
+                <li data-inline-id="__prefix__" id="{{ inline.prefix }}-__prefix__" class="related-inline-item list-group-item bg-light pt-4 empty-form">
                     {% if inline.can_order  %}
                         <div class="field-group float-left">
                             {% get_form_field inline.formset.empty_form inline.order_field as order_field %}

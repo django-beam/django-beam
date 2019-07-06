@@ -39,19 +39,18 @@
 
     {% block inlines %}
         {% for inline in inlines %}
-            <section id="{%  if inline.formset %}{{ inline.formset.prefix }}-related-inline{% endif %}" class="related-inline">
+            <section id="{%  if inline.prefix %}{{ inline.prefix }}-related-inline{% endif %}" class="related-inline">
                 <div class="container">
                     <h2>{{ inline.get_title|capfirst }}</h2>
                 <div class="card mb-4">
                     <ul class="list-group list-group-flush mb-0">
-                            {% for instance in inline.instances %}
-                                <li class="list-group-item bg-light">
+                        {% for instance in inline.instances %}
+                            <li class="list-group-item bg-light">
                                 {% include "beam/partials/layout.html" with object=instance layout=inline.layout fields=inline.fields only %}
-                                </li>
-                            {% empty %}
-                                <li class="list-group-item bg-light">{% blocktrans with title=inline.get_title %}There aren't any.{% endblocktrans %}</li>
-                            {% endfor %}
-                        </li>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item bg-light">{% blocktrans with title=inline.get_title %}There aren't any.{% endblocktrans %}</li>
+                        {% endfor %}
                     </ul>
                 </div>
                 </div>
