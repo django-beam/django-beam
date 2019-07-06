@@ -48,7 +48,7 @@ class RelatedInline(object):
             fk_name=self.foreign_key_field,
             extra=extra,
             can_delete=self.can_delete,
-            fields=self.fields,
+            fields=self.fields[:],
         )(
             instance=self.parent_instance,
             data=self.request.POST or None,
