@@ -5,10 +5,10 @@
 {% block body_classes %}{{ block.super }} beam-detail{% if component.model %}{% get_options component.model as options %} beam-detail-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
 
 {% block content %}
-    <section>
+    <section class="beam-main">
         <div class="container">
             {% block links %}
-                <div class="float-right">
+                <div class="float-right beam-links">
                     {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
                 </div>
             {% endblock %}
@@ -23,7 +23,7 @@
                 </h1>
             {% endblock %}
 
-            <div class="card bg-light mb-4">
+            <div class="card bg-light mb-4 beam-model-fields">
                 <div class="card-body">
                 <div class="card-text">
                     {% block details %}

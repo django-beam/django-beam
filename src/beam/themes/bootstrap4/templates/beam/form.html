@@ -10,10 +10,10 @@
         {% csrf_token %}
 
 
-        <section>
+        <section class="beam-main">
             <div class="container">
                 {% block links %}
-                    <div class="float-right">
+                    <div class="float-right beam-links">
                         {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
                     </div>
                 {% endblock %}
