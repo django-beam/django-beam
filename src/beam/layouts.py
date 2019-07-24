@@ -1,5 +1,7 @@
 from typing import Dict, List
 
+from django.utils.text import slugify
+
 from beam.components import BaseComponent
 
 
@@ -13,12 +15,16 @@ class HTML:
 class VirtualField:
     is_virtual = True
 
-    def __init__(self, verbose_name, callback):
+    def __init__(self, verbose_name, callback, name=None):
         self.verbose_name = verbose_name
         self.callback = callback
+        self.name = name if name is not None else slugify(verbose_name).lower()
 
     def get_value(self, obj=None):
         return self.callback(obj)
+
+    def __str__(self):
+        return self.name
 
 
 def layout_links(
