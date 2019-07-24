@@ -162,7 +162,7 @@ def preserve_query_string(context, **kwargs):
         else:
             get[item] = value
 
-    return "?{}".format(urlencode(get.items()))
+    return "?{}".format(get.urlencode())
 
 
 @register.simple_tag()
