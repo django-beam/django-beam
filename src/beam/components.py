@@ -120,3 +120,36 @@ class ListComponent(Component):
         self.list_paginate_by = list_paginate_by
         self.list_item_link_layout = list_item_link_layout
         super().__init__(**kwargs)
+
+
+class Link(BaseComponent):
+    """
+    A component class that can be added to ViewSet.links to add links to external views.
+    """
+
+    show_link = True
+
+    def __init__(
+        self,
+        name=None,
+        verbose_name=None,
+        url_name=None,
+        url_kwargs=None,
+        permission=None,
+        **kwargs
+    ):
+        self.resolve_url = kwargs.pop("resolve_url", reverse)
+        super().__init__(name, verbose_name, url_name, url_kwargs, permission, **kwargs)
+
+    def reverse(self, obj=None, extra_kwargs=None):
+        if not obj:
+            return self.resolve_url(self.url_name)
+
+        if not obj and self.url_kwargs:
+            return
+
+        kwargs = {kwarg: getattr(obj, kwarg) for kwarg in self.url_kwargs}
+        if extra_kwargs:
+            kwargs.update(extra_kwargs)
+
+        return self.resolve_url(self.url_name, kwargs=kwargs)
