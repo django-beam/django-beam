@@ -61,13 +61,7 @@ function RelatedInline(elem) {
 
 
 RelatedInline.prototype.getItemCount = function () {
-    let itemCount = 0
-    for (let item of this.items) {
-        if (!item.deleted) {
-            itemCount += 1
-        }
-    }
-    return itemCount
+    return this.items.length;
 }
 
 RelatedInline.prototype.render = function () {
