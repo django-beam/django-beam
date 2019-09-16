@@ -85,12 +85,12 @@ class Component(BaseComponent):
                 "Component {} needs at least one of model, queryset".format(self.name)
             )
         elif model and not queryset:
-            queryset = model._default_manager.all()
+            queryset = model._default_manager
         elif queryset and not model:
             model = queryset.model
 
         self.model = model
-        self.queryset = queryset
+        self.queryset = queryset.all()  # ensure we don't keep stale copies of querysets
 
         if not self.url_name:
             self.url_name = "{}_{}_{}".format(

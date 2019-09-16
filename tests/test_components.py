@@ -13,6 +13,14 @@ def test_component_with_queryset_guesses_model():
     )
 
 
+def test_component_with_queryset_copies_queryset():
+    queryset = Mock()
+    assert (
+        Component(name="test", queryset=queryset, view_class=Mock()).queryset
+        is not queryset
+    )
+
+
 def test_component_with_model_guesses_queryset():
     model = Mock()
     assert (
