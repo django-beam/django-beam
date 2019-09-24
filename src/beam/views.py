@@ -2,7 +2,9 @@ from typing import List, Type
 
 from django.apps import apps
 from django.forms import all_valid
+from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.utils.html import escape
 from django.views import generic
 from django.views.generic.base import ContextMixin, TemplateView
 from extra_views import SearchableListMixin
@@ -20,6 +22,7 @@ class ViewSetContextMixin(ContextMixin):
 
         context["viewset"] = self.viewset
         context["component"] = self.component
+        context["popup"] = self.request.GET.get("_popup")
 
         return context
 
@@ -129,6 +132,21 @@ class CreateView(ViewSetContextMixin, CreateWithInlinesMixin, generic.CreateView
 
     def get_success_url(self):
         return self.viewset.links["detail"].reverse(obj=self.object)
+
+    def form_valid(self, form, inlines):
+        response = super().form_valid(form, inlines)
+        if self.request.GET.get("_popup"):
+            return HttpResponse(
+                "<script>"
+                'window.opener.postMessage({{id: "{id}", result: "created", source: "{source}", text: "{text}"}});'
+                "window.close()"
+                "</script>".format(
+                    id=escape(self.object.pk),
+                    source=escape(self.request.GET["_popup"]),
+                    text=escape(str(self.object)),
+                )
+            )
+        return response
 
 
 class UpdateView(ViewSetContextMixin, UpdateWithInlinesMixin, generic.UpdateView):

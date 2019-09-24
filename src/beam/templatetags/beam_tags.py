@@ -59,6 +59,9 @@ def is_queryset(value):
 
 @register.simple_tag(takes_context=True)
 def get_url_for_related(context, instance, component_name):
+    if not instance:
+        return None
+
     opts = get_options(instance)
 
     viewset = context.get("viewset", None)

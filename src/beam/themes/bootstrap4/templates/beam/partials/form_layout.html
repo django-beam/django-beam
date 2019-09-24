@@ -1,4 +1,5 @@
 {% load beam_tags %}
+{% load i18n %}
 
 {% if fields and not layout %}
     {% fields_to_layout form.fields as layout %}
@@ -32,14 +33,24 @@
                                     </div>
                                 </div>
                             {% elif not form_field.is_hidden %}
+
+                                {% get_url_for_related form_field.field.queryset.model "create" as create_url %}
+                                {% get_options form_field.field.queryset.model as related_options %}
+
                                 <div class="col-sm-4 col-md-4 col-lg-4 text-right beam-field-label-{{ field }}">
                                     <label class="col-form-label" for="{{ form_field.auto_id }}">
                                         {{ form_field.label }}<span class="text-muted small">{% if form_field.field.required %}*{% else %}&nbsp;{% endif %}</span>
                                     </label>
                                 </div>
-                                <div class="col-sm-8 col-md-8 col-lg-8 beam-field-{{ field }}">
+
+                                <div class="col-sm-8 col-md-8 col-lg-8 beam-field-{{ field }}"{% if create_url %}
+                                     data-create-text="{% blocktrans with verbose_name=related_options.verbose_name|capfirst %}Create {{ verbose_name }}{% endblocktrans %}"
+                                     data-create-url="{{ create_url }}?_popup={{ form_field.auto_id }}"
+                                {% endif %}>
                                     {% include "bootstrap4/field.html" with field=form_field form_show_errors=True %}
                                 </div>
+
+
                             {% endif %}
                         {% endif %}
                     </div>

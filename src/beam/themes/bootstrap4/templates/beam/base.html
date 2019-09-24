@@ -11,10 +11,10 @@
 
     {% block extra_styles %}{% endblock %}
 
-    <title>Hello, world!</title>
+    <title>{% block title %}{% endblock %}</title>
 </head>
 
-<body class="{% block body_classes %}{% endblock %}">
+<body class="beam {% if popup %}popup {% endif %}{% block body_classes %}{% endblock %}">
 {% block layout %}
     {% block navigation %}
         {% render_navigation %}
@@ -29,6 +29,7 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script src="{% static "beam/js/sortable.min.js" %}"></script>  {# add/remove for formsets #}
 <script src="{% static "beam/js/inlines.js" %}"></script>  {# add/remove for formsets #}
+<script src="{% static "beam/js/add_related.js" %}"></script>  {# add/remove for dynamic add related #}
 {% block extra_scripts %}{% endblock %}
 </body>
 </html>
