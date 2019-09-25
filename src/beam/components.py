@@ -80,13 +80,13 @@ class Component(BaseComponent):
         self.fields = fields  # FIXME do the layout / fields auto-create thing
         self.layout = layout
 
-        if not model and not queryset:
+        if model is None and queryset is None:
             raise ValueError(
                 "Component {} needs at least one of model, queryset".format(self.name)
             )
-        elif model and not queryset:
+        elif model is not None and queryset is None:
             queryset = model._default_manager
-        elif queryset and not model:
+        elif queryset is not None and model is None:
             model = queryset.model
 
         self.model = model
