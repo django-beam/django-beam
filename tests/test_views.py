@@ -74,3 +74,19 @@ def test_create_with_inlines(client):
 
     assert dragonfly.age == 81
     assert dragonfly.sighting_set.get().name == "Tokyo"
+
+
+@mark.django_db
+def test_only_popup_param_is_preserved(client):
+    instance = Dragonfly.objects.create(name="alpha", age=12)
+    response = client.get(
+        DragonflyViewSet().links["list"].reverse(),
+        data={"_popup": "id_test", "not_preserved": "nope"},
+    )
+
+    response_content = response.content.decode("utf-8")
+
+    detail_url = DragonflyViewSet().links["update"].reverse(instance)
+    assert detail_url in response_content
+    assert detail_url + "?_popup=id_test" in response_content
+    assert "not_preserved" not in response_content

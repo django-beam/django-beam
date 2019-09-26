@@ -1,8 +1,11 @@
+from urllib.parse import urlparse, parse_qsl, ParseResult
+
 from django import template
 from django.apps import apps
 from django.db.models import Model, QuerySet, Manager, FieldDoesNotExist, ManyToManyRel
 from django.db.models.fields.files import ImageFieldFile, FieldFile
 from django.db.models.fields.reverse_related import ForeignObjectRel
+from django.template import RequestContext
 from django.template.loader import get_template
 from django.urls import NoReverseMatch
 from django.utils.http import urlencode
@@ -75,7 +78,11 @@ def get_url_for_related(context, instance, component_name):
     except KeyError:
         return None
 
-    return viewset().components[component_name].reverse(instance)
+    components = viewset().components
+    if component_name not in components:
+        return None
+
+    return components[component_name].reverse(instance)
 
 
 @register.filter
@@ -168,13 +175,48 @@ def preserve_query_string(context, **kwargs):
     return "?{}".format(get.urlencode())
 
 
-@register.simple_tag()
+def _add_params_to_url_if_new(url, default_params):
+    """
+    Add params from default_params unless they already exist.
+    """
+    parsed_url = urlparse(url)
+    existing_params = parse_qsl(parsed_url.query)
+
+    params = {}
+    params.update(default_params)
+    params.update(existing_params)
+
+    return ParseResult(
+        parsed_url.scheme,
+        parsed_url.netloc,
+        parsed_url.path,
+        parsed_url.params,
+        urlencode(params),
+        parsed_url.fragment,
+    ).geturl()
+
+
+PRESERVED_GET_PARAMS = [
+    "_popup"
+]  # get parameters that should be preserved while following links
+
+
+@register.simple_tag(takes_context=True)
 def get_visible_links(
+    context: RequestContext,
     links: Dict[str, BaseComponent],
     link_layout: List[str],
     obj: Model = None,
     **extra_kwargs
 ) -> List[Tuple[BaseComponent, str]]:
+
+    get_params = {}
+    if context and hasattr(context, "request"):
+        request = context.request
+        for param in PRESERVED_GET_PARAMS:
+            value = request.GET.get(param)
+            if value:
+                get_params[param] = value
 
     visible_links = []
     for link in layout_links(links, link_layout):
@@ -182,6 +224,9 @@ def get_visible_links(
             url = link.reverse(obj, extra_kwargs=extra_kwargs)
         except NoReverseMatch:
             url = None
+
+        if url and get_params:
+            url = _add_params_to_url_if_new(url, get_params)
 
         if url:
             visible_links.append((link, url))

@@ -39,7 +39,7 @@
                         {% if inline.formset.can_delete %}
                             <button class="btn btn-outline-danger related-inline-item-remove d-none float-right">{% trans "delete" %}</button>
                         {% endif %}
-                        {% include "beam/partials/form_layout.html" with form=form fields=inline.fields layout=inline.layout only %}
+                        {% include "beam/partials/form_layout.html" with form=form fields=inline.fields layout=inline.layout %}
                     </li>
                 {% endfor %}
             </ul>
@@ -54,7 +54,7 @@
                     {% if inline.formset.can_delete %}
                         <button class="btn btn-outline-danger related-inline-item-remove float-right d-none">{% trans "delete" %}</button>
                     {% endif %}
-                    {% include "beam/partials/form_layout.html" with form=inline.formset.empty_form fields=inline.fields layout=inline.layout only %}
+                    {% include "beam/partials/form_layout.html" with form=inline.formset.empty_form fields=inline.fields layout=inline.layout %}
                 </li>
             </ul>
         </div>

@@ -136,17 +136,20 @@ class CreateView(ViewSetContextMixin, CreateWithInlinesMixin, generic.CreateView
     def form_valid(self, form, inlines):
         response = super().form_valid(form, inlines)
         if self.request.GET.get("_popup"):
-            return HttpResponse(
-                "<script>"
-                'window.opener.postMessage({{id: "{id}", result: "created", source: "{source}", text: "{text}"}});'
-                "window.close()"
-                "</script>".format(
-                    id=escape(self.object.pk),
-                    source=escape(self.request.GET["_popup"]),
-                    text=escape(str(self.object)),
-                )
-            )
+            return self.popup_response()
         return response
+
+    def popup_response(self):
+        return HttpResponse(
+            "<script>"
+            'window.opener.postMessage({{id: "{id}", result: "created", source: "{source}", text: "{text}"}});'
+            "window.close()"
+            "</script>".format(
+                id=escape(self.object.pk),
+                source=escape(self.request.GET["_popup"]),
+                text=escape(str(self.object)),
+            )
+        )
 
 
 class UpdateView(ViewSetContextMixin, UpdateWithInlinesMixin, generic.UpdateView):

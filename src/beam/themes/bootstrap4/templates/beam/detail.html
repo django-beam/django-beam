@@ -46,7 +46,7 @@
                     <ul class="list-group list-group-flush mb-0">
                         {% for instance in inline.instances %}
                             <li class="list-group-item bg-light">
-                                {% include "beam/partials/layout.html" with object=instance layout=inline.layout fields=inline.fields only %}
+                                {% include "beam/partials/layout.html" with object=instance layout=inline.layout fields=inline.fields %}
                             </li>
                         {% empty %}
                             <li class="list-group-item bg-light">{% blocktrans with title=inline.get_title %}There aren't any.{% endblocktrans %}</li>
