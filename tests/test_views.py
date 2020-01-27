@@ -1,5 +1,5 @@
 from pytest import mark
-from testapp.models import Dragonfly, Sighting
+from testapp.models import Dragonfly, Sighting, CascadingSighting, ProtectedSighting
 from testapp.views import DragonflyViewSet
 
 
@@ -50,6 +50,60 @@ def test_update(client):
     assert b"alpha" in response.content
     assert "form" in response.context
     assert response.context["form"]["name"].value() == "alpha"
+
+
+@mark.django_db
+def test_delete(client):
+    alpha = Dragonfly.objects.create(name="alpha", age=47)
+    delete_url = DragonflyViewSet().links["delete"].reverse(alpha)
+    response = client.get(delete_url)
+    assert b"Are you sure you want to delete" in response.content
+    assert b"alpha" in response.content
+
+    response = client.post(delete_url)
+
+    assert response.status_code == 302
+    assert response["location"] == DragonflyViewSet().links["list"].reverse()
+
+    assert not Dragonfly.objects.filter(name="alpha").exists()
+
+
+@mark.django_db
+def test_delete_shows_related(client):
+    alpha = Dragonfly.objects.create(name="alpha", age=47)
+    CascadingSighting.objects.create(dragonfly=alpha, name="A related sighting")
+
+    delete_url = DragonflyViewSet().links["delete"].reverse(alpha)
+    response = client.get(delete_url)
+
+    assert b"The following objects" in response.content
+    assert b"sighting" in response.content
+
+    response = client.post(delete_url)
+
+    assert response.status_code == 302
+    assert response["location"] == DragonflyViewSet().links["list"].reverse()
+
+    assert not Dragonfly.objects.filter(name="alpha").exists()
+
+
+@mark.django_db
+def test_delete_protected_not_allowed(client):
+    alpha = Dragonfly.objects.create(name="alpha", age=47)
+    ProtectedSighting.objects.create(dragonfly=alpha, name="A related sighting")
+
+    delete_url = DragonflyViewSet().links["delete"].reverse(alpha)
+    response = client.get(delete_url)
+
+    assert b"You can't delete" in response.content
+    assert b"the following objects depend" in response.content
+    assert b"sighting" in response.content
+
+    response = client.post(delete_url)
+
+    assert response.status_code == 403
+
+    assert Dragonfly.objects.filter(name="alpha").exists()
 
 
 @mark.django_db

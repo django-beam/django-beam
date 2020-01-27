@@ -1,8 +1,10 @@
 from typing import List, Type
 
 from django.apps import apps
+from django.contrib.admin.utils import NestedObjects
+from django.db import router
 from django.forms import all_valid
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.utils.html import escape
 from django.views import generic
@@ -194,6 +196,38 @@ class DeleteView(ViewSetContextMixin, InlinesMixin, generic.DeleteView):
 
     def get_success_url(self):
         return self.viewset.links["list"].reverse()
+
+    def post(self, *args, **kwargs):
+        nested, protected = self.get_nested_objects(self.get_object())
+        if protected:
+            return HttpResponseForbidden()
+        return super(DeleteView, self).post(*args, **kwargs)
+
+    @classmethod
+    def get_nested_objects(cls, obj):
+        using = router.db_for_write(cls.model)
+        collector = NestedObjects(using=using)
+        collector.collect([obj])
+        nested = collector.nested(cls._format_obj)
+        collector.dependencies
+        return nested, list(map(cls._format_obj, collector.protected))
+
+    @staticmethod
+    def _format_obj(obj):
+        return '%s "%s"' % (obj._meta.verbose_name, str(obj))
+
+    def get_context_data(self, **kwargs):
+        context = super(DeleteView, self).get_context_data(**kwargs)
+        nested, protected = self.get_nested_objects(self.get_object())
+        context.update(
+            {
+                "object": self.object,
+                "object_name": self._format_obj(self.object),
+                "nested_objects": nested,
+                "protected_objects": protected,
+            }
+        )
+        return context
 
 
 class DashboardView(TemplateView):

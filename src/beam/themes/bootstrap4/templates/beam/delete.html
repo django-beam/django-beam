@@ -17,15 +17,28 @@
                 </h1>
             {% endblock %}
 
-            <p>
-                {% trans "Are you sure you want to delete this object:" %} {{ object }}?
-            </p>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-danger float-left">{% trans "Yes, I'm sure" %}</button>
-            </form>
-            <button class="btn btn-default float-left" onclick="window.history.back()">{% trans "No, go back." %}</button>
+            {% if protected_objects %}
+
+                <p>
+                    {% blocktrans with object_name=object_name %}You can't delete <em>{{ object_name }}</em> because the following objects depend on it:{% endblocktrans %}
+                </p>
+                <ul>{{ protected_objects|unordered_list }}</ul>
+
+            {% else %}
+                <p>
+                    {% blocktrans with object_name=object_name %}Are you sure you want to delete <em>{{ object_name }}</em>?{% endblocktrans %}
+                </p>
+                {% if nested_objects|length > 1 %}
+                <p>{%trans "The following objects will also be deleted:" %}</p>
+                <ul>{{ nested_objects|unordered_list }}</ul>
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-danger float-left">{% trans "Yes, I'm sure" %}</button>
+                </form>
+                <button class="btn btn-default float-left" onclick="window.history.back()">{% trans "No, go back." %}</button>
+            {% endif %}
         </div>
     </section>
 {% endblock %}
