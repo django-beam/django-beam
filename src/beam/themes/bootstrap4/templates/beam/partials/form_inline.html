@@ -4,7 +4,7 @@
          data-related-inline-js
          {% if inline.can_order %}data-can-order="true" data-order-field="{{ inline.order_field }}"{% endif %}
          {% if inline.can_delete %}data-can-delete="true"{% endif %}
-         {% if inline.can_delete %}data-prefix="{{ inline.prefix }}"{% endif %}
+         data-prefix="{{ inline.prefix }}"
 >
     <div class="container">
         <h2 class="pt-2">{{ inline.get_title|capfirst }}</h2>
