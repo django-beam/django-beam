@@ -1,7 +1,7 @@
 let $ = jQuery;
 
 function add_create_related_button(elem, text, url) {
-    $("<a><i class='fa fa-plus-circle' title='" + text + "'></a>").appendTo(elem).attr("href", url).attr("target", "_blank").css({
+    $("<a><i class='fa fa-plus-circle' title='" + text + "'></a>").appendTo(elem).attr("rel", "opener").attr("href", url).attr("target", "_blank").css({
         "position": "absolute",
         "right": 0,
         "top": "6px"

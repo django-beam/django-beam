@@ -144,7 +144,10 @@ class CreateView(ViewSetContextMixin, CreateWithInlinesMixin, generic.CreateView
     def popup_response(self):
         return HttpResponse(
             "<script>"
-            'window.opener.postMessage({{id: "{id}", result: "created", source: "{source}", text: "{text}"}});'
+            "window.opener.postMessage("
+            '{{id: "{id}", result: "created", source: "{source}", text: "{text}"}}, '
+            "document.origin"
+            ");"
             "window.close()"
             "</script>".format(
                 id=escape(self.object.pk),
