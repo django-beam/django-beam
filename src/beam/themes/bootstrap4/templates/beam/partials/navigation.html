@@ -21,13 +21,24 @@
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbar-link-{{ app.app_config.label }}">
                                 {% for viewset in app.viewsets %}
-                                    {% get_attribute viewset.model "_meta" as model_options %}
-                                    {% get_link_url viewset.links.list as list_url %}
-                                    {% if list_url %}
-                                        <a class="dropdown-item" href="{{ list_url }}">
-                                            {{model_options.verbose_name_plural|capfirst }}
-                                        </a>
-                                    {% endif %}
+                                    {% block viewset_menu_entry %}
+                                        {% if viewset.show_link and viewset.url_name %}
+                                        {# this isn't a viewset, it is a component we want to link #}
+                                        {% with component=viewset %}
+                                            <a class="dropdown-item" href="{{ component.reverse }}">
+                                                {{ component.verbose_name }}
+                                            </a>
+                                        {% endwith %}
+                                        {% else %}
+                                            {% get_attribute viewset.model "_meta" as model_options %}
+                                            {% get_link_url viewset.links.list as list_url %}
+                                            {% if list_url %}
+                                                <a class="dropdown-item" href="{{ list_url }}">
+                                                    {{model_options.verbose_name_plural|capfirst }}
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endblock %}
                                 {% endfor %}
                             </div>
                         </li>
