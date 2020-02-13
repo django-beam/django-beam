@@ -22,6 +22,18 @@ def test_list_search(client):
 
 
 @mark.django_db
+def test_list_sort(client):
+    Dragonfly.objects.create(name="alpha", age=12)
+    Dragonfly.objects.create(name="omega", age=99)
+
+    response = client.get(DragonflyViewSet().links["list"].reverse() + "?o=-name")
+    assert response.content.index(b"alpha") > response.content.index(b"omega")
+
+    response = client.get(DragonflyViewSet().links["list"].reverse() + "?o=name")
+    assert response.content.index(b"alpha") < response.content.index(b"omega")
+
+
+@mark.django_db
 def test_detail(client):
     alpha = Dragonfly.objects.create(name="alpha", age=47)
     Sighting.objects.create(name="Berlin", dragonfly=alpha)
@@ -131,7 +143,7 @@ def test_create_with_inlines(client):
 
 
 @mark.django_db
-def test_only_popup_param_is_preserved(client):
+def test_only_popup_param_is_preserved_in_detail_links(client):
     instance = Dragonfly.objects.create(name="alpha", age=12)
     response = client.get(
         DragonflyViewSet().links["list"].reverse(),
@@ -143,4 +155,4 @@ def test_only_popup_param_is_preserved(client):
     detail_url = DragonflyViewSet().links["update"].reverse(instance)
     assert detail_url in response_content
     assert detail_url + "?_popup=id_test" in response_content
-    assert "not_preserved" not in response_content
+    assert detail_url + "?_popup=id_test&not_preserved" not in response_content

@@ -1,7 +1,8 @@
-from typing import List, Type
+from typing import List, Type, Tuple, Optional
 
 from django.apps import apps
 from django.contrib.admin.utils import NestedObjects
+from django.core.exceptions import FieldDoesNotExist
 from django.db import router
 from django.forms import all_valid
 from django.http import HttpResponse, HttpResponseForbidden
@@ -165,7 +166,90 @@ class UpdateView(ViewSetContextMixin, UpdateWithInlinesMixin, generic.UpdateView
         return self.viewset.links["detail"].reverse(obj=self.object)
 
 
-class ListView(SearchableListMixin, ViewSetContextMixin, generic.ListView):
+class SortableListMixin(ViewSetContextMixin):
+    sort_param = "o"
+
+    def get_sort_fields(self):
+        if self.component.list_sort_fields is None:
+            return [
+                field
+                for field in self.component.fields
+                if self.get_sort_column_for_field(field)
+            ]
+
+        for field in self.component.list_sort_fields:
+            if self.get_sort_column_for_field(field) is None:
+                raise Exception(
+                    "Unable to determine sort column for explicit sort field {} on {}".format(
+                        field, self.viewset
+                    )
+                )
+
+        return self.component.list_sort_fields
+
+    def get_sort_fields_columns(self):
+        return self.component.list_sort_fields_columns or {}
+
+    def get_sort_column_for_field(self, field_name):
+        explicit = self.get_sort_fields_columns()
+        if field_name in explicit:
+            return explicit[field_name]
+
+        try:
+            field = self.model._meta.get_field(field_name)
+            return field.name
+        except FieldDoesNotExist:
+            return None
+
+    def get_sort_fields_from_request(self) -> List[str]:
+        current_sort = self.request.GET.get(self.sort_param, "")
+        if current_sort.startswith("-"):
+            sort_field = current_sort[1:]
+        else:
+            sort_field = current_sort
+
+        if sort_field in self.get_sort_fields():
+            return [current_sort]
+        else:
+            return []
+
+    def get_sort_columns(self, fields):
+        columns = []
+        for field in fields:
+            if field.startswith("-"):
+                descending = True
+                field = field[1:]
+            else:
+                descending = False
+
+            column = self.get_sort_column_for_field(field)
+            if not column:
+                continue
+
+            columns.append("-" + column if descending else column)
+        return columns
+
+    def sort_queryset(self, qs):
+        current_sort_fields = self.get_sort_fields_from_request()
+        current_sort_columns = self.get_sort_columns(current_sort_fields)
+        if current_sort_columns:
+            qs = qs.order_by(*current_sort_columns)
+        return qs
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return self.sort_queryset(qs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["sortable_fields"] = set(self.get_sort_fields())
+        context["sorted_fields"] = set(self.get_sort_fields_from_request())
+        return context
+
+
+class ListView(
+    SearchableListMixin, SortableListMixin, ViewSetContextMixin, generic.ListView
+):
     @property
     def search_fields(self):
         return self.component.list_search_fields

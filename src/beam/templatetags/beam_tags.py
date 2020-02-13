@@ -157,6 +157,18 @@ def fields_to_layout(fields):
 
 
 @register.simple_tag(takes_context=True)
+def sort_link(context, field, sorted_fields):
+    sort_param = context["view"].sort_param
+
+    if field in sorted_fields:
+        sort = "-" + field
+    else:
+        sort = field
+
+    return preserve_query_string(context, **{"page": "", sort_param: sort})
+
+
+@register.simple_tag(takes_context=True)
 def preserve_query_string(context, **kwargs):
     if not "request" in context:
         raise Exception(
@@ -197,7 +209,7 @@ def _add_params_to_url_if_new(url, default_params):
 
 
 PRESERVED_GET_PARAMS = [
-    "_popup"
+    "_popup",
 ]  # get parameters that should be preserved while following links
 
 

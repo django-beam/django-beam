@@ -114,11 +114,15 @@ class ListComponent(Component):
         list_search_fields=None,
         list_paginate_by=None,
         list_item_link_layout=None,
+        list_sort_fields=None,
+        list_sort_fields_columns=None,
         **kwargs
     ):
         self.list_search_fields = list_search_fields
         self.list_paginate_by = list_paginate_by
         self.list_item_link_layout = list_item_link_layout
+        self.list_sort_fields = list_sort_fields
+        self.list_sort_fields_columns = list_sort_fields_columns
         super().__init__(**kwargs)
 
 

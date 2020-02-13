@@ -40,16 +40,25 @@
 
             {% block table %}
                 <table class="table table-striped">
+                    {% block table_head %}
                     <thead>
                     <tr>
                         {% for field in component.fields %}
                             <th scope="col">
-                                {{ component.model|field_verbose_name:field|capfirst }}
+                                {% if field in sortable_fields %}
+                                    <a href="{% sort_link field sorted_fields %}">
+                                        {{ component.model|field_verbose_name:field|capfirst }}
+                                        {% if field in sorted_fields %}<i class="fa fa-caret-up"></i>{% elif "-"|add:field in sorted_fields %}<i class="fa fa-caret-down"></i>{% endif %}
+                                    </a>
+                                {% else %}
+                                    {{ component.model|field_verbose_name:field|capfirst }}
+                                {% endif %}
                             </th>
                         {% endfor %}
                         <th>{% trans "Actions" %}</th>
                     </tr>
                     </thead>
+                        {% endblock %}
                     <tbody>
                     {% for object in object_list %}
                         <tr>

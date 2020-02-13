@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from functools import wraps
 from logging import getLogger
-from typing import Any, List, Tuple, Dict, Type, Iterable, Sequence
+from typing import Any, List, Tuple, Dict, Type, Iterable, Sequence, Mapping
 
 from django.db.models import Model, QuerySet
 from django.forms import ModelForm, Form
@@ -120,6 +120,8 @@ class ListMixin(BaseViewSet):
     list_url_kwargs: List[str] = []
     list_verbose_name = _("list")
 
+    list_sort_fields: List[str]
+    list_sort_fields_columns: Mapping[str, str]
     list_search_fields: List[str] = []
     list_paginate_by = 25
     list_item_link_layout = ["update", "detail"]
