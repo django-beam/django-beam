@@ -173,9 +173,10 @@ class SortableListMixin(ViewSetContextMixin):
     def get_sort_fields(self):
         if self.component.list_sort_fields is None:
             return [
-                field
+                # cast to string to support virtual fields
+                str(field)
                 for field in self.component.fields
-                if self.get_sort_column_for_field(field)
+                if self.get_sort_column_for_field(str(field))
             ]
 
         for field in self.component.list_sort_fields:
