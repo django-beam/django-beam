@@ -159,13 +159,23 @@ def fields_to_layout(fields):
 @register.simple_tag(takes_context=True)
 def sort_link(context, field, sorted_fields):
     sort_param = context["view"].sort_param
+    sort_separator = context["view"].sort_separator
+
+    sorted_fields = list(sorted_fields)
+    negated_field = "-" + field
 
     if field in sorted_fields:
-        sort = "-" + field
+        sorted_fields.remove(field)
+        sorted_fields.append(negated_field)
+    elif negated_field in sorted_fields:
+        sorted_fields.remove(negated_field)
+        sorted_fields.append(field)
     else:
-        sort = field
+        sorted_fields.append(field)
 
-    return preserve_query_string(context, **{"page": "", sort_param: sort})
+    return preserve_query_string(
+        context, **{"page": "", sort_param: sort_separator.join(sorted_fields)}
+    )
 
 
 @register.simple_tag(takes_context=True)

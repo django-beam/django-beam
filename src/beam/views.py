@@ -168,6 +168,7 @@ class UpdateView(ViewSetContextMixin, UpdateWithInlinesMixin, generic.UpdateView
 
 class SortableListMixin(ViewSetContextMixin):
     sort_param = "o"
+    sort_separator = ","
 
     def get_sort_fields(self):
         if self.component.list_sort_fields is None:
@@ -202,16 +203,19 @@ class SortableListMixin(ViewSetContextMixin):
             return None
 
     def get_sort_fields_from_request(self) -> List[str]:
-        current_sort = self.request.GET.get(self.sort_param, "")
-        if current_sort.startswith("-"):
-            sort_field = current_sort[1:]
-        else:
-            sort_field = current_sort
+        fields = []
+        sort_fields = set(self.get_sort_fields())
+        for field in self.request.GET.get(self.sort_param, "").split(
+            self.sort_separator
+        ):
+            if field.startswith("-"):
+                sort_field = field[1:]
+            else:
+                sort_field = field
 
-        if sort_field in self.get_sort_fields():
-            return [current_sort]
-        else:
-            return []
+            if sort_field in sort_fields:
+                fields.append(field)
+        return fields
 
     def get_sort_columns(self, fields):
         columns = []
@@ -243,7 +247,7 @@ class SortableListMixin(ViewSetContextMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["sortable_fields"] = set(self.get_sort_fields())
-        context["sorted_fields"] = set(self.get_sort_fields_from_request())
+        context["sorted_fields"] = self.get_sort_fields_from_request()
         return context
 
 

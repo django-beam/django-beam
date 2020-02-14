@@ -46,9 +46,8 @@
                         {% for field in component.fields %}
                             <th scope="col">
                                 {% if field in sortable_fields %}
-                                    <a href="{% sort_link field sorted_fields %}">
-                                        {{ component.model|field_verbose_name:field|capfirst }}
-                                        {% if field in sorted_fields %}<i class="fa fa-caret-up"></i>{% elif "-"|add:field in sorted_fields %}<i class="fa fa-caret-down"></i>{% endif %}
+                                    <a class="text-nowrap" href="{% sort_link field sorted_fields %}">
+                                        {{ component.model|field_verbose_name:field|capfirst }}&nbsp;{% if field in sorted_fields %}<i class="fa fa-caret-up"></i>{% elif "-"|add:field in sorted_fields %}<i class="fa fa-caret-down"></i>{% endif %}
                                     </a>
                                 {% else %}
                                     {{ component.model|field_verbose_name:field|capfirst }}
