@@ -1,3 +1,4 @@
+import warnings
 from collections import OrderedDict
 from typing import Dict, TYPE_CHECKING
 
@@ -17,12 +18,13 @@ def register(registry: RegistryType, viewset: BaseViewSet):
 
     app_registry = registry.setdefault(app_label, {})
     if model_name in app_registry:
-        raise Exception(
+        warnings.warn(
             "Duplicate registration of {} for app label {} with model {}, "
             "beam.viewsets.unregister the existing viewset first.".format(
                 viewset, app_label, registry
             )
         )
+        return
     app_registry[model_name] = viewset
 
 

@@ -10,8 +10,8 @@ def test_registry_contains_viewset():
     assert default_registry["testapp"]["dragonfly"] is DragonflyViewSet
 
 
-def test_duplicate_registration_errors():
-    with pytest.raises(Exception):
+def test_duplicate_registration_warns():
+    with pytest.warns(UserWarning):
 
         class AnotherDragonFlyViewSet(DragonflyViewSet):
             pass
