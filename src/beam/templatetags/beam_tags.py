@@ -9,7 +9,7 @@ from django.template import RequestContext
 from django.template.loader import get_template
 from django.urls import NoReverseMatch
 from django.utils.http import urlencode
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Sequence
 
 from beam.layouts import layout_links
 from beam.registry import get_viewset_for_model, default_registry
@@ -157,7 +157,7 @@ def fields_to_layout(fields):
 
 
 @register.simple_tag(takes_context=True)
-def sort_link(context, field, sorted_fields):
+def sort_link(context, field: str, sorted_fields: Sequence[str]):
     sort_param = context["view"].sort_param
     sort_separator = context["view"].sort_separator
 

@@ -45,12 +45,12 @@
                     <tr>
                         {% for field in component.fields %}
                             <th scope="col">
-                                {% with field=field|stringformat:"s" %}{# cast to string to support virtual fields #}
-                                    {% if field in sortable_fields %}
-                                        <a class="text-nowrap" href="{% sort_link field sorted_fields %}">
-                                            {{ component.model|field_verbose_name:field|capfirst }}&nbsp;{% if field in sorted_fields %}<i class="fa fa-caret-up"></i>{% elif "-"|add:field in sorted_fields %}<i class="fa fa-caret-down"></i>{% endif %}
+                                {% with field_name=field|stringformat:"s" %}{# cast to string to support virtual fields #}
+                                    {% if field_name in sortable_fields %}
+                                        <a class="text-nowrap" href="{% sort_link field_name sorted_fields %}">
+                                            {{ component.model|field_verbose_name:field|capfirst }}&nbsp;{% if field_name in sorted_fields %}<i class="fa fa-caret-up"></i>{% elif "-"|add:field_name in sorted_fields %}<i class="fa fa-caret-down"></i>{% endif %}
                                         </a>
-                                        {% if field in sorted_fields or "-"|add:field in sorted_fields %}
+                                        {% if field_name in sorted_fields or "-"|add:field_name in sorted_fields %}
                                             <a title="{% trans "reset sort" %}" href="{% sort_link "" "" %}"><i class="fa fa-remove"></i></a>
                                         {% endif %}
                                     {% else %}
