@@ -56,6 +56,7 @@ Should end up at  https://django-beam.readthedocs.io/en/latest/
     INSTALLED_APPS += [
         "beam",
         "beam.themes.bootstrap4",  # or choose any theme you like
+        "crispy_forms",
     ]
 ```
 
