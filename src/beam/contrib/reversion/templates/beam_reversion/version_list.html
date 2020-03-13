@@ -24,7 +24,7 @@
         </thead>
         {% for version in versions %}
             <tr>
-                {% get_link_url links.version_detail version.object version_id=version.pk as version_detail_url %}
+                {% get_link_url viewset.links.version_detail version.object version_id=version.pk as version_detail_url %}
                 <th scope="row"><a href="{{ version_detail_url }}">{{version.revision.date_created|date:"DATETIME_FORMAT"}}</a></th>
                 <td>
                     {% if version.revision.user %}
