@@ -2,4 +2,3 @@
 tox
 pytest
 pytest-django
-pytest-sugar
