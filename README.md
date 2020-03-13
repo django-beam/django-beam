@@ -10,7 +10,7 @@ The goal is having the functionality provided by django's own admin, but in a wa
 
 ## This project is still in early development. 
 Most of the core concepts have stabilized and it is being used in production. However there may
-still be breaking changes gonig forward
+still be breaking changes going forward
 
 ## Features
 - CRUD operations based on class based views
@@ -60,7 +60,7 @@ Should end up at  https://django-beam.readthedocs.io/en/latest/
 ```
 
 ## Core concepts
-There are a few pieces beyond standard django that you need to understand to use beams.
+There are a few pieces beyond standard django that you need to understand to use beam.
 The first one are **ViewSets**. They are used to group and configure several views for a single model (similar to
 `django-rest-framework`). Specifying e.g. `fields = ["name", "age"]` will pass those fields to all views for the specified model. They also allow you to specify and override configuration for single views, by setting e.g. `update_fields = ["name"]` the update view will be restricted to just the name.
 
@@ -69,7 +69,7 @@ the viewset to the individual views. A view is only passed data that it's compon
 `__init__`. 
 
 The viewset figures out which attributes should be passed to a component and also takes into account
-the specificiy. If you specify both `fields` and `detail_fields`, the detail component will receive
+the specificity. If you specify both `fields` and `detail_fields`, the detail component will receive
 the latter, while all other components will be passed the former.
 
 ### Example of using a custom component 
