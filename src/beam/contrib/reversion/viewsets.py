@@ -92,6 +92,16 @@ class VersionViewSetMixin(VersionDetailMixin, VersionListMixin):
         inline_fields = []
         for inline_class in inline_classes:
             inline_model = inline_class.model
+            inline_model_opts = inline_class.model._meta
+
+            # do not register inlines that have their own viewset, this yields confusing
+            # behaviour as they may not be registered on their own
+            if (
+                inline_model_opts.app_label in self.registry
+                and inline_model_opts.model_name
+                in self.registry[inline_model_opts.app_label]
+            ):
+                continue
 
             # register the inline model
             self._register_model_with_parents(inline_model)
