@@ -200,13 +200,12 @@ def test_show_detail_from_previous_version(django_user_model):
 
 
 @mark.django_db
-def test_revert_to_previous_version():
+def test_revert_to_previous_version(django_user_model):
     alpha = Dragonfly.objects.create(name="alpha", age=47)
     sighting = Sighting.objects.create(name="Berlin", dragonfly=alpha)
 
-    user = get_user_model().objects.create()
     request = RequestFactory().post("/", {})
-    request.user = user
+    request.user = user_with_perms(django_user_model, ["testapp.change_dragonfly"])
     SessionMiddleware().process_request(request)
     MessageMiddleware().process_request(request)
 
@@ -224,7 +223,7 @@ def test_revert_to_previous_version():
     sighting.save()
 
     version_view = VersionedDragonflyViewSet()._get_view(
-        VersionedDragonflyViewSet().components["version_detail"]
+        VersionedDragonflyViewSet().components["version_restore"]
     )
     response = version_view(request, pk=alpha.pk, version_id=version.pk)
 

@@ -14,7 +14,9 @@
 {% block below_inlines %}
     <section class="border-top">
         <div class="container">
-            <form method="post">
+
+            {% get_link_url links.version_restore version.object version_id=version.pk as version_restore_url %}
+            <form action="{{ version_restore_url }}" method="post">
                 {% csrf_token %}
                 <input class="btn btn-danger float-right" type="submit" value="{% trans "Revert to this version" %}">
             </form>
