@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, transaction
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext as _
 from django.views import generic
@@ -26,6 +27,10 @@ class VersionDetailView(DetailView):
         self.version = Version.objects.get_for_object_reference(
             self.model, kwargs["pk"]
         ).get(pk=kwargs["version_id"])
+
+        # ensure permissions because in POST case we will not call super().dispatch
+        if not self.has_perm():
+            self.handle_no_permission()
 
         # Check that database transactions are supported.
         if not connection.features.uses_savepoints:
