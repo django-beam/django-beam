@@ -13,8 +13,24 @@ from reversion import (
 
 from beam import RelatedInline
 from beam import ViewSet
+from beam.contrib.reversion.views import VersionRestoreView
 from beam.viewsets import BaseViewSet, Component
 from .views import VersionDetailView, VersionListView
+
+
+class VersionRestoreMixin(BaseViewSet):
+    version_restore_view_class = VersionRestoreView
+    version_restore_url = "<str:pk>/versions/<str:version_id>/restore/"
+    version_restore_url_kwargs = ["pk"]
+    version_restore_verbose_name = _("restore version")
+    version_restore_url_name = None
+    version_restore_link_layout = ["version_list"]
+    version_restore_permission = (
+        "{component.model._meta.app_label}.change_{component.model._meta.model_name}"
+    )
+
+    def get_component_classes(self):
+        return super().get_component_classes() + [("version_restore", Component)]
 
 
 class VersionDetailMixin(BaseViewSet):
@@ -47,7 +63,7 @@ class VersionListMixin(BaseViewSet):
         return super().get_component_classes() + [("version_list", Component)]
 
 
-class VersionViewSetMixin(VersionDetailMixin, VersionListMixin):
+class VersionViewSetMixin(VersionRestoreMixin, VersionDetailMixin, VersionListMixin):
     versioned_component_names = ["create", "update"]
 
     def __init__(self) -> None:
