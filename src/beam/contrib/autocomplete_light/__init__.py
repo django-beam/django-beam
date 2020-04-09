@@ -87,6 +87,9 @@ class AutocompleteMixin(BaseViewSet):
     autocomplete_lookup_type = "istartswith"
     autocomplete_search_fields = None
     autocomplete_result_label = None
+    autocomplete_permission = (
+        "{component.model._meta.app_label}.view_{component.model._meta.model_name}"
+    )
 
     def get_component_classes(self):
         return [

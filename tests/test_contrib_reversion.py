@@ -10,6 +10,7 @@ from reversion import is_registered, set_comment
 from beam import RelatedInline
 from beam.contrib.reversion.viewsets import VersionViewSet
 from beam.registry import RegistryType
+from test_views import user_with_perms
 from testapp.models import Dragonfly, Petaluridae, Sighting
 
 
@@ -48,8 +49,8 @@ def test_unrelated_models_are_not_registered():
 
 
 @mark.django_db
-def test_using_create_view_creates_a_revision():
-    user = get_user_model().objects.create()
+def test_using_create_view_creates_a_revision(django_user_model):
+    user = user_with_perms(django_user_model, ["testapp.add_dragonfly"])
     create_view = VersionedDragonflyViewSet()._get_view(
         VersionedDragonflyViewSet().components["create"]
     )
@@ -87,10 +88,10 @@ def test_using_create_view_creates_a_revision():
 
 
 @mark.django_db
-def test_using_update_view_creates_a_revision():
+def test_using_update_view_creates_a_revision(django_user_model):
+    user = user_with_perms(django_user_model, ["testapp.change_dragonfly"])
     alpha = Dragonfly.objects.create(name="alpha", age=47)
 
-    user = get_user_model().objects.create()
     update_view = VersionedDragonflyViewSet()._get_view(
         VersionedDragonflyViewSet().components["update"]
     )
@@ -122,12 +123,11 @@ def test_using_update_view_creates_a_revision():
 
 
 @mark.django_db
-def test_revision_is_visible_in_list():
+def test_revision_is_visible_in_list(django_user_model):
     alpha = Dragonfly.objects.create(name="alpha", age=47)
 
-    user = get_user_model().objects.create()
     request = RequestFactory().get("/", {})
-    request.user = user
+    request.user = user_with_perms(django_user_model, ["testapp.view_dragonfly"])
 
     with VersionedDragonflyViewSet().create_revision(request):
         set_comment("number one")
@@ -156,13 +156,12 @@ def test_revision_is_visible_in_list():
 
 
 @mark.django_db
-def test_show_detail_from_previous_version():
+def test_show_detail_from_previous_version(django_user_model):
     alpha = Dragonfly.objects.create(name="alpha", age=47)
     sighting = Sighting.objects.create(name="Berlin", dragonfly=alpha)
 
-    user = get_user_model().objects.create()
     request = RequestFactory().get("/", {})
-    request.user = user
+    request.user = user_with_perms(django_user_model, ["testapp.view_dragonfly"])
 
     with VersionedDragonflyViewSet().create_revision(request):
         alpha.save()

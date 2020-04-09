@@ -2,7 +2,7 @@ from typing import List, Type, Tuple, Optional
 
 from django.apps import apps
 from django.contrib.admin.utils import NestedObjects
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, PermissionDenied
 from django.db import router
 from django.forms import all_valid
 from django.http import HttpResponse, HttpResponseForbidden
@@ -49,6 +49,15 @@ class ViewSetContextMixin(ContextMixin):
 
     def get_inline_classes(self):
         return self.component.inline_classes
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            obj = self.get_object()
+        except AttributeError:
+            obj = None
+        if not self.component.has_perm(request.user, obj):
+            raise PermissionDenied("You shall not pass")
+        return super().dispatch(request, *args, **kwargs)
 
 
 class InlinesMixin(ContextMixin):

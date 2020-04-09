@@ -1,7 +1,7 @@
 {% load beam_tags %}
 {% load i18n %}
 
-{% get_visible_links links link_layout object as link_urls %}
+{% get_visible_links request.user links link_layout object as link_urls %}
 
 {% if link_urls %}
     <div class="btn-group" role="group" aria-label="{% trans "Actions" %}">

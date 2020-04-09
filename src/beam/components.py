@@ -21,9 +21,13 @@ class BaseComponent:
 
         self.name = name
         self.verbose_name = verbose_name or self.name
-        self.permission = permission  # FIXME string / list / callable
         self.url_name = url_name
         self.url_kwargs = url_kwargs
+
+        if isinstance(permission, str):
+            self.permission = permission.format(component=self)
+        else:
+            self.permission = permission
 
     @classmethod
     def get_arguments(cls) -> Set[str]:
@@ -38,6 +42,17 @@ class BaseComponent:
 
     def get_context(self):
         return {name: getattr(self, name) for name in self.get_arguments()}
+
+    def has_perm(self, user, obj=None):
+        if self.permission is None:
+            return True
+        if not user:
+            return False
+        if callable(self.permission):
+            return self.permission(user, obj=obj)
+        # FIXME support for object permissions
+        # the ModelBackend returns False as soon as we supply an obj which gives us a bad default :-(
+        return user.has_perm(self.permission)
 
     def reverse(self, obj=None, extra_kwargs=None):
         if not obj:
@@ -64,9 +79,10 @@ class Component(BaseComponent):
         model=None,
         inline_classes=None,
         link_layout=None,
+        name=None,
+        url_name=None,
         **kwargs
     ):
-        super().__init__(**kwargs)
         self.url = url
 
         if not view_class:
@@ -82,7 +98,7 @@ class Component(BaseComponent):
 
         if model is None and queryset is None:
             raise ValueError(
-                "Component {} needs at least one of model, queryset".format(self.name)
+                "Component {} needs at least one of model, queryset".format(name)
             )
         elif model is not None and queryset is None:
             queryset = model._default_manager
@@ -92,14 +108,15 @@ class Component(BaseComponent):
         self.model = model
         self.queryset = queryset.all()  # ensure we don't keep stale copies of querysets
 
-        if not self.url_name:
-            self.url_name = "{}_{}_{}".format(
-                self.model._meta.app_label, self.model._meta.model_name, self.name
+        if not url_name:
+            url_name = "{}_{}_{}".format(
+                self.model._meta.app_label, self.model._meta.model_name, name
             )
 
         self.link_layout = (
-            link_layout if link_layout is not None else ["!{}".format(self.name), "..."]
+            link_layout if link_layout is not None else ["!{}".format(name), "..."]
         )
+        super().__init__(name=name, url_name=url_name, **kwargs)
 
 
 class FormComponent(Component):
