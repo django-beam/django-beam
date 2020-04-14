@@ -5,11 +5,11 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from beam.components import Component
-from beam.views import ViewSetContextMixin
+from beam.views import ComponentMixin
 from beam.viewsets import BaseViewSet
 
 
-class BaseAutocomplete(ViewSetContextMixin, autocomplete.Select2QuerySetView):
+class BaseAutocomplete(ComponentMixin, autocomplete.Select2QuerySetView):
     @property
     def lookup_type(self):
         return self.component.autocomplete_lookup_type

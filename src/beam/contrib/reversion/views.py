@@ -9,7 +9,7 @@ from django.views import generic
 from reversion import set_comment, RevertError
 from reversion.models import Version
 
-from beam.views import ViewSetContextMixin, DetailView
+from beam.views import ComponentMixin, DetailView
 
 
 class _RollBackRevisionView(Exception):
@@ -70,7 +70,7 @@ class VersionDetailView(DetailView):
         return ["beam_reversion/version_detail.html"]
 
 
-class VersionListView(ViewSetContextMixin, generic.DetailView):
+class VersionListView(ComponentMixin, generic.DetailView):
     def get_template_names(self):
         return ["beam_reversion/version_list.html"]
 
