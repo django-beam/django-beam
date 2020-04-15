@@ -36,6 +36,14 @@ def test_list(client_with_perms):
 
 
 @mark.django_db
+def test_list_requires_permission(client_with_perms):
+    client = client_with_perms()
+    Dragonfly.objects.create(name="alpha", age=12)
+    response = client.get(DragonflyViewSet().links["list"].reverse())
+    assert response.status_code == 403
+
+
+@mark.django_db
 def test_list_search(client_with_perms):
     client = client_with_perms("testapp.view_dragonfly")
     Dragonfly.objects.create(name="alpha", age=12)
@@ -84,6 +92,15 @@ def test_detail(client_with_perms):
 
 
 @mark.django_db
+def test_detail_requires_permission(client_with_perms):
+    client = client_with_perms()
+    alpha = Dragonfly.objects.create(name="alpha", age=47)
+    links = DragonflyViewSet().links
+    response = client.get(links["detail"].reverse(alpha))
+    assert response.status_code == 403
+
+
+@mark.django_db
 def test_update(client_with_perms):
     client = client_with_perms("testapp.change_dragonfly")
     alpha = Dragonfly.objects.create(name="alpha", age=47)
@@ -91,6 +108,14 @@ def test_update(client_with_perms):
     assert b"alpha" in response.content
     assert "form" in response.context
     assert response.context["form"]["name"].value() == "alpha"
+
+
+@mark.django_db
+def test_update_requires_permission(client_with_perms):
+    client = client_with_perms()
+    alpha = Dragonfly.objects.create(name="alpha", age=47)
+    response = client.get(DragonflyViewSet().links["update"].reverse(alpha))
+    assert response.status_code == 403
 
 
 @mark.django_db
@@ -148,6 +173,19 @@ def test_delete_protected_not_allowed(client_with_perms):
     assert response.status_code == 403
 
     assert Dragonfly.objects.filter(name="alpha").exists()
+
+
+@mark.django_db
+def test_delete_requires_permission(client_with_perms):
+    client = client_with_perms()
+    alpha = Dragonfly.objects.create(name="alpha", age=47)
+    delete_url = DragonflyViewSet().links["delete"].reverse(alpha)
+
+    response = client.get(delete_url)
+    assert response.status_code == 403
+
+    response = client.post(delete_url)
+    assert response.status_code == 403
 
 
 @mark.django_db
