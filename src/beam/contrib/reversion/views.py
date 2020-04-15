@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, transaction
 from django.http import HttpResponseRedirect
+from django.views import View
 from django.shortcuts import get_object_or_404
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext as _
@@ -18,46 +19,62 @@ class _RollBackRevisionView(Exception):
         self.response = response
 
 
-class VersionDetailView(DetailView):
-    def get_context_data(self, **kwargs):
-        kwargs["version"] = self.version
-        return super().get_context_data(**kwargs)
-
-    def dispatch(self, request, *args, **kwargs):
+class VersionRestoreView(ComponentMixin, View):
+    def post(self, request, *args, **kwargs):
         self.version = Version.objects.get_for_object_reference(
             self.model, kwargs["pk"]
         ).get(pk=kwargs["version_id"])
 
-        # ensure permissions because in POST case we will not call super().dispatch
-        if not self.has_perm():
-            self.handle_no_permission()
-
         # Check that database transactions are supported.
         if not connection.features.uses_savepoints:
             raise ImproperlyConfigured(
-                "Cannot use VersionAdmin with a database that does not support savepoints."
+                "Cannot use with a database that does not support savepoints."
             )
 
         # Run the view.
         try:
             with transaction.atomic(using=self.version.db):
                 # Revert the revision.
-                if request.method == "POST":
-                    with self.viewset.create_revision(request):
-                        set_comment(_("revert to version {}".format(self.version.pk)))
-                        self.version.revision.revert(delete=True)
-                        messages.success(request, "Reverted")
-                        return HttpResponseRedirect(
-                            self.viewset.links["detail"].reverse(self.version.object)
-                        )
-                else:
+                with self.viewset.create_revision(request):
+                    set_comment(_("revert to version {}".format(self.version.pk)))
                     self.version.revision.revert(delete=True)
-                    response = super().dispatch(request, *args, **kwargs)
-                    if hasattr(response, "render"):
-                        response.render()
-                    raise _RollBackRevisionView(
-                        response
-                    )  # Raise exception to undo the transaction and revision.
+                    messages.success(request, "Reverted")
+                    return HttpResponseRedirect(
+                        self.viewset.links["detail"].reverse(self.version.object)
+                    )
+        except RevertError as ex:
+            messages.error(request, force_text(ex))
+            return HttpResponseRedirect(
+                self.viewset.links["detail"].reverse(self.version.object)
+            )
+
+
+class VersionDetailView(DetailView):
+    def get_context_data(self, **kwargs):
+        kwargs["version"] = self.version
+        return super().get_context_data(**kwargs)
+
+    def get(self, request, *args, **kwargs):
+        self.version = Version.objects.get_for_object_reference(
+            self.model, kwargs["pk"]
+        ).get(pk=kwargs["version_id"])
+
+        # Check that database transactions are supported.
+        if not connection.features.uses_savepoints:
+            raise ImproperlyConfigured(
+                "Cannot use with a database that does not support savepoints."
+            )
+
+        # Run the view.
+        try:
+            with transaction.atomic(using=self.version.db):
+                self.version.revision.revert(delete=True)
+                response = super().get(request, *args, **kwargs)
+                if hasattr(response, "render"):
+                    response.render()
+                raise _RollBackRevisionView(
+                    response
+                )  # Raise exception to undo the transaction and revision.
         except RevertError as ex:
             messages.error(request, force_text(ex))
             return HttpResponseRedirect(
