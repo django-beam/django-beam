@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from typing import Iterable
+from typing import Iterable, List
 
 from django.utils.translation import ugettext_lazy as _
 from reversion import (
@@ -14,7 +14,20 @@ from reversion import (
 from beam import RelatedInline
 from beam import ViewSet
 from beam.viewsets import BaseViewSet, Component
-from .views import VersionDetailView, VersionListView
+from .views import VersionRestoreView, VersionDetailView, VersionListView
+
+
+class VersionRestoreMixin(BaseViewSet):
+    version_restore_view_class = VersionRestoreView
+    version_restore_url = "<str:pk>/versions/<str:version_id>/restore/"
+    version_restore_url_kwargs = ["pk"]
+    version_restore_verbose_name = None
+    version_restore_url_name = None
+    version_restore_link_layout: List[str] = []
+    version_restore_permission = "{app_label}.change_{model_name}"
+
+    def get_component_classes(self):
+        return super().get_component_classes() + [("version_restore", Component)]
 
 
 class VersionDetailMixin(BaseViewSet):
@@ -24,6 +37,7 @@ class VersionDetailMixin(BaseViewSet):
     version_detail_verbose_name = _("show version")
     version_detail_url_name = None
     version_detail_link_layout = ["version_list"]
+    version_detail_permission = "{app_label}.view_{model_name}"
 
     def get_component_classes(self):
         return super().get_component_classes() + [("version_detail", Component)]
@@ -36,12 +50,13 @@ class VersionListMixin(BaseViewSet):
     version_list_verbose_name = _("history")
     version_list_url_name = None
     version_list_link_layout = ["detail"]
+    version_list_permission = "{app_label}.view_{model_name}"
 
     def get_component_classes(self):
         return super().get_component_classes() + [("version_list", Component)]
 
 
-class VersionViewSetMixin(VersionDetailMixin, VersionListMixin):
+class VersionViewSetMixin(VersionDetailMixin, VersionRestoreMixin, VersionListMixin):
     versioned_component_names = ["create", "update"]
 
     def __init__(self) -> None:

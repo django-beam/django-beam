@@ -132,6 +132,9 @@ class ListMixin(BaseViewSet):
     list_queryset: QuerySet
     list_inline_classes: List[RelatedInline]
     list_form_class: ModelForm
+    list_permission = "{app_label}.view_{model_name}"
+
+    # add / change / delete / view
 
 
 class CreateMixin(BaseViewSet):
@@ -149,6 +152,7 @@ class CreateMixin(BaseViewSet):
     create_inline_classes: List[RelatedInline]
     create_form_class: ModelForm
     create_link_layout = ["!create", "!update", "..."]
+    create_permission = "{app_label}.add_{model_name}"
 
 
 class UpdateMixin(BaseViewSet):
@@ -166,6 +170,7 @@ class UpdateMixin(BaseViewSet):
     update_inline_classes: List[RelatedInline]
     update_form_class: ModelForm
     update_link_layout = ["!create", "!update", "list", "...", "detail"]
+    update_permission = "{app_label}.change_{model_name}"
 
 
 class DetailMixin(BaseViewSet):
@@ -182,6 +187,7 @@ class DetailMixin(BaseViewSet):
     detail_queryset: QuerySet
     detail_inline_classes: List[RelatedInline]
     detail_link_layout = ["!detail", "...", "update"]
+    detail_permission = "{app_label}.view_{model_name}"
 
 
 class DeleteMixin(BaseViewSet):
@@ -198,6 +204,7 @@ class DeleteMixin(BaseViewSet):
     delete_queryset: QuerySet
     delete_inline_classes: List[RelatedInline]
     delete_link_layout = ["!delete", "..."]
+    delete_permission = "{app_label}.delete_{model_name}"
 
 
 class ViewSet(

@@ -1,10 +1,33 @@
+import pytest
+from django.contrib.auth.models import Permission
 from pytest import mark
 from testapp.models import Dragonfly, Sighting, CascadingSighting, ProtectedSighting
 from testapp.views import DragonflyViewSet
 
 
+def user_with_perms(django_user_model, perms, username="foo", password="bar"):
+    user = django_user_model.objects.create_user(username=username, password=password)
+    for perm in perms:
+        app_label, codename = perm.split(".")
+        user.user_permissions.add(
+            Permission.objects.get(content_type__app_label=app_label, codename=codename)
+        )
+    return user
+
+
+@pytest.fixture
+def client_with_perms(client, django_user_model):
+    def get_client_with_perms(*perms):
+        user_with_perms(django_user_model, perms, username="foo", password="bar")
+        client.login(username="foo", password="bar")
+        return client
+
+    return get_client_with_perms
+
+
 @mark.django_db
-def test_list(client):
+def test_list(client_with_perms):
+    client = client_with_perms("testapp.view_dragonfly")
     Dragonfly.objects.create(name="alpha", age=12)
     Dragonfly.objects.create(name="omega", age=99)
     response = client.get(DragonflyViewSet().links["list"].reverse())
@@ -13,7 +36,16 @@ def test_list(client):
 
 
 @mark.django_db
-def test_list_search(client):
+def test_list_requires_permission(client_with_perms):
+    client = client_with_perms()
+    Dragonfly.objects.create(name="alpha", age=12)
+    response = client.get(DragonflyViewSet().links["list"].reverse())
+    assert response.status_code == 403
+
+
+@mark.django_db
+def test_list_search(client_with_perms):
+    client = client_with_perms("testapp.view_dragonfly")
     Dragonfly.objects.create(name="alpha", age=12)
     Dragonfly.objects.create(name="omega", age=99)
     response = client.get(DragonflyViewSet().links["list"].reverse() + "?q=alpha")
@@ -22,7 +54,8 @@ def test_list_search(client):
 
 
 @mark.django_db
-def test_list_sort(client):
+def test_list_sort(client_with_perms):
+    client = client_with_perms("testapp.view_dragonfly")
     Dragonfly.objects.create(name="alpha", age=12)
     Dragonfly.objects.create(name="omega", age=99)
 
@@ -34,7 +67,10 @@ def test_list_sort(client):
 
 
 @mark.django_db
-def test_detail(client):
+def test_detail(client_with_perms):
+    client = client_with_perms(
+        "testapp.view_dragonfly", "testapp.change_dragonfly", "testapp.delete_dragonfly"
+    )
     alpha = Dragonfly.objects.create(name="alpha", age=47)
     Sighting.objects.create(name="Berlin", dragonfly=alpha)
     Sighting.objects.create(name="Paris", dragonfly=alpha)
@@ -56,7 +92,17 @@ def test_detail(client):
 
 
 @mark.django_db
-def test_update(client):
+def test_detail_requires_permission(client_with_perms):
+    client = client_with_perms()
+    alpha = Dragonfly.objects.create(name="alpha", age=47)
+    links = DragonflyViewSet().links
+    response = client.get(links["detail"].reverse(alpha))
+    assert response.status_code == 403
+
+
+@mark.django_db
+def test_update(client_with_perms):
+    client = client_with_perms("testapp.change_dragonfly")
     alpha = Dragonfly.objects.create(name="alpha", age=47)
     response = client.get(DragonflyViewSet().links["update"].reverse(alpha))
     assert b"alpha" in response.content
@@ -65,7 +111,16 @@ def test_update(client):
 
 
 @mark.django_db
-def test_delete(client):
+def test_update_requires_permission(client_with_perms):
+    client = client_with_perms()
+    alpha = Dragonfly.objects.create(name="alpha", age=47)
+    response = client.get(DragonflyViewSet().links["update"].reverse(alpha))
+    assert response.status_code == 403
+
+
+@mark.django_db
+def test_delete(client_with_perms):
+    client = client_with_perms("testapp.delete_dragonfly")
     alpha = Dragonfly.objects.create(name="alpha", age=47)
     delete_url = DragonflyViewSet().links["delete"].reverse(alpha)
     response = client.get(delete_url)
@@ -81,7 +136,8 @@ def test_delete(client):
 
 
 @mark.django_db
-def test_delete_shows_related(client):
+def test_delete_shows_related(client_with_perms):
+    client = client_with_perms("testapp.delete_dragonfly")
     alpha = Dragonfly.objects.create(name="alpha", age=47)
     CascadingSighting.objects.create(dragonfly=alpha, name="A related sighting")
 
@@ -100,7 +156,8 @@ def test_delete_shows_related(client):
 
 
 @mark.django_db
-def test_delete_protected_not_allowed(client):
+def test_delete_protected_not_allowed(client_with_perms):
+    client = client_with_perms("testapp.delete_dragonfly")
     alpha = Dragonfly.objects.create(name="alpha", age=47)
     ProtectedSighting.objects.create(dragonfly=alpha, name="A related sighting")
 
@@ -119,7 +176,21 @@ def test_delete_protected_not_allowed(client):
 
 
 @mark.django_db
-def test_create_with_inlines(client):
+def test_delete_requires_permission(client_with_perms):
+    client = client_with_perms()
+    alpha = Dragonfly.objects.create(name="alpha", age=47)
+    delete_url = DragonflyViewSet().links["delete"].reverse(alpha)
+
+    response = client.get(delete_url)
+    assert response.status_code == 403
+
+    response = client.post(delete_url)
+    assert response.status_code == 403
+
+
+@mark.django_db
+def test_create_with_inlines(client_with_perms):
+    client = client_with_perms("testapp.add_dragonfly")
     response = client.post(
         "/dragonfly/create/",
         {
@@ -143,7 +214,8 @@ def test_create_with_inlines(client):
 
 
 @mark.django_db
-def test_only_popup_param_is_preserved_in_detail_links(client):
+def test_only_popup_param_is_preserved_in_detail_links(client_with_perms):
+    client = client_with_perms("testapp.view_dragonfly", "testapp.change_dragonfly")
     instance = Dragonfly.objects.create(name="alpha", age=12)
     response = client.get(
         DragonflyViewSet().links["list"].reverse(),

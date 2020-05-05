@@ -226,6 +226,7 @@ PRESERVED_GET_PARAMS = [
 @register.simple_tag(takes_context=True)
 def get_visible_links(
     context: RequestContext,
+    user,
     links: Dict[str, BaseComponent],
     link_layout: List[str],
     obj: Model = None,
@@ -242,6 +243,8 @@ def get_visible_links(
 
     visible_links = []
     for link in layout_links(links, link_layout):
+        if not link.has_perm(user, obj=obj):
+            continue
         try:
             url = link.reverse(obj, extra_kwargs=extra_kwargs)
         except NoReverseMatch:

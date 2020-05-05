@@ -2,14 +2,17 @@ from django.contrib.auth import get_user_model
 from django.contrib.messages.apps import MessagesConfig
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.core.exceptions import PermissionDenied
 from django.test import RequestFactory
 from reversion.models import Version
 from pytest import mark
 from reversion import is_registered, set_comment
 
+import pytest
 from beam import RelatedInline
 from beam.contrib.reversion.viewsets import VersionViewSet
 from beam.registry import RegistryType
+from test_views import user_with_perms
 from testapp.models import Dragonfly, Petaluridae, Sighting
 
 
@@ -48,8 +51,8 @@ def test_unrelated_models_are_not_registered():
 
 
 @mark.django_db
-def test_using_create_view_creates_a_revision():
-    user = get_user_model().objects.create()
+def test_using_create_view_creates_a_revision(django_user_model):
+    user = user_with_perms(django_user_model, ["testapp.add_dragonfly"])
     create_view = VersionedDragonflyViewSet()._get_view(
         VersionedDragonflyViewSet().components["create"]
     )
@@ -87,10 +90,10 @@ def test_using_create_view_creates_a_revision():
 
 
 @mark.django_db
-def test_using_update_view_creates_a_revision():
+def test_using_update_view_creates_a_revision(django_user_model):
+    user = user_with_perms(django_user_model, ["testapp.change_dragonfly"])
     alpha = Dragonfly.objects.create(name="alpha", age=47)
 
-    user = get_user_model().objects.create()
     update_view = VersionedDragonflyViewSet()._get_view(
         VersionedDragonflyViewSet().components["update"]
     )
@@ -122,12 +125,11 @@ def test_using_update_view_creates_a_revision():
 
 
 @mark.django_db
-def test_revision_is_visible_in_list():
+def test_revision_is_visible_in_list(django_user_model):
     alpha = Dragonfly.objects.create(name="alpha", age=47)
 
-    user = get_user_model().objects.create()
     request = RequestFactory().get("/", {})
-    request.user = user
+    request.user = user_with_perms(django_user_model, ["testapp.view_dragonfly"])
 
     with VersionedDragonflyViewSet().create_revision(request):
         set_comment("number one")
@@ -156,13 +158,31 @@ def test_revision_is_visible_in_list():
 
 
 @mark.django_db
-def test_show_detail_from_previous_version():
+def test_version_list_requires_view_permission(django_user_model):
+    alpha = Dragonfly.objects.create(name="alpha", age=47)
+
+    request = RequestFactory().get("/", {})
+    request.user = user_with_perms(django_user_model, [])
+
+    with VersionedDragonflyViewSet().create_revision(request):
+        set_comment("number one")
+        alpha.save()
+
+    view = VersionedDragonflyViewSet()._get_view(
+        VersionedDragonflyViewSet().components["version_list"]
+    )
+
+    with pytest.raises(PermissionDenied):
+        view(request, pk=alpha.pk)
+
+
+@mark.django_db
+def test_show_detail_from_previous_version(django_user_model):
     alpha = Dragonfly.objects.create(name="alpha", age=47)
     sighting = Sighting.objects.create(name="Berlin", dragonfly=alpha)
 
-    user = get_user_model().objects.create()
     request = RequestFactory().get("/", {})
-    request.user = user
+    request.user = user_with_perms(django_user_model, ["testapp.view_dragonfly"])
 
     with VersionedDragonflyViewSet().create_revision(request):
         alpha.save()
@@ -201,13 +221,33 @@ def test_show_detail_from_previous_version():
 
 
 @mark.django_db
-def test_revert_to_previous_version():
+def test_version_detail_requires_view_perm(django_user_model):
     alpha = Dragonfly.objects.create(name="alpha", age=47)
     sighting = Sighting.objects.create(name="Berlin", dragonfly=alpha)
 
-    user = get_user_model().objects.create()
+    request = RequestFactory().get("/", {})
+    request.user = user_with_perms(django_user_model, [])
+
+    with VersionedDragonflyViewSet().create_revision(request):
+        alpha.save()
+
+    version = Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
+        "revision__created_date"
+    )
+    detail_view = VersionedDragonflyViewSet()._get_view(
+        VersionedDragonflyViewSet().components["detail"]
+    )
+    with pytest.raises(PermissionDenied):
+        detail_view(request, pk=alpha.pk)
+
+
+@mark.django_db
+def test_revert_to_previous_version(django_user_model):
+    alpha = Dragonfly.objects.create(name="alpha", age=47)
+    sighting = Sighting.objects.create(name="Berlin", dragonfly=alpha)
+
     request = RequestFactory().post("/", {})
-    request.user = user
+    request.user = user_with_perms(django_user_model, ["testapp.change_dragonfly"])
     SessionMiddleware().process_request(request)
     MessageMiddleware().process_request(request)
 
@@ -225,7 +265,7 @@ def test_revert_to_previous_version():
     sighting.save()
 
     version_view = VersionedDragonflyViewSet()._get_view(
-        VersionedDragonflyViewSet().components["version_detail"]
+        VersionedDragonflyViewSet().components["version_restore"]
     )
     response = version_view(request, pk=alpha.pk, version_id=version.pk)
 
@@ -236,3 +276,25 @@ def test_revert_to_previous_version():
 
     assert alpha.name == "alpha"
     assert sighting.name == "Berlin"
+
+
+@mark.django_db
+def test_revert_to_previous_version_requires_change_perm(django_user_model):
+    alpha = Dragonfly.objects.create(name="alpha", age=47)
+    sighting = Sighting.objects.create(name="Berlin", dragonfly=alpha)
+
+    request = RequestFactory().post("/", {})
+    request.user = user_with_perms(django_user_model, [])
+
+    with VersionedDragonflyViewSet().create_revision(request):
+        alpha.save()
+
+    version = Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
+        "revision__created_date"
+    )
+
+    version_view = VersionedDragonflyViewSet()._get_view(
+        VersionedDragonflyViewSet().components["version_restore"]
+    )
+    with pytest.raises(PermissionDenied):
+        response = version_view(request, pk=alpha.pk, version_id=version.pk)

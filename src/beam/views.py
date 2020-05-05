@@ -2,7 +2,7 @@ from typing import List, Type, Tuple, Optional
 
 from django.apps import apps
 from django.contrib.admin.utils import NestedObjects
-from django.core.exceptions import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist, PermissionDenied
 from django.db import router
 from django.forms import all_valid
 from django.http import HttpResponse, HttpResponseForbidden
@@ -16,7 +16,7 @@ from beam.registry import register, default_registry
 from .inlines import RelatedInline
 
 
-class ViewSetContextMixin(ContextMixin):
+class ComponentMixin(ContextMixin):
     component = None
     viewset = None
 
@@ -49,6 +49,22 @@ class ViewSetContextMixin(ContextMixin):
 
     def get_inline_classes(self):
         return self.component.inline_classes
+
+    def has_perm(self):
+        try:
+            obj = self.get_object()
+        except AttributeError:
+            obj = None
+        return self.component.has_perm(self.request.user, obj)
+
+    def handle_no_permission(self):
+        raise PermissionDenied("You shall not pass")
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.has_perm():
+            self.handle_no_permission()
+
+        return super().dispatch(request, *args, **kwargs)
 
 
 class InlinesMixin(ContextMixin):
@@ -129,7 +145,7 @@ class UpdateWithInlinesMixin(InlinesMixin):
         )
 
 
-class CreateView(ViewSetContextMixin, CreateWithInlinesMixin, generic.CreateView):
+class CreateView(ComponentMixin, CreateWithInlinesMixin, generic.CreateView):
     def get_template_names(self):
         return super().get_template_names() + ["beam/create.html"]
 
@@ -158,7 +174,7 @@ class CreateView(ViewSetContextMixin, CreateWithInlinesMixin, generic.CreateView
         )
 
 
-class UpdateView(ViewSetContextMixin, UpdateWithInlinesMixin, generic.UpdateView):
+class UpdateView(ComponentMixin, UpdateWithInlinesMixin, generic.UpdateView):
     def get_template_names(self):
         return super().get_template_names() + ["beam/update.html"]
 
@@ -166,7 +182,7 @@ class UpdateView(ViewSetContextMixin, UpdateWithInlinesMixin, generic.UpdateView
         return self.viewset.links["detail"].reverse(obj=self.object)
 
 
-class SortableListMixin(ViewSetContextMixin):
+class SortableListMixin(ComponentMixin):
     sort_param = "o"
     sort_separator = ","
 
@@ -253,7 +269,7 @@ class SortableListMixin(ViewSetContextMixin):
 
 
 class ListView(
-    SearchableListMixin, SortableListMixin, ViewSetContextMixin, generic.ListView
+    SearchableListMixin, SortableListMixin, ComponentMixin, generic.ListView
 ):
     @property
     def search_fields(self):
@@ -277,12 +293,12 @@ class ListView(
         return context
 
 
-class DetailView(ViewSetContextMixin, InlinesMixin, generic.DetailView):
+class DetailView(ComponentMixin, InlinesMixin, generic.DetailView):
     def get_template_names(self):
         return super().get_template_names() + ["beam/detail.html"]
 
 
-class DeleteView(ViewSetContextMixin, InlinesMixin, generic.DeleteView):
+class DeleteView(ComponentMixin, InlinesMixin, generic.DeleteView):
     def get_template_names(self):
         return super().get_template_names() + ["beam/delete.html"]
 

@@ -15,12 +15,17 @@ def pytest_configure(config):
             "crispy_forms",
             "django.contrib.contenttypes",
             "django.contrib.admin",
+            "django.contrib.sessions",
             "django.contrib.auth",
             "reversion",
             "beam.contrib.reversion",
         ],
         SECRET_KEY="secret_key_for_testing",
         ROOT_URLCONF="testapp.urls",
+        MIDDLEWARE=[
+            "django.contrib.sessions.middleware.SessionMiddleware",
+            "django.contrib.auth.middleware.AuthenticationMiddleware",
+        ],
         TEMPLATES=[
             {
                 "BACKEND": "django.template.backends.django.DjangoTemplates",
