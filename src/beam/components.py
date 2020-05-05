@@ -25,7 +25,12 @@ class BaseComponent:
         self.url_kwargs = url_kwargs
 
         if isinstance(permission, str):
-            self.permission = permission.format(component=self)
+            context = {"component": self}
+            if getattr(self, "model", None) is not None:
+                opts = self.model._meta
+                context["model_name"] = opts.model_name
+                context["app_label"] = opts.app_label
+            self.permission = permission.format(**context)
         else:
             self.permission = permission
 
@@ -50,8 +55,7 @@ class BaseComponent:
             return False
         if callable(self.permission):
             return self.permission(user, obj=obj)
-        # FIXME support for object permissions
-        # the ModelBackend returns False as soon as we supply an obj which gives us a bad default :-(
+        # the ModelBackend returns False as soon as we supply an obj so we can't pass that here
         return user.has_perm(self.permission)
 
     def reverse(self, obj=None, extra_kwargs=None):

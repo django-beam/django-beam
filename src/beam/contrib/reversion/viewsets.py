@@ -24,9 +24,7 @@ class VersionRestoreMixin(BaseViewSet):
     version_restore_verbose_name = None
     version_restore_url_name = None
     version_restore_link_layout: List[str] = []
-    version_restore_permission = (
-        "{component.model._meta.app_label}.change_{component.model._meta.model_name}"
-    )
+    version_restore_permission = "{app_label}.change_{model_name}"
 
     def get_component_classes(self):
         return super().get_component_classes() + [("version_restore", Component)]
@@ -39,9 +37,7 @@ class VersionDetailMixin(BaseViewSet):
     version_detail_verbose_name = _("show version")
     version_detail_url_name = None
     version_detail_link_layout = ["version_list"]
-    version_detail_permission = (
-        "{component.model._meta.app_label}.view_{component.model._meta.model_name}"
-    )
+    version_detail_permission = "{app_label}.view_{model_name}"
 
     def get_component_classes(self):
         return super().get_component_classes() + [("version_detail", Component)]
@@ -54,9 +50,7 @@ class VersionListMixin(BaseViewSet):
     version_list_verbose_name = _("history")
     version_list_url_name = None
     version_list_link_layout = ["detail"]
-    version_list_permission = (
-        "{component.model._meta.app_label}.view_{component.model._meta.model_name}"
-    )
+    version_list_permission = "{app_label}.view_{model_name}"
 
     def get_component_classes(self):
         return super().get_component_classes() + [("version_list", Component)]
