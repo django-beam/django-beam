@@ -1,7 +1,5 @@
-let $ = jQuery;
-
 function add_create_related_button(elem, text, url) {
-    $("<a><i class='fa fa-plus-circle' title='" + text + "'></a>").appendTo(elem).attr("rel", "opener").attr("href", url).attr("target", "_blank").css({
+    jQuery("<a><i class='fa fa-plus-circle' title='" + text + "'></a>").appendTo(elem).attr("rel", "opener").attr("href", url).attr("target", "_blank").css({
         "position": "absolute",
         "right": 0,
         "top": "6px"
@@ -32,10 +30,10 @@ function handle_message_from_related(event) {
 }
 
 
-$(function () {
+jQuery(function () {
     window.addEventListener("message", handle_message_from_related, false);
     // FIXME right now this won't work for dynamically added inputs
-    $("[data-create-url]").each(function (index, elem) {
-        add_create_related_button(elem, $(elem).data("create-text"), $(elem).data("create-url"));
+    jQuery("[data-create-url]").each(function (index, elem) {
+        add_create_related_button(elem, jQuery(elem).data("create-text"), jQuery(elem).data("create-url"));
     });
 });

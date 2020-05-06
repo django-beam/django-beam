@@ -1,9 +1,7 @@
-let $=jQuery
-
 function RelatedInline(elem) {
     this.elem = elem
     this.items = []
-    let $elem = $(elem)
+    let $elem = jQuery(elem)
     this.canOrder = !!$elem.data("can-order")
     this.canDelete = !!$elem.data("can-delete")
     this.orderFieldName = $elem.data("order-field")
@@ -13,9 +11,9 @@ function RelatedInline(elem) {
     let that = this
 
     $elem.find(".related-inline-group .related-inline-item").each(function () {
-        let itemId = $(this).data("inline-id")
-        let orderInput = $(this).find("#id_" + that.prefix + "-" + itemId + "-" + that.orderFieldName)
-        let order = parseInt($(orderInput).val(), 10)
+        let itemId = jQuery(this).data("inline-id")
+        let orderInput = jQuery(this).find("#id_" + that.prefix + "-" + itemId + "-" + that.orderFieldName)
+        let order = parseInt(jQuery(orderInput).val(), 10)
         // might result in invalid order values, fixed after all items are added
         that._addItem(itemId, this, order)
     })
@@ -30,7 +28,7 @@ function RelatedInline(elem) {
     if (this.canDelete) {
         $elem.on('click', '.related-inline-item-remove', function (event) {
             event.preventDefault()
-            that.remove($(this).closest(".related-inline-item").data("inline-id"))
+            that.remove(jQuery(this).closest(".related-inline-item").data("inline-id"))
         }).removeClass("d-none")
     }
     $elem.on('click', '.related-inline-item-add', function (event) {
@@ -66,32 +64,32 @@ RelatedInline.prototype.getItemCount = function () {
 
 RelatedInline.prototype.render = function () {
     let itemCount = this.getItemCount()
-    $(this.numItemsInput).val(itemCount)
+    jQuery(this.numItemsInput).val(itemCount)
 
     for (let item of this.items) {
         if (item.elem === undefined) {
-            let template = $(this.elem).find(".empty-form")[0].outerHTML
+            let template = jQuery(this.elem).find(".empty-form")[0].outerHTML
             let itemHtml = template.replace(/__prefix__/g, item.id)
-            item.elem = $(itemHtml).removeClass("empty-form").appendTo($(this.elem).find('.related-inline-group'))[0]
+            item.elem = jQuery(itemHtml).removeClass("empty-form").appendTo(jQuery(this.elem).find('.related-inline-group'))[0]
         }
         if (this.canOrder && item.orderInput === undefined) {
-            item.orderInput = $(item.elem).find("#id_" + this.prefix + "-" + item.id + "-" + this.orderFieldName)
-            $(item.orderInput).closest(".field-group").children().hide()
-            $(item.orderInput).closest(".field-group").append("<label class='handle col-form-label btn' style='cursor: grab'>↕</label>")
+            item.orderInput = jQuery(item.elem).find("#id_" + this.prefix + "-" + item.id + "-" + this.orderFieldName)
+            jQuery(item.orderInput).closest(".field-group").children().hide()
+            jQuery(item.orderInput).closest(".field-group").append("<label class='handle col-form-label btn' style='cursor: grab'>↕</label>")
         }
         if (this.canDelete && item.deleteInput === undefined) {
-            item.deleteInput = $('<input type="hidden" name="' + this.prefix + '-' + item.id + '-DELETE">').appendTo($(item.elem))[0]
+            item.deleteInput = jQuery('<input type="hidden" name="' + this.prefix + '-' + item.id + '-DELETE">').appendTo(jQuery(item.elem))[0]
         }
 
         if (item.deleted) {
-            $(item.elem).hide()
-            $(item.deleteInput).val(true)
+            jQuery(item.elem).hide()
+            jQuery(item.deleteInput).val(true)
         } else {
-            $(item.elem).show()
-            $(item.deleteInput).val(false)
+            jQuery(item.elem).show()
+            jQuery(item.deleteInput).val(false)
         }
         if (this.canOrder) {
-            $(item.orderInput).val(item.order)
+            jQuery(item.orderInput).val(item.order)
         }
     }
 }
@@ -106,6 +104,7 @@ RelatedInline.prototype._addItem = function (itemId, elem, order) {
         deleted: false
     }
     this.items.push(item)
+    return item;
 }
 
 RelatedInline.prototype.getNextItemId = function () {
@@ -154,21 +153,37 @@ RelatedInline.prototype.setItemOrderFromIds = function (ids) {
 RelatedInline.prototype.add = function () {
     let itemId = this.getNextItemId()
     let order = this.getMaxOrder() + 1
-    this._addItem(itemId, undefined, order)
+    let item = this._addItem(itemId, undefined, order)
     this.render()
+
+    let event = new CustomEvent("formset:added", {
+            detail: {elem: item.elem, prefix: this.prefix}
+        }
+    );
+    this.elem.dispatchEvent(event)
 }
 
 RelatedInline.prototype.remove = function (id) {
+    let deleted;
     for (let item of this.items) {
         if (item.id === id) {
             item.deleted = true
+            deleted = item;
         }
     }
     this.render()
+
+    if (deleted !== undefined) {
+        let event = new CustomEvent("formset:removed", {
+                detail: {elem: deleted.elem, prefix: this.prefix}
+            }
+        );
+        this.elem.dispatchEvent(event)
+    }
 }
 
-$(function () {
-    $("[data-related-inline-js]").each(function () {
+jQuery(function () {
+    jQuery("[data-related-inline-js]").each(function () {
         new RelatedInline(this)
     })
 })
