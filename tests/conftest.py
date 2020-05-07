@@ -17,8 +17,13 @@ def pytest_configure(config):
             "django.contrib.admin",
             "django.contrib.sessions",
             "django.contrib.auth",
+            # contrib.reversion
             "reversion",
             "beam.contrib.reversion",
+            # contrib.autocomplete_light
+            "dal",
+            "beam.contrib.autocomplete_light",
+            "dal_select2",
         ],
         SECRET_KEY="secret_key_for_testing",
         ROOT_URLCONF="testapp.urls",

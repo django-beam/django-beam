@@ -85,7 +85,7 @@ class AutocompleteMixin(BaseViewSet):
     autocomplete_verbose_name = _("autocomplete")
 
     autocomplete_lookup_type = "istartswith"
-    autocomplete_search_fields = None
+    autocomplete_search_fields: List[str] = []
     autocomplete_result_label = None
     autocomplete_permission = "{app_label}.view_{model_name}"
 
