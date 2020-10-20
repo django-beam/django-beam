@@ -3,14 +3,16 @@ version: 2.1
 orbs:
   python: circleci/python@0.2.1
 
+executors:
+  tox-docker:
+    docker:
+      - image: themattrix/tox
+
 jobs:
   build-and-test:
-    executor: python/default
+    executor: tox-docker
     steps:
       - checkout
-      #- python/load-cache
-      #- python/install-deps
-      #- python/save-cache
       - run:
           command: pip install tox && tox
           name: Test
