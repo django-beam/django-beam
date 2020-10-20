@@ -1,14 +1,38 @@
 default_language_version:
-    python: python3.7
+  python: python3.7
 
 repos:
-    -   repo: https://github.com/pre-commit/mirrors-mypy
-        rev: 'master'
-        hooks:
-        -   id: mypy
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: "master"
+    hooks:
+      - id: mypy
 
-    -   repo: https://github.com/ambv/black
-        rev: stable
-        hooks:
-        - id: black
+  - repo: https://github.com/ambv/black
+    rev: stable
+    hooks:
+      - id: black
 
+  - repo: https://github.com/prettier/prettier
+    rev: 2.0.5
+    hooks:
+      - id: prettier
+        # prettier has no support for django templates
+        exclude: \.html$
+
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: v4.3.21
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+  - repo: https://gitlab.com/PyCQA/flake8
+    rev: 3.8.3
+    hooks:
+      - id: flake8
