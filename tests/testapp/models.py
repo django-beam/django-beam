@@ -18,7 +18,7 @@ class Petaluridae(models.Model):
 
 class Sighting(models.Model):
     name = models.CharField(max_length=255)
-    dragonfly = models.ForeignKey(Dragonfly, on_delete=models.SET_NULL)
+    dragonfly = models.ForeignKey(Dragonfly, on_delete=models.SET_NULL, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

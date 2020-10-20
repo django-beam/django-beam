@@ -1,20 +1,14 @@
-from django.contrib.auth import get_user_model
-from django.contrib.messages.apps import MessagesConfig
-from django.contrib.messages.middleware import MessageMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
-from django.core.exceptions import PermissionDenied
-from django.test import RequestFactory
-from reversion.models import Version
-from pytest import mark
-from reversion import is_registered, set_comment
-
-import pytest
 from beam import RelatedInline
 from beam.contrib.reversion.viewsets import VersionViewSet
 from beam.registry import RegistryType
+from django.contrib.messages.middleware import MessageMiddleware
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.core.exceptions import PermissionDenied
+from django.test import RequestFactory, TestCase
+from reversion import is_registered, set_comment
+from reversion.models import Version
 from test_views import user_with_perms
 from testapp.models import Dragonfly, Petaluridae, Sighting
-
 
 registry: RegistryType = {}
 
@@ -38,263 +32,247 @@ class VersionedDragonflyViewSet(VersionViewSet):
 VersionedDragonflyViewSet()
 
 
-def test_versioned_view_set_models_are_registered():
-    assert is_registered(Dragonfly)
+class RegistrationTest(TestCase):
+    def test_versioned_view_set_models_are_registered(self):
+        self.assertTrue(is_registered(Dragonfly))
+
+    def test_inlines_of_versioned_view_set_models_are_registered(self):
+        self.assertTrue(is_registered(Sighting))
+
+    def test_unrelated_models_are_not_registered(self):
+        self.assertFalse(is_registered(Petaluridae))
 
 
-def test_inlines_of_versioned_view_set_models_are_registered():
-    assert is_registered(Sighting)
+class ReversionViewTest(TestCase):
+    def test_using_create_view_creates_a_revision(self):
+        user = user_with_perms(["testapp.add_dragonfly"])
+        create_view = VersionedDragonflyViewSet()._get_view(
+            VersionedDragonflyViewSet().components["create"]
+        )
 
+        request = RequestFactory().post(
+            "/dragonfly/create/",
+            data={
+                "name": "versionfly",
+                "age": 81,
+                "sighting_set-TOTAL_FORMS": 1,
+                "sighting_set-INITIAL_FORMS": 0,
+                "sighting_set-MIN_NUM_FORMS": 0,
+                "sighting_set-MAX_NUM_FORMS": 10,
+                "sighting_set-0-name": "Tokyo",
+            },
+        )
+        request.user = user
 
-def test_unrelated_models_are_not_registered():
-    assert not is_registered(Petaluridae)
+        response = create_view(request)
 
+        self.assertEqual(response.status_code, 302)
 
-@mark.django_db
-def test_using_create_view_creates_a_revision(django_user_model):
-    user = user_with_perms(django_user_model, ["testapp.add_dragonfly"])
-    create_view = VersionedDragonflyViewSet()._get_view(
-        VersionedDragonflyViewSet().components["create"]
-    )
+        fly = Dragonfly.objects.get()
+        fly_version = Version.objects.get_for_object_reference(Dragonfly, fly.pk).get()
 
-    request = RequestFactory().post(
-        "/dragonfly/create/",
-        data={
-            "name": "versionfly",
-            "age": 81,
-            "sighting_set-TOTAL_FORMS": 1,
-            "sighting_set-INITIAL_FORMS": 0,
-            "sighting_set-MIN_NUM_FORMS": 0,
-            "sighting_set-MAX_NUM_FORMS": 10,
-            "sighting_set-0-name": "Tokyo",
-        },
-    )
-    request.user = user
+        self.assertEqual(fly_version.object.name, "versionfly")
+        self.assertEqual(fly_version.field_dict["name"], "versionfly")
+        self.assertEqual(fly_version.revision.user, user)
+        self.assertEqual(fly_version.revision.comment, "create")
 
-    response = create_view(request)
+        sighting_version = Version.objects.get_for_object_reference(
+            Sighting, fly.sighting_set.get().pk
+        ).get()
 
-    assert response.status_code == 302
+        self.assertEqual(sighting_version.field_dict["name"], "Tokyo")
 
-    fly = Dragonfly.objects.get()
-    fly_version = Version.objects.get_for_object_reference(Dragonfly, fly.pk).get()
+    def test_using_update_view_creates_a_revision(self):
+        user = user_with_perms(["testapp.change_dragonfly"])
+        alpha = Dragonfly.objects.create(name="alpha", age=47)
 
-    assert fly_version.object.name == "versionfly"
-    assert fly_version.field_dict["name"] == "versionfly"
-    assert fly_version.revision.user == user
-    assert fly_version.revision.comment == "create"
+        update_view = VersionedDragonflyViewSet()._get_view(
+            VersionedDragonflyViewSet().components["update"]
+        )
 
-    sighting_version = Version.objects.get_for_object_reference(
-        Sighting, fly.sighting_set.get().pk
-    ).get()
-    assert sighting_version.field_dict["name"] == "Tokyo"
+        request = RequestFactory().post(
+            "/dragonfly/update/{}/".format(alpha.pk),
+            data={
+                "name": "beta",
+                "age": 81,
+                "sighting_set-TOTAL_FORMS": 0,
+                "sighting_set-INITIAL_FORMS": 0,
+                "sighting_set-MIN_NUM_FORMS": 0,
+                "sighting_set-MAX_NUM_FORMS": 10,
+            },
+        )
+        request.user = user
+        response = update_view(request, pk=alpha.pk)
 
+        self.assertEqual(response.status_code, 302)
 
-@mark.django_db
-def test_using_update_view_creates_a_revision(django_user_model):
-    user = user_with_perms(django_user_model, ["testapp.change_dragonfly"])
-    alpha = Dragonfly.objects.create(name="alpha", age=47)
+        fly_version = Version.objects.get_for_object_reference(
+            Dragonfly, alpha.pk
+        ).latest("revision__created_date")
 
-    update_view = VersionedDragonflyViewSet()._get_view(
-        VersionedDragonflyViewSet().components["update"]
-    )
+        self.assertEqual(fly_version.object.name, "beta")
+        self.assertEqual(fly_version.field_dict["name"], "beta")
+        self.assertEqual(fly_version.revision.user, user)
+        self.assertEqual(fly_version.revision.comment, "update")
 
-    request = RequestFactory().post(
-        "/dragonfly/update/{}/".format(alpha.pk),
-        data={
-            "name": "beta",
-            "age": 81,
-            "sighting_set-TOTAL_FORMS": 0,
-            "sighting_set-INITIAL_FORMS": 0,
-            "sighting_set-MIN_NUM_FORMS": 0,
-            "sighting_set-MAX_NUM_FORMS": 10,
-        },
-    )
-    request.user = user
-    response = update_view(request, pk=alpha.pk)
+    def test_revision_is_visible_in_list(self):
+        alpha = Dragonfly.objects.create(name="alpha", age=47)
 
-    assert response.status_code == 302
+        request = RequestFactory().get("/", {})
+        request.user = user_with_perms(["testapp.view_dragonfly"])
 
-    fly_version = Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
-        "revision__created_date"
-    )
+        with VersionedDragonflyViewSet().create_revision(request):
+            set_comment("number one")
+            alpha.save()
 
-    assert fly_version.object.name == "beta"
-    assert fly_version.field_dict["name"] == "beta"
-    assert fly_version.revision.user == user
-    assert fly_version.revision.comment == "update"
+        with VersionedDragonflyViewSet().create_revision(request):
+            set_comment("number two")
+            alpha.save()
 
+        with VersionedDragonflyViewSet().create_revision(request):
+            set_comment("number three")
+            alpha.save()
 
-@mark.django_db
-def test_revision_is_visible_in_list(django_user_model):
-    alpha = Dragonfly.objects.create(name="alpha", age=47)
+        self.assertEqual(
+            Version.objects.get_for_object_reference(Dragonfly, alpha.pk).count(), 3
+        )
 
-    request = RequestFactory().get("/", {})
-    request.user = user_with_perms(django_user_model, ["testapp.view_dragonfly"])
+        view = VersionedDragonflyViewSet()._get_view(
+            VersionedDragonflyViewSet().components["version_list"]
+        )
 
-    with VersionedDragonflyViewSet().create_revision(request):
-        set_comment("number one")
+        response = view(request, pk=alpha.pk)
+
+        self.assertContains(response, "number one")
+        self.assertContains(response, "number two")
+        self.assertContains(response, "number three")
+
+    def test_version_list_requires_view_permission(self):
+        alpha = Dragonfly.objects.create(name="alpha", age=47)
+
+        request = RequestFactory().get("/", {})
+        request.user = user_with_perms([])
+
+        with VersionedDragonflyViewSet().create_revision(request):
+            set_comment("number one")
+            alpha.save()
+
+        view = VersionedDragonflyViewSet()._get_view(
+            VersionedDragonflyViewSet().components["version_list"]
+        )
+
+        with self.assertRaises(PermissionDenied):
+            view(request, pk=alpha.pk)
+
+    def test_show_detail_from_previous_version(self):
+        alpha = Dragonfly.objects.create(name="alpha", age=47)
+        sighting = Sighting.objects.create(name="Berlin", dragonfly=alpha)
+
+        request = RequestFactory().get("/", {})
+        request.user = user_with_perms(["testapp.view_dragonfly"])
+
+        with VersionedDragonflyViewSet().create_revision(request):
+            alpha.save()
+
+        version = Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
+            "revision__created_date"
+        )
+
+        alpha.name = "beta"
         alpha.save()
 
-    with VersionedDragonflyViewSet().create_revision(request):
-        set_comment("number two")
+        sighting.name = "Tokyo"
+        sighting.save()
+
+        detail_view = VersionedDragonflyViewSet()._get_view(
+            VersionedDragonflyViewSet().components["detail"]
+        )
+        detail_page = detail_view(request, pk=alpha.pk)
+
+        self.assertContains(detail_page, "beta")
+        self.assertContains(detail_page, "Tokyo")
+
+        version_view = VersionedDragonflyViewSet()._get_view(
+            VersionedDragonflyViewSet().components["version_detail"]
+        )
+        version_page = version_view(request, pk=alpha.pk, version_id=version.pk)
+
+        self.assertContains(version_page, "alpha")
+        self.assertContains(version_page, "Berlin")
+
+        self.assertNotContains(version_page, "beta")
+        self.assertNotContains(version_page, "Tokyo")
+
+    def test_version_detail_requires_view_perm(self):
+        alpha = Dragonfly.objects.create(name="alpha", age=47)
+        Sighting.objects.create(name="Berlin", dragonfly=alpha)
+
+        request = RequestFactory().get("/", {})
+        request.user = user_with_perms([])
+
+        with VersionedDragonflyViewSet().create_revision(request):
+            alpha.save()
+
+        Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
+            "revision__created_date"
+        )
+        detail_view = VersionedDragonflyViewSet()._get_view(
+            VersionedDragonflyViewSet().components["detail"]
+        )
+        with self.assertRaises(PermissionDenied):
+            detail_view(request, pk=alpha.pk)
+
+    def test_revert_to_previous_version(self):
+        alpha = Dragonfly.objects.create(name="alpha", age=47)
+        sighting = Sighting.objects.create(name="Berlin", dragonfly=alpha)
+
+        request = RequestFactory().post("/", {})
+        request.user = user_with_perms(["testapp.change_dragonfly"])
+        SessionMiddleware().process_request(request)
+        MessageMiddleware().process_request(request)
+
+        with VersionedDragonflyViewSet().create_revision(request):
+            alpha.save()
+
+        version = Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
+            "revision__created_date"
+        )
+
+        alpha.name = "beta"
         alpha.save()
 
-    with VersionedDragonflyViewSet().create_revision(request):
-        set_comment("number three")
-        alpha.save()
+        sighting.name = "Tokyo"
+        sighting.save()
 
-    assert Version.objects.get_for_object_reference(Dragonfly, alpha.pk).count() == 3
-
-    view = VersionedDragonflyViewSet()._get_view(
-        VersionedDragonflyViewSet().components["version_list"]
-    )
-
-    response = view(request, pk=alpha.pk)
-    response_content = response.rendered_content
-
-    assert "number one" in response_content
-    assert "number two" in response_content
-    assert "number three" in response_content
-
-
-@mark.django_db
-def test_version_list_requires_view_permission(django_user_model):
-    alpha = Dragonfly.objects.create(name="alpha", age=47)
-
-    request = RequestFactory().get("/", {})
-    request.user = user_with_perms(django_user_model, [])
-
-    with VersionedDragonflyViewSet().create_revision(request):
-        set_comment("number one")
-        alpha.save()
-
-    view = VersionedDragonflyViewSet()._get_view(
-        VersionedDragonflyViewSet().components["version_list"]
-    )
-
-    with pytest.raises(PermissionDenied):
-        view(request, pk=alpha.pk)
-
-
-@mark.django_db
-def test_show_detail_from_previous_version(django_user_model):
-    alpha = Dragonfly.objects.create(name="alpha", age=47)
-    sighting = Sighting.objects.create(name="Berlin", dragonfly=alpha)
-
-    request = RequestFactory().get("/", {})
-    request.user = user_with_perms(django_user_model, ["testapp.view_dragonfly"])
-
-    with VersionedDragonflyViewSet().create_revision(request):
-        alpha.save()
-
-    version = Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
-        "revision__created_date"
-    )
-
-    alpha.name = "beta"
-    alpha.save()
-
-    sighting.name = "Tokyo"
-    sighting.save()
-
-    detail_view = VersionedDragonflyViewSet()._get_view(
-        VersionedDragonflyViewSet().components["detail"]
-    )
-    detail_content = detail_view(request, pk=alpha.pk).rendered_content
-
-    assert "beta" in detail_content
-    assert "Tokyo" in detail_content
-
-    version_view = VersionedDragonflyViewSet()._get_view(
-        VersionedDragonflyViewSet().components["version_detail"]
-    )
-
-    version_content = version_view(
-        request, pk=alpha.pk, version_id=version.pk
-    ).content.decode("utf-8")
-
-    assert "alpha" in version_content
-    assert "Berlin" in version_content
-
-    assert "beta" not in version_content
-    assert "Tokyo" not in version_content
-
-
-@mark.django_db
-def test_version_detail_requires_view_perm(django_user_model):
-    alpha = Dragonfly.objects.create(name="alpha", age=47)
-    sighting = Sighting.objects.create(name="Berlin", dragonfly=alpha)
-
-    request = RequestFactory().get("/", {})
-    request.user = user_with_perms(django_user_model, [])
-
-    with VersionedDragonflyViewSet().create_revision(request):
-        alpha.save()
-
-    version = Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
-        "revision__created_date"
-    )
-    detail_view = VersionedDragonflyViewSet()._get_view(
-        VersionedDragonflyViewSet().components["detail"]
-    )
-    with pytest.raises(PermissionDenied):
-        detail_view(request, pk=alpha.pk)
-
-
-@mark.django_db
-def test_revert_to_previous_version(django_user_model):
-    alpha = Dragonfly.objects.create(name="alpha", age=47)
-    sighting = Sighting.objects.create(name="Berlin", dragonfly=alpha)
-
-    request = RequestFactory().post("/", {})
-    request.user = user_with_perms(django_user_model, ["testapp.change_dragonfly"])
-    SessionMiddleware().process_request(request)
-    MessageMiddleware().process_request(request)
-
-    with VersionedDragonflyViewSet().create_revision(request):
-        alpha.save()
-
-    version = Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
-        "revision__created_date"
-    )
-
-    alpha.name = "beta"
-    alpha.save()
-
-    sighting.name = "Tokyo"
-    sighting.save()
-
-    version_view = VersionedDragonflyViewSet()._get_view(
-        VersionedDragonflyViewSet().components["version_restore"]
-    )
-    response = version_view(request, pk=alpha.pk, version_id=version.pk)
-
-    assert response.status_code == 302
-
-    alpha.refresh_from_db()
-    sighting.refresh_from_db()
-
-    assert alpha.name == "alpha"
-    assert sighting.name == "Berlin"
-
-
-@mark.django_db
-def test_revert_to_previous_version_requires_change_perm(django_user_model):
-    alpha = Dragonfly.objects.create(name="alpha", age=47)
-    sighting = Sighting.objects.create(name="Berlin", dragonfly=alpha)
-
-    request = RequestFactory().post("/", {})
-    request.user = user_with_perms(django_user_model, [])
-
-    with VersionedDragonflyViewSet().create_revision(request):
-        alpha.save()
-
-    version = Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
-        "revision__created_date"
-    )
-
-    version_view = VersionedDragonflyViewSet()._get_view(
-        VersionedDragonflyViewSet().components["version_restore"]
-    )
-    with pytest.raises(PermissionDenied):
+        version_view = VersionedDragonflyViewSet()._get_view(
+            VersionedDragonflyViewSet().components["version_restore"]
+        )
         response = version_view(request, pk=alpha.pk, version_id=version.pk)
+
+        self.assertEqual(response.status_code, 302)
+
+        alpha.refresh_from_db()
+        sighting.refresh_from_db()
+
+        self.assertEqual(alpha.name, "alpha")
+        self.assertEqual(sighting.name, "Berlin")
+
+    def test_revert_to_previous_version_requires_change_perm(self):
+        alpha = Dragonfly.objects.create(name="alpha", age=47)
+        Sighting.objects.create(name="Berlin", dragonfly=alpha)
+
+        request = RequestFactory().post("/", {})
+        request.user = user_with_perms([])
+
+        with VersionedDragonflyViewSet().create_revision(request):
+            alpha.save()
+
+        version = Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
+            "revision__created_date"
+        )
+
+        version_view = VersionedDragonflyViewSet()._get_view(
+            VersionedDragonflyViewSet().components["version_restore"]
+        )
+        with self.assertRaises(PermissionDenied):
+            version_view(request, pk=alpha.pk, version_id=version.pk)

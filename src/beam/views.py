@@ -1,5 +1,6 @@
-from typing import List, Type, Tuple, Optional
+from typing import List, Type
 
+from beam.registry import default_registry, register
 from django.apps import apps
 from django.contrib.admin.utils import NestedObjects
 from django.core.exceptions import FieldDoesNotExist, PermissionDenied
@@ -12,7 +13,6 @@ from django.views import generic
 from django.views.generic.base import ContextMixin, TemplateView
 from extra_views import SearchableListMixin
 
-from beam.registry import register, default_registry
 from .inlines import RelatedInline
 
 

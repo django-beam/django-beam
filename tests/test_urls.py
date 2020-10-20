@@ -1,77 +1,63 @@
 from beam.templatetags.beam_tags import get_link_url
-from pytest import mark
+from django.test import TestCase
 from testapp.models import Dragonfly
 from testapp.views import DragonflyViewSet
 
 
-def test_get_urls_produces_urls():
-    assert len(DragonflyViewSet().get_urls()) == 6
+class UrlTest(TestCase):
+    def test_get_urls_produces_urls(self):
+        self.assertEqual(len(DragonflyViewSet().get_urls()), 6)
 
+    def test_get_links_contains_all_view_types(self):
+        self.assertSetEqual(
+            set(DragonflyViewSet().links.keys()),
+            {"list", "detail", "update", "create", "delete", "extra"},
+        )
 
-expected_component_names = ["list", "detail", "update", "create", "delete"]
+    def test_url_patterns_are_correct(self):
+        expected = {
+            "testapp_dragonfly_list": "",
+            "testapp_dragonfly_create": "create/",
+            "testapp_dragonfly_detail": "<str:pk>/",
+            "testapp_dragonfly_delete": "<str:pk>/delete/",
+            "testapp_dragonfly_update": "<str:pk>/update/",
+            "testapp_dragonfly_extra": "extra/<str:id>/<str:special>/",
+        }
 
+        for url in DragonflyViewSet().get_urls():
+            self.assertEqual(str(url.pattern), expected[url.name])
 
-@mark.parametrize("component_name", expected_component_names)
-def test_get_links_contains_all_view_types(component_name):
-    assert component_name in DragonflyViewSet().links
+    def test_links_that_do_not_require_an_instance(self):
+        links = DragonflyViewSet().links
+        self.assertEqual(get_link_url(links["list"]), "/dragonfly/")
+        self.assertEqual(get_link_url(links["create"]), "/dragonfly/create/")
 
+    def test_links_that_do_not_require_an_instance_work_if_one_is_supplied(self):
+        links = DragonflyViewSet().links
+        instance = Dragonfly(pk=123)
+        self.assertEqual(get_link_url(links["list"], instance), "/dragonfly/")
+        self.assertEqual(get_link_url(links["create"], instance), "/dragonfly/create/")
 
-urls = {
-    "testapp_dragonfly_list": "",
-    "testapp_dragonfly_detail": "<str:pk>/",
-    "testapp_dragonfly_delete": "<str:pk>/delete/",
-    "testapp_dragonfly_update": "<str:pk>/update/",
-}
+    def test_links_that_require_an_instance(self):
+        links = DragonflyViewSet().links
+        instance = Dragonfly(pk=123)
+        self.assertEqual(get_link_url(links["detail"], instance), "/dragonfly/123/")
+        self.assertEqual(
+            get_link_url(links["update"], instance), "/dragonfly/123/update/"
+        )
+        self.assertEqual(
+            get_link_url(links["delete"], instance), "/dragonfly/123/delete/"
+        )
 
+    def test_links_that_require_an_instance_return_none_if_missing(self):
+        links = DragonflyViewSet().links
+        self.assertEqual(get_link_url(links["detail"], None), None)
+        self.assertEqual(get_link_url(links["update"], None), None)
+        self.assertEqual(get_link_url(links["delete"], None), None)
 
-@mark.parametrize("url", urls.items())
-def test_list_url(url):
-    urlpattern = next(filter(lambda p: p.name == url[0], DragonflyViewSet().get_urls()))
-    assert str(urlpattern.pattern) == url[1]
-
-
-view_types_which_require_object_to_link = {
-    "update": "/dragonfly/123/update/",
-    "detail": "/dragonfly/123/",
-    "delete": "/dragonfly/123/delete/",
-}
-
-
-view_types_which_require_no_object_to_link = {
-    "create": "/dragonfly/create/",
-    "list": "/dragonfly/",
-}
-
-
-@mark.parametrize("view_type, url", view_types_which_require_no_object_to_link.items())
-def test_get_link_urls_that_require_object_without_object(view_type, url):
-    link = dict(DragonflyViewSet().links)[view_type]
-    assert get_link_url(link, None) == url
-
-
-@mark.parametrize("view_type", view_types_which_require_object_to_link.keys())
-def test_get_link_urls_with_missing_object(view_type):
-    link = dict(DragonflyViewSet().links)[view_type]
-    assert get_link_url(link, None) is None
-
-
-@mark.parametrize("view_type, url", view_types_which_require_object_to_link.items())
-def test_get_link_urls_that_require_object_with_object(view_type, url):
-    instance = Dragonfly(pk=123)
-    link = dict(DragonflyViewSet().links)[view_type]
-    assert get_link_url(link, instance) == url
-
-
-@mark.parametrize("view_type, url", view_types_which_require_no_object_to_link.items())
-def test_get_link_urls_that_require_object(view_type, url):
-    instance = Dragonfly(pk=123)
-    link = dict(DragonflyViewSet().links)[view_type]
-    assert get_link_url(link, instance) == url
-
-
-def test_component_url_with_extra_context():
-    instance = Dragonfly(pk=123)
-    link = DragonflyViewSet().links["extra"]
-    assert (
-        get_link_url(link, instance, special="param") == "/dragonfly/extra/123/param/"
-    )
+    def test_component_url_with_extra_context(self):
+        instance = Dragonfly(pk=123)
+        link = DragonflyViewSet().links["extra"]
+        self.assertEqual(
+            get_link_url(link, instance, special="param"), "/dragonfly/extra/123/param/"
+        )

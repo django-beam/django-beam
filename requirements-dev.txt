@@ -6,3 +6,4 @@ sphinx
 sphinx_rtd_theme
 django-reversion
 django-autocomplete-light
+django-webtest
