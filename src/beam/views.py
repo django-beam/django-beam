@@ -58,11 +58,18 @@ class ComponentMixin(ContextMixin):
         return self.component.has_perm(self.request.user, obj)
 
     def handle_no_permission(self):
-        raise PermissionDenied("You shall not pass")
+        if self.request.user.is_authenticated:
+            raise PermissionDenied("You shall not pass")
+
+        # Inner import to prevent django.contrib.admin (app) from
+        # importing django.contrib.auth.models.User (unrelated model).
+        from django.contrib.auth.views import redirect_to_login
+
+        return redirect_to_login(self.request.get_full_path())
 
     def dispatch(self, request, *args, **kwargs):
         if not self.has_perm():
-            self.handle_no_permission()
+            return self.handle_no_permission()
 
         return super().dispatch(request, *args, **kwargs)
 

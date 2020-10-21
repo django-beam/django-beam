@@ -35,6 +35,13 @@ class ViewTest(WebTest):
             status=403,
         )
 
+    def test_list_redirects_on_login_required(self):
+        Dragonfly.objects.create(name="alpha", age=12)
+        response = self.app.get(DragonflyViewSet().links["list"].reverse(), user=None,)
+        self.assertRedirects(
+            response, "/accounts/login/?next=/dragonfly/", fetch_redirect_response=False
+        )
+
     def test_list_search(self):
         Dragonfly.objects.create(name="alpha", age=12)
         Dragonfly.objects.create(name="omega", age=99)
