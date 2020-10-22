@@ -12,6 +12,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views import View
 
+from .actions import Action
 from .components import BaseComponent, Component, FormComponent, ListComponent
 from .inlines import RelatedInline
 from .views import CreateView, DeleteView, DetailView, ListView, UpdateView
@@ -135,7 +136,8 @@ class ListMixin(BaseViewSet):
     list_form_class: ModelForm
     list_permission = "{app_label}.view_{model_name}"
     list_filterset_fields: List[str] = []
-    list_filterset_class: Optional[django_filters.FilterSet] = None
+    list_filterset_class: Optional[Type[django_filters.FilterSet]] = None
+    list_action_classes: List[Type[Action]] = []
 
 
 class CreateMixin(BaseViewSet):

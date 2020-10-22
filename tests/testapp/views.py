@@ -1,5 +1,6 @@
 import django_filters
-from beam import RelatedInline, ViewSet
+from beam import RelatedInline, ViewSet, actions
+from beam.actions import DeleteAction
 from beam.views import DetailView
 from beam.viewsets import Component
 
@@ -22,7 +23,12 @@ class ExtraComponent(Component):
 
 
 class DragonflyFilterSet(django_filters.FilterSet):
+    name = django_filters.CharFilter()
     max_age = django_filters.NumberFilter(lookup_expr="lte", field_name="age")
+
+
+class DragonFlyUpdateAction(actions.MassUpdateAction):
+    form_fields = ["age"]
 
 
 class DragonflyViewSet(ViewSet):
@@ -31,6 +37,7 @@ class DragonflyViewSet(ViewSet):
     list_search_fields = ["name"]
     fields = ["name", "age"]
     list_filterset_class = DragonflyFilterSet
+    list_action_classes = [DeleteAction, DragonFlyUpdateAction]
     list_paginate_by = 5
 
     extra_component = ExtraComponent

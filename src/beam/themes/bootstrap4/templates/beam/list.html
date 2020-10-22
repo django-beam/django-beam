@@ -25,18 +25,23 @@
                 {% if view.search_fields %}
                     <form method="get" id="search-form">
                         <div class="input-group">
-                            <input name="q" type="text" value="{{ search_query }}" class="form-control" placeholder="{% trans 'Search the list below' %}" aria-label="{% trans 'Search the list below' %}" aria-describedby="search-form-input">
+                            <input name="q" type="text" value="{{ search_query }}" class="form-control"
+                                   placeholder="{% trans 'Search the list below' %}"
+                                   aria-label="{% trans 'Search the list below' %}"
+                                   aria-describedby="search-form-input">
                             <div class="input-group-append">
 
                                 {% if search_query %}
-                                    <a href="{{ request.path }}" class="btn btn-outline-secondary">{% trans "Clear" %}</a>
+                                    <a href="{{ request.path }}"
+                                       class="btn btn-outline-secondary">{% trans "Clear" %}</a>
                                 {% endif %}
                                 <input type="submit" class="btn btn-outline-primary" value="{% trans 'Search' %}"/>
                             </div>
                         </div>
                     </form>
                 {% endif %}
-
+            {% endblock %}
+            {% block filters %}
                 {% if filterset %}
                     <div class="mt-2 mb-2">
                         <div class="input-group">
@@ -64,15 +69,30 @@
                 {% endif %}
             {% endblock %}
 
+            {% if actions %}
+            <form method="post" id="list-action-form">
+                {% csrf_token %}
+                {% block actions %}
+                    {% include "beam/partials/actions.html" %}
+                {% endblock %}
+            {% endif %}
+
             {% block table %}
                 <table class="table table-striped">
                     {% block table_head %}
                     <thead>
                     <tr>
+                        {% if actions %}
+                        <th>
+                            <input class="beam-action-select-across" name="_action_select_across" type="hidden" value="">
+                            <input title={% trans "Select all" %} class="beam-action-select-all" type="checkbox">
+                        </th>
+                        {% endif %}
                         {% for field in component.fields %}
                             <th scope="col">
                                 {% with field_name=field|stringformat:"s" %}{# cast to string to support virtual fields #}
                                     {% if field_name in sortable_fields %}
+                                        {# fixme text-nowrap only if there is a chance to fit this?  #}
                                         <a class="text-nowrap" href="{% sort_link field_name sorted_fields %}">
                                             {{ component.model|field_verbose_name:field|capfirst }}&nbsp;{% if field_name in sorted_fields %}<i class="fa fa-caret-up"></i>{% elif "-"|add:field_name in sorted_fields %}<i class="fa fa-caret-down"></i>{% endif %}
                                         </a>
@@ -92,6 +112,12 @@
                     <tbody>
                     {% for object in object_list %}
                         <tr>
+                            {% if actions %}
+                            <td>
+                                <input type="checkbox" class="beam-action-select-item" name="_action_select[]"
+                                       value="{{ object.pk }}">
+                            </td>
+                            {% endif %}
                             {% for field in component.fields %}
                                 <td>
                                     {% include "beam/partials/detail_field.html" with object=object field=field %}
@@ -114,7 +140,7 @@
                         {% if search_query %}
                             {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }} for query "{{ search_query }}"{% endblocktrans %}.
                         {% elif filterset and filterset.is_bound and filterset.is_valid %}
-                                {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }} that match the current filters{% endblocktrans %}.
+                            {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }} that match the current filters{% endblocktrans %}.
                         {% else %}
                             {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }}{% endblocktrans %}.
                         {% endif %}
@@ -125,6 +151,10 @@
             {% block pagination %}
                 {% include "beam/partials/pagination.html" with page_param=view.page_kwarg %}
             {% endblock %}
+
+            {% if actions %}
+            </form>
+            {% endif %}
         </div>
     </section>
 {% endblock %}
