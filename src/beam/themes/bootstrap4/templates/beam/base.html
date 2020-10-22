@@ -19,6 +19,7 @@
     {% block navigation %}
         {% render_navigation %}
     {% endblock %}
+    {% block messages %}{% include "beam/partials/messages.html" %}{% endblock %}
     {% block content %}{% endblock %}
 {% endblock %}
 

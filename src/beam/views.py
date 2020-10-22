@@ -2,6 +2,7 @@ from typing import List, Type
 
 from beam.registry import default_registry, register
 from django.apps import apps
+from django.contrib import messages
 from django.contrib.admin.utils import NestedObjects
 from django.core.exceptions import FieldDoesNotExist, PermissionDenied
 from django.db import router
@@ -9,6 +10,7 @@ from django.forms import all_valid
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.utils.html import escape
+from django.utils.translation import gettext as _
 from django.views import generic
 from django.views.generic.base import ContextMixin, TemplateView
 from extra_views import SearchableListMixin
@@ -159,8 +161,16 @@ class CreateView(ComponentMixin, CreateWithInlinesMixin, generic.CreateView):
     def get_success_url(self):
         return self.viewset.links["detail"].reverse(obj=self.object)
 
+    def get_success_message(self):
+        return _('The {model} "{name}" was added successfully.').format(
+            model=self.model._meta.verbose_name, name=str(self.object),
+        )
+
     def form_valid(self, form, inlines):
         response = super().form_valid(form, inlines)
+        success_message = self.get_success_message()
+        if success_message:
+            messages.success(self.request, success_message)
         if self.request.GET.get("_popup"):
             return self.popup_response()
         return response
@@ -184,6 +194,18 @@ class CreateView(ComponentMixin, CreateWithInlinesMixin, generic.CreateView):
 class UpdateView(ComponentMixin, UpdateWithInlinesMixin, generic.UpdateView):
     def get_template_names(self):
         return super().get_template_names() + ["beam/update.html"]
+
+    def get_success_message(self):
+        return _('The {model} "{name}" was changed successfully.').format(
+            model=self.model._meta.verbose_name, name=str(self.object),
+        )
+
+    def form_valid(self, form, inlines):
+        response = super().form_valid(form, inlines)
+        success_message = self.get_success_message()
+        if success_message:
+            messages.success(self.request, success_message)
+        return response
 
     def get_success_url(self):
         return self.viewset.links["detail"].reverse(obj=self.object)
@@ -312,11 +334,25 @@ class DeleteView(ComponentMixin, InlinesMixin, generic.DeleteView):
     def get_success_url(self):
         return self.viewset.links["list"].reverse()
 
-    def post(self, *args, **kwargs):
-        nested, protected = self.get_nested_objects(self.get_object())
+    def get_success_message(self):
+        return _('The {model} "{name}" was deleted successfully.').format(
+            model=self.model._meta.verbose_name, name=str(self.object)
+        )
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        nested, protected = self.get_nested_objects(self.object)
         if protected:
             return HttpResponseForbidden()
-        return super(DeleteView, self).post(*args, **kwargs)
+
+        success_message = self.get_success_message()
+
+        response = self.delete(request, *args, **kwargs)
+
+        if success_message:
+            messages.success(request, success_message)
+
+        return response
 
     @classmethod
     def get_nested_objects(cls, obj):
@@ -324,7 +360,6 @@ class DeleteView(ComponentMixin, InlinesMixin, generic.DeleteView):
         collector = NestedObjects(using=using)
         collector.collect([obj])
         nested = collector.nested(cls._format_obj)
-        collector.dependencies
         return nested, list(map(cls._format_obj, collector.protected))
 
     @staticmethod

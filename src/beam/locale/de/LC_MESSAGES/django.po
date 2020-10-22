@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-14 13:35+0100\n"
+"POT-Creation-Date: 2020-10-22 15:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,7 @@ msgid "Revert to this version"
 msgstr "Auf diese Version zurücksetzen"
 
 #: beam/contrib/reversion/templates/beam_reversion/version_list.html:11
-#: beam/contrib/reversion/viewsets.py:36
+#: beam/contrib/reversion/viewsets.py:50
 msgid "history"
 msgstr "Verlauf"
 
@@ -47,11 +47,11 @@ msgstr "Benutzer"
 msgid "action"
 msgstr "Aktion"
 
-#: beam/contrib/reversion/views.py:42
+#: beam/contrib/reversion/views.py:39
 msgid "revert to version {}"
 msgstr "Zurücksetzen auf Version {}"
 
-#: beam/contrib/reversion/viewsets.py:24
+#: beam/contrib/reversion/viewsets.py:37
 msgid "show version"
 msgstr "Version zeigen"
 
@@ -174,7 +174,7 @@ msgstr "runterladen"
 
 #: beam/themes/bootstrap4/templates/beam/partials/form_inline.html:40
 #: beam/themes/bootstrap4/templates/beam/partials/form_inline.html:55
-#: beam/viewsets.py:193
+#: beam/viewsets.py:199
 msgid "delete"
 msgstr "löschen"
 
@@ -182,6 +182,10 @@ msgstr "löschen"
 #, python-format
 msgid "add %(name)s"
 msgstr "%(name)s hinzufügen"
+
+#: beam/themes/bootstrap4/templates/beam/partials/messages.html:8
+msgid "Close"
+msgstr ""
 
 #: beam/themes/bootstrap4/templates/beam/partials/navigation.html:8
 msgid "Home"
@@ -200,19 +204,34 @@ msgstr ""
 msgid "Update %(object)s"
 msgstr "%(object)s bearbeiten"
 
+#: beam/views.py:165
+#, python-brace-format
+msgid "The {model} \"{name}\" was added successfully."
+msgstr "{model} \"{name}\" wurde erfolgreich hinzugefügt."
+
+#: beam/views.py:199
+#, python-brace-format
+msgid "The {model} \"{name}\" was changed successfully."
+msgstr "{model} \"{name}\" wurde erfolgreich geändert."
+
+#: beam/views.py:338
+#, python-brace-format
+msgid "The {model} \"{name}\" was deleted successfully."
+msgstr "{model} \"{name}\" wurde erfolgreich gelöscht."
+
 #: beam/viewsets.py:121
 msgid "list"
 msgstr "alle zeigen"
 
-#: beam/viewsets.py:143
+#: beam/viewsets.py:146
 msgid "create"
 msgstr "anlegen"
 
-#: beam/viewsets.py:160
+#: beam/viewsets.py:164
 msgid "update"
 msgstr "bearbeiten"
 
-#: beam/viewsets.py:177
+#: beam/viewsets.py:182
 msgid "detail"
 msgstr "Detail-Ansicht"
 
