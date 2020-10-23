@@ -117,11 +117,28 @@ class ViewTest(WebTest):
         alpha = Dragonfly.objects.create(name="alpha", age=47)
         response = self.app.get(
             DragonflyViewSet().links["update"].reverse(alpha),
-            user=user_with_perms(["testapp.change_dragonfly"]),
+            user=user_with_perms(
+                ["testapp.view_dragonfly", "testapp.change_dragonfly",]
+            ),
         )
         self.assertContains(response, "alpha")
         self.assertIn("form", response.context)
         self.assertEqual(response.context["form"]["name"].value(), "alpha")
+
+        form = response.form
+        form["name"] = "first"
+        update_response = form.submit()
+
+        self.assertRedirects(
+            update_response,
+            DragonflyViewSet().links["detail"].reverse(obj=alpha),
+            fetch_redirect_response=False,
+        )
+
+        self.assertContains(
+            update_response.follow(),
+            "The dragonfly &quot;first&quot; was changed successfully.",
+        )
 
     def test_update_requires_permission(self):
         alpha = Dragonfly.objects.create(name="alpha", age=47)
@@ -136,7 +153,10 @@ class ViewTest(WebTest):
         alpha = Dragonfly.objects.create(name="alpha", age=47)
         delete_url = DragonflyViewSet().links["delete"].reverse(alpha)
         response = self.app.get(
-            delete_url, user=user_with_perms(["testapp.delete_dragonfly"]),
+            delete_url,
+            user=user_with_perms(
+                ["testapp.view_dragonfly", "testapp.delete_dragonfly"]
+            ),
         )
 
         self.assertContains(response, "Are you sure you want to delete")
@@ -149,7 +169,10 @@ class ViewTest(WebTest):
             DragonflyViewSet().links["list"].reverse(),
             fetch_redirect_response=False,
         )
-
+        self.assertContains(
+            delete_response.follow(),
+            "The dragonfly &quot;alpha&quot; was deleted successfully",
+        )
         self.assertFalse(Dragonfly.objects.filter(name="alpha").exists())
 
     def test_delete_shows_related(self):
@@ -197,7 +220,7 @@ class ViewTest(WebTest):
         self.app.post(delete_url, user=user, status=403)
 
     def test_create_with_inlines(self):
-        user = user_with_perms(["testapp.add_dragonfly"])
+        user = user_with_perms(["testapp.view_dragonfly", "testapp.add_dragonfly"])
         create_page = self.app.get(
             DragonflyViewSet().links["create"].reverse(), user=user
         )
@@ -218,6 +241,10 @@ class ViewTest(WebTest):
             fetch_redirect_response=False,
         )
 
+        self.assertContains(
+            response.follow(),
+            "The dragonfly &quot;foobar&quot; was added successfully.",
+        )
         self.assertEqual(dragonfly.age, 81)
         self.assertEqual(dragonfly.sighting_set.get().name, "Tokyo")
 

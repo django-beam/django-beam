@@ -2,6 +2,7 @@ from beam import RelatedInline
 from beam.contrib.reversion.viewsets import VersionViewSet
 from beam.registry import RegistryType
 from django.contrib.messages.middleware import MessageMiddleware
+from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import PermissionDenied
 from django.test import RequestFactory, TestCase
@@ -64,6 +65,11 @@ class ReversionViewTest(TestCase):
         )
         request.user = user
 
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        messages = FallbackStorage(request)
+        setattr(request, "_messages", messages)
+
         response = create_view(request)
 
         self.assertEqual(response.status_code, 302)
@@ -102,6 +108,11 @@ class ReversionViewTest(TestCase):
             },
         )
         request.user = user
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        messages = FallbackStorage(request)
+        setattr(request, "_messages", messages)
+
         response = update_view(request, pk=alpha.pk)
 
         self.assertEqual(response.status_code, 302)
