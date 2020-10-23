@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load beam_tags  %}
+{% with inline.page as page %}
 <section id="{{ inline.prefix }}-related-inline" class="related-inline"
          data-related-inline-js
          {% if inline.can_order %}data-can-order="true" data-order-field="{{ inline.order_field }}"{% endif %}
@@ -68,5 +69,7 @@
                 </div>
             </div>
         </div>
+        {% include "beam/partials/pagination.html" with page_param=inline.page_param paginator=page.paginator is_paginated=page.has_other_pages page_obj=page page_number=page.number object_list=page.object_list options=inline.model_options %}
     </div>
 </section>
+{% endwith %}
