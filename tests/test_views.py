@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django_webtest import WebTest
 from testapp.models import CascadingSighting, Dragonfly, ProtectedSighting, Sighting
-from testapp.views import DragonflyViewSet
+from testapp.views import DragonflyViewSet, SightingViewSet
 
 
 def user_with_perms(perms, username="foo", password="bar", user_model=None):
@@ -51,6 +51,58 @@ class ViewTest(WebTest):
         )
         self.assertContains(response, "alpha")
         self.assertNotContains(response, "omega")
+
+    def test_list_filter_with_class(self):
+        Dragonfly.objects.create(name="alpha", age=12)
+        Dragonfly.objects.create(name="omega", age=99)
+        response = self.app.get(
+            DragonflyViewSet().links["list"].reverse(),
+            user=user_with_perms(["testapp.view_dragonfly"]),
+        )
+
+        filter_form = response.forms["filter-form"]
+
+        filter_form["filter-max_age"] = "0"
+        max_0 = filter_form.submit()
+        self.assertNotContains(max_0, "alpha")
+        self.assertNotContains(max_0, "omega")
+
+        filter_form["filter-max_age"] = "50"
+        max_50 = filter_form.submit()
+        self.assertContains(max_50, "alpha")
+        self.assertNotContains(max_50, "omega")
+
+        filter_form["filter-max_age"] = "100"
+        max_100 = filter_form.submit()
+        self.assertContains(max_100, "alpha")
+        self.assertContains(max_100, "omega")
+
+    def test_list_filter_with_fields(self):
+        alpha = Dragonfly.objects.create(name="alpha", age=12)
+        omega = Dragonfly.objects.create(name="omega", age=99)
+        Sighting.objects.create(name="Berlin", dragonfly=alpha)
+        Sighting.objects.create(name="Tokyo", dragonfly=omega)
+
+        response = self.app.get(
+            SightingViewSet().links["list"].reverse(),
+            user=user_with_perms(["testapp.view_sighting"]),
+        )
+
+        filter_form = response.forms["filter-form"]
+
+        filter_form["filter-name"] = "Tokyo"
+        tokyo_response = filter_form.submit()
+        self.assertNotContains(tokyo_response, "alpha")
+        self.assertContains(tokyo_response, "omega")
+
+        filter_form["filter-name"] = "nothing"
+        empty_response = filter_form.submit()
+        self.assertNotContains(empty_response, "alpha")
+        self.assertNotContains(empty_response, "omega")
+        self.assertContains(
+            empty_response,
+            "Could not find any sightings that match the current filters",
+        )
 
     def test_list_sort(self):
         user = user_with_perms(["testapp.view_dragonfly"])
@@ -149,7 +201,6 @@ class ViewTest(WebTest):
         )
 
     def test_delete(self):
-
         alpha = Dragonfly.objects.create(name="alpha", age=47)
         delete_url = DragonflyViewSet().links["delete"].reverse(alpha)
         response = self.app.get(

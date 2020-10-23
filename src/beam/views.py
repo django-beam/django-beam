@@ -13,6 +13,7 @@ from django.utils.html import escape
 from django.utils.translation import gettext as _
 from django.views import generic
 from django.views.generic.base import ContextMixin, TemplateView
+from django_filters.filterset import filterset_factory
 from extra_views import SearchableListMixin
 
 from .inlines import RelatedInline
@@ -297,8 +298,67 @@ class SortableListMixin(ComponentMixin):
         return context
 
 
+class FiltersetMixin(ComponentMixin):
+    filterset_class = None
+    filterset_fields = None
+    filterset = None
+
+    def get_filterset_fields(self):
+        if self.filterset_fields is not None:
+            return self.filterset_fields
+        return self.component.list_filterset_fields
+
+    def get_filterset_class(self):
+        if self.filterset_class:
+            return self.filterset_class
+        if self.component.list_filterset_class:
+            return self.component.list_filterset_class
+        elif self.component.list_filterset_fields:
+            return filterset_factory(
+                model=self.model, fields=self.get_filterset_fields()
+            )
+        return None
+
+    def get_filterset_kwargs(self):
+        """
+        Returns the keyword arguments for instantiating the filterset.
+        """
+        kwargs = {
+            "data": self.request.GET or None,
+            "request": self.request,
+            "queryset": self.get_queryset(),
+            "prefix": "filter",
+        }
+        return kwargs
+
+    def get_filterset(self):
+        filterset_class = self.get_filterset_class()
+        if not filterset_class:
+            return None
+        return filterset_class(**self.get_filterset_kwargs())
+
+    def get_queryset(self):
+        if self.filterset and self.filterset.is_bound and self.filterset.is_valid():
+            return self.filterset.qs
+        else:
+            return super().get_queryset()
+
+    def dispatch(self, request, *args, **kwargs):
+        self.filterset = self.get_filterset()
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["filterset"] = self.filterset
+        return context
+
+
 class ListView(
-    SearchableListMixin, SortableListMixin, ComponentMixin, generic.ListView
+    FiltersetMixin,
+    SearchableListMixin,
+    SortableListMixin,
+    ComponentMixin,
+    generic.ListView,
 ):
     @property
     def search_fields(self):

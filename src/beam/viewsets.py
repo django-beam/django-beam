@@ -1,19 +1,20 @@
 from collections import OrderedDict
 from functools import wraps
 from logging import getLogger
-from typing import Any, List, Tuple, Dict, Type, Iterable, Sequence, Mapping
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Type
 
+import django_filters
+from beam.registry import ViewsetMetaClass, default_registry
 from django.db.models import Model, QuerySet
-from django.forms import ModelForm, Form
+from django.forms import Form, ModelForm
 from django.urls import path
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views import View
 
-from beam.registry import ViewsetMetaClass, default_registry
 from .components import BaseComponent, Component, FormComponent, ListComponent
 from .inlines import RelatedInline
-from .views import CreateView, UpdateView, DetailView, DeleteView, ListView
+from .views import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 logger = getLogger(__name__)
 
@@ -133,8 +134,8 @@ class ListMixin(BaseViewSet):
     list_inline_classes: List[RelatedInline]
     list_form_class: ModelForm
     list_permission = "{app_label}.view_{model_name}"
-
-    # add / change / delete / view
+    list_filterset_fields: List[str] = []
+    list_filterset_class: Optional[django_filters.FilterSet] = None
 
 
 class CreateMixin(BaseViewSet):
