@@ -1,19 +1,18 @@
-from urllib.parse import urlparse, parse_qsl, ParseResult
+from typing import Dict, List, Sequence, Tuple
+from urllib.parse import ParseResult, parse_qsl, urlparse
 
+from beam.components import BaseComponent
+from beam.layouts import layout_links
+from beam.registry import default_registry, get_viewset_for_model
 from django import template
 from django.apps import apps
-from django.db.models import Model, QuerySet, Manager, FieldDoesNotExist, ManyToManyRel
-from django.db.models.fields.files import ImageFieldFile, FieldFile
+from django.db.models import FieldDoesNotExist, Manager, Model, QuerySet
+from django.db.models.fields.files import FieldFile, ImageFieldFile
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.template import RequestContext
 from django.template.loader import get_template
 from django.urls import NoReverseMatch
 from django.utils.http import urlencode
-from typing import Dict, List, Tuple, Sequence
-
-from beam.layouts import layout_links
-from beam.registry import get_viewset_for_model, default_registry
-from beam.components import BaseComponent
 
 register = template.Library()
 
@@ -179,8 +178,13 @@ def sort_link(context, field: str, sorted_fields: Sequence[str]):
 
 
 @register.simple_tag(takes_context=True)
+def page_link(context, page_query_string, page_number):
+    return preserve_query_string(context, **{page_query_string: page_number})
+
+
+@register.simple_tag(takes_context=True)
 def preserve_query_string(context, **kwargs):
-    if not "request" in context:
+    if "request" not in context:
         raise Exception(
             "The query_string tag requires django.core.context_processors.request"
         )

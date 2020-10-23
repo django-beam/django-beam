@@ -31,6 +31,7 @@ class DragonflyViewSet(ViewSet):
     list_search_fields = ["name"]
     fields = ["name", "age"]
     list_filterset_class = DragonflyFilterSet
+    list_paginate_by = 5
 
     extra_component = ExtraComponent
     extra_view_class = ExtraView
