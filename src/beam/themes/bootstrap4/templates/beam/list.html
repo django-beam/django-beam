@@ -138,8 +138,8 @@
                             </p>
                         </div>
 
+                        {% if is_paginated %}
                         <nav class="col-sm-6" aria-label="{% trans 'pagination' %}">
-                            {% if is_paginated %}
                             <ul class="pagination justify-content-end">
                                 {% if page_obj.has_previous %}
                                     <li class="page-item">
@@ -164,8 +164,8 @@
                                 {% endif %}
                             </ul>
                         </nav>
+                        {% endif %}
                     </div>
-                {% endif %}
             {% endblock %}
         </div>
     </section>
