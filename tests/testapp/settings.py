@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     "dal",
     "beam.contrib.autocomplete_light",
     "dal_select2",
+    "django_filters",
 ]
 
 SECRET_KEY = "secret_key_for_testing"

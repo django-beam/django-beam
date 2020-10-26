@@ -1,6 +1,7 @@
 import inspect
-from typing import Set, TypeVar
+from typing import List, Mapping, Optional, Set
 
+import django_filters
 from django.urls import reverse
 
 
@@ -49,14 +50,17 @@ class BaseComponent:
         return {name: getattr(self, name) for name in self.get_arguments()}
 
     def has_perm(self, user, obj=None):
-        if self.permission is None:
+        return self._has_perm(self.permission, user, obj=obj)
+
+    def _has_perm(self, permission, user, obj):
+        if permission is None:
             return True
         if not user:
             return False
-        if callable(self.permission):
-            return self.permission(user, obj=obj)
+        if callable(permission):
+            return permission(user, obj=obj)
         # the ModelBackend returns False as soon as we supply an obj so we can't pass that here
-        return user.has_perm(self.permission)
+        return user.has_perm(permission)
 
     def reverse(self, obj=None, extra_kwargs=None):
         if not obj:
@@ -91,7 +95,8 @@ class Component(BaseComponent):
 
         if not view_class:
             raise ValueError(
-                "A component requires a view class, if you do not want to serve a view use BaseComponent"
+                "A component requires a view class, if you do "
+                "not want to serve a view use BaseComponent"
             )
         self.view_class = view_class
 
@@ -132,11 +137,13 @@ class FormComponent(Component):
 class ListComponent(Component):
     def __init__(
         self,
-        list_search_fields=None,
-        list_paginate_by=None,
-        list_item_link_layout=None,
-        list_sort_fields=None,
-        list_sort_fields_columns=None,
+        list_search_fields: Optional[List[str]] = None,
+        list_paginate_by: Optional[int] = None,
+        list_item_link_layout: Optional[List[str]] = None,
+        list_sort_fields: Optional[List[str]] = None,
+        list_sort_fields_columns: Optional[Mapping[str, str]] = None,
+        list_filterset_fields: Optional[List[str]] = None,
+        list_filterset_class: Optional[django_filters.filterset.BaseFilterSet] = None,
         **kwargs
     ):
         self.list_search_fields = list_search_fields
@@ -144,6 +151,8 @@ class ListComponent(Component):
         self.list_item_link_layout = list_item_link_layout
         self.list_sort_fields = list_sort_fields
         self.list_sort_fields_columns = list_sort_fields_columns
+        self.list_filterset_fields = list_filterset_fields
+        self.list_filterset_class = list_filterset_class
         super().__init__(**kwargs)
 
 

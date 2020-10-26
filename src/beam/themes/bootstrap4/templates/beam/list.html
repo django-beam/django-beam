@@ -36,6 +36,32 @@
                         </div>
                     </form>
                 {% endif %}
+
+                {% if filterset %}
+                    <div class="mt-2 mb-2">
+                        <div class="input-group">
+                            <button class="btn btn-outline-secondary ml-auto"
+                                    type="button" data-toggle="collapse"
+                                    data-target="#filter-form-container" aria-expanded="false"
+                                    aria-controls="filter-form-container">
+                                {% trans "show/hide filters" %}
+                            </button>
+                        </div>
+                        <div class="collapse {% if filterset.form.has_changed %}show{% endif %}"
+                             id="filter-form-container">
+                            <form method="get" id="filter-form">
+                                {% include "beam/partials/form_layout.html" with form=filterset.form layout=filterset.layout %}
+                                <input type="hidden" name="_has_beam_filter" value="1">
+                                <div class="input-group">
+                                    <a href="{{ request.path }}"
+                                       class="btn btn-outline-secondary">{% trans "Clear filters" %}</a>
+                                    <input type="submit" class="btn btn-outline-primary ml-auto"
+                                           value="{% trans 'Filter' %}"/>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
             {% endblock %}
 
             {% block table %}
@@ -87,10 +113,12 @@
                     <p class="alert alert-info" role="alert">
                         {% if search_query %}
                             {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }} for query "{{ search_query }}"{% endblocktrans %}.
+                        {% elif filterset and filterset.is_bound and filterset.is_valid %}
+                                {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }} that match the current filters{% endblocktrans %}.
                         {% else %}
                             {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }}{% endblocktrans %}.
                         {% endif %}
-                        </p>
+                    </p>
                 {% endif %}
             {% endblock %}
 
