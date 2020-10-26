@@ -1,7 +1,7 @@
 from typing import List
 
 from django.db.models import Model
-from django.forms import inlineformset_factory, ModelForm
+from django.forms import ModelForm, inlineformset_factory
 
 
 class RelatedInline(object):
@@ -43,7 +43,7 @@ class RelatedInline(object):
             .replace("+", "")
         )
 
-    def construct_formset(self):
+    def get_formset_class(self):
         if self.extra is not None:
             extra = self.extra
         elif self.parent_instance:
@@ -59,12 +59,21 @@ class RelatedInline(object):
             extra=extra,
             can_delete=self.can_delete,
             fields=self.fields[:],
-        )(
-            instance=self.parent_instance,
-            data=self.request.POST if self.request and self.request.POST else None,
-            files=self.request.FILES if self.request and self.request.FILES else None,
-            prefix=self.prefix,
         )
+
+    def get_formset_kwargs(self):
+        return {
+            "instance": self.parent_instance,
+            "data": self.request.POST if self.request and self.request.POST else None,
+            "files": self.request.FILES
+            if self.request and self.request.FILES
+            else None,
+            "prefix": self.prefix,
+        }
+
+    def construct_formset(self):
+        formset_class = self.get_formset_class()
+        return formset_class(**self.get_formset_kwargs())
 
     def get_title(self):
         return self.title or self.model._meta.verbose_name_plural
