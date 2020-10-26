@@ -1,0 +1,86 @@
+{% load i18n beam_tags %}
+<div class="row">
+    <div class="col-sm-6">
+        <p class="pt-2">
+            {% if object_list %}
+                {% if is_paginated %}
+                    {% blocktrans with total=page_obj.paginator.count start=page_obj.start_index end=page_obj.end_index name=options.verbose_name_plural %}Showing {{ start }} to {{ end }} of {{ total }} {{ name }}{% endblocktrans %}
+                {% elif page_obj.paginator.count == 1 %}
+                    {% blocktrans with total=page_obj.paginator.count start=page_obj.start_index end=page_obj.end_index name_singular=options.verbose_name %}Showing {{ total }} {{ name_singular }}{% endblocktrans %}
+                {% else %}
+                    {% blocktrans with total=page_obj.paginator.count start=page_obj.start_index end=page_obj.end_index name_plural=options.verbose_name_plural %}Showing {{ total }} {{ name_plural }}{% endblocktrans %}
+                {% endif %}
+            {% endif %}
+        </p>
+    </div>
+
+    {% if is_paginated %}
+        <nav class="col-sm-6" aria-label="{% trans 'pagination' %}">
+            <ul class="pagination justify-content-end">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="{% page_link page_param page_obj.previous_page_number  %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">{% trans "Previous" %}</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% with current_page=page_obj.number num_pages=paginator.page_range|length %}
+                {% if num_pages > 9 %}{# if only 9 pages we might as well show them all, see below #}
+                    {# show page numbers like so #}
+                    {# [1] 2 ... 98 99           #}
+                    {# 1 [2] 3 ... 98 99         #}
+                    {# 1 2 [3] 4 ... 98 99       #}
+                    {# 1 2 3 [4] 5 ... 98 99     #}
+                    {# 1 2 ... 4 [5] 6 ... 98 99 #}
+                    {% for page_number in paginator.page_range|slice:2 %}
+                        <li class="page-item {% if page_number == current_page %}active{% endif %}">
+                            <a class="page-link" href="{% page_link page_param page_number %}">{{ page_number }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if current_page == 1 or current_page > 4 %}
+                        <li class="page-item disabled"><span class="page-link">&#8230;</span></li>
+                    {% endif %}
+
+                    {% if current_page > 3 and current_page < num_pages %}
+                    <li class="page-item"><a class="page-link" href="{% page_link page_param current_page|add:-1 %}">{{ current_page|add:-1 }}</a></li>
+                    {% endif %}
+
+                    {% if current_page > 2 and current_page < num_pages|add:-1 %}
+                        <li class="page-item active"><a class="page-link" href="{% page_link page_param current_page %}">{{ current_page }}</a></li>
+                    {% endif %}
+
+                    {% if current_page > 1 and current_page < num_pages|add:-2 %}
+                        <li class="page-item"><a class="page-link" href="{% page_link page_param current_page|add:1 %}">{{ current_page|add:1 }}</a></li>
+                    {% endif %}
+
+                    {% if current_page > 1 and current_page < num_pages|add:-3 %}
+                        <li class="page-item disabled"><span class="page-link">&#8230;</span></li>
+                    {% endif %}
+
+                    {% for page_number in paginator.page_range|slice:"-2:" %}
+                        <li class="page-item {% if page_number == current_page %}active{% endif %}">
+                            <a class="page-link" href="{% page_link page_param page_number %}">{{ page_number }}</a>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    {% for page_number in paginator.page_range %}
+                        <li class="page-item {% if page_number == page_obj.number %}active{% endif %}">
+                            <a class="page-link" href="{% page_link page_param page_number %}">{{ page_number }}</a>
+                        </li>
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{% page_link page_param page_obj.next_page_number  %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">{% trans "Next" %}</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>

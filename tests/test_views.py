@@ -27,6 +27,51 @@ class ViewTest(WebTest):
         self.assertContains(response, "alpha")
         self.assertContains(response, "omega")
 
+    def test_list_pagination_small_numbers(self):
+        for i in range(DragonflyViewSet.list_paginate_by * 3):
+            Dragonfly.objects.create(name="dragonfly-{}".format(i), age=100)
+
+        first_page = self.app.get(
+            DragonflyViewSet().links["list"].reverse(),
+            user=user_with_perms(["testapp.view_dragonfly"]),
+        )
+        self.assertContains(first_page, "dragonfly-0")
+        self.assertContains(first_page, "dragonfly-1")
+        self.assertContains(first_page, "dragonfly-2")
+        self.assertContains(first_page, "dragonfly-3")
+        self.assertContains(first_page, "dragonfly-4")
+        self.assertNotContains(first_page, "dragonfly-5")
+
+        second_page = first_page.click("2")
+        self.assertNotContains(second_page, "dragonfly-4")
+        self.assertContains(second_page, "dragonfly-5")
+        self.assertContains(second_page, "dragonfly-6")
+        self.assertContains(second_page, "dragonfly-7")
+        self.assertContains(second_page, "dragonfly-8")
+        self.assertContains(second_page, "dragonfly-9")
+        self.assertNotContains(second_page, "dragonfly-10")
+
+    def test_list_pagination_large_numbers(self):
+        for i in range(DragonflyViewSet.list_paginate_by * 10):
+            Dragonfly.objects.create(name="dragonfly-{}".format(i), age=100)
+
+        response = self.app.get(
+            DragonflyViewSet().links["list"].reverse() + "?page=5",
+            user=user_with_perms(["testapp.view_dragonfly"]),
+        )
+
+        # see beam/partials/pagination.html for a description
+        self.assertContains(response, "page=1")
+        self.assertContains(response, "page=2")
+        self.assertNotContains(response, "page=3")
+
+        self.assertContains(response, "page=4")
+        self.assertContains(response, "page=6")
+
+        self.assertNotContains(response, "page=8")
+        self.assertContains(response, "page=9")
+        self.assertContains(response, "page=10")
+
     def test_list_requires_permission(self):
         Dragonfly.objects.create(name="alpha", age=12)
         self.app.get(
