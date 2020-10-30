@@ -1,5 +1,5 @@
 {% load i18n beam_tags %}
-<div class="row">
+<div class="row" data-object-count="{% if is_paginated %}{{ page_obj.paginator.count }}{% else %}{{ object_list.count }}{% endif %}">
     <div class="col-sm-6">
         <p class="pt-2">
             {% if object_list %}

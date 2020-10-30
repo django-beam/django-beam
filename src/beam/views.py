@@ -1,4 +1,4 @@
-from typing import List, Type
+from typing import List, Optional, Type
 
 from beam.registry import default_registry, register
 from django.apps import apps
@@ -16,11 +16,13 @@ from django.views.generic.base import ContextMixin, TemplateView
 from django_filters.filterset import filterset_factory
 from extra_views import SearchableListMixin
 
+from .actions import Action
+from .components import Component, ListComponent
 from .inlines import RelatedInline
 
 
 class ComponentMixin(ContextMixin):
-    component = None
+    component: Optional[Component] = None
     viewset = None
 
     def get_context_data(self, **kwargs):
@@ -353,7 +355,89 @@ class FiltersetMixin(ComponentMixin):
         return context
 
 
+class ListActionMixin(ComponentMixin):
+    component: ListComponent
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["actions"] = self.actions
+        return context
+
+    def get_action_qs(self):
+        ids = self.request.POST.getlist("_action_select[]")
+        select_across = self.request.POST.get("_action_select_across") == "all"
+
+        objects = self.get_queryset()
+        if not select_across:
+            objects = objects.filter(pk__in=ids)
+
+        if not select_across and len(objects) != len(ids):
+            messages.error(
+                self.request,
+                _(
+                    "There was an error finding the objects you selected. "
+                    "This could be caused by another user changing them concurrently. "
+                    "Please try again."
+                ),
+            )
+            return objects.none()
+
+        return objects
+
+    def get_actions(self, request):
+        selected_action = request.POST.get("_action_choice")
+        actions = []
+        action_class: Type[Action]
+        for index, action_class in enumerate(self.component.list_actions_classes):
+            action_id = "{}-{}".format(index, action_class.name)
+            action = action_class(
+                data=request.POST if action_id == selected_action else None,
+                model=self.model,
+                id=action_id,
+                request=request,
+            )
+            if action.has_perm(request.user):
+                actions.append(action)
+        return actions
+
+    def get_action(self):
+        for action in self.actions:
+            if action.is_bound:
+                return action
+        return None
+
+    def handle_action(self, action):
+        form = action.get_form()
+
+        if form and not form.is_valid():
+            return None
+
+        result: Optional[HttpResponse] = action.apply(queryset=self.get_action_qs())
+        success_message: str = action.get_success_message()
+
+        if success_message:
+            messages.success(self.request, success_message)
+
+        if result:
+            return result
+
+        return redirect(self.request.get_full_path())
+
+    def dispatch(self, request, *args, **kwargs):
+        self.actions = self.get_actions(request)
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        action = self.get_action()
+        if action:
+            response = self.handle_action(action)
+            if response:
+                return response
+        return self.get(request, *args, **kwargs)
+
+
 class ListView(
+    ListActionMixin,
     FiltersetMixin,
     SearchableListMixin,
     SortableListMixin,

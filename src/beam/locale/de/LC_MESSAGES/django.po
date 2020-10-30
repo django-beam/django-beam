@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-22 15:23+0200\n"
+"POT-Creation-Date: 2020-10-30 13:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,58 +17,78 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: beam/contrib/autocomplete_light/__init__.py:85
+#: actions.py:78 themes/bootstrap4/templates/beam/partials/form_inline.html:40
+#: themes/bootstrap4/templates/beam/partials/form_inline.html:55
+#: viewsets.py:202
+msgid "delete"
+msgstr "löschen"
+
+#: actions.py:95
+#, python-brace-format
+msgid "Deleted {count} {name}"
+msgstr "Es wurden {count} {name} gelöscht"
+
+#: actions.py:102
+msgid "update selected"
+msgstr "Auswahl bearbeiten"
+
+#: actions.py:143
+#, python-brace-format
+msgid "Updated {count} {name}"
+msgstr "Es wurden {count} {name} aktualisiert"
+
+#: contrib/autocomplete_light/__init__.py:85
 msgid "autocomplete"
 msgstr "Auto-Vervollständigung"
 
-#: beam/contrib/reversion/templates/beam_reversion/version_detail.html:9
+#: contrib/reversion/templates/beam_reversion/version_detail.html:9
 #, python-format
 msgid "Version as of %(date)s"
 msgstr "Version von %(date)s"
 
-#: beam/contrib/reversion/templates/beam_reversion/version_detail.html:19
+#: contrib/reversion/templates/beam_reversion/version_detail.html:19
 msgid "Revert to this version"
 msgstr "Auf diese Version zurücksetzen"
 
-#: beam/contrib/reversion/templates/beam_reversion/version_list.html:11
-#: beam/contrib/reversion/viewsets.py:50
+#: contrib/reversion/templates/beam_reversion/version_list.html:11
+#: contrib/reversion/viewsets.py:50
 msgid "history"
 msgstr "Verlauf"
 
-#: beam/contrib/reversion/templates/beam_reversion/version_list.html:20
+#: contrib/reversion/templates/beam_reversion/version_list.html:20
 msgid "date"
 msgstr "Datum"
 
-#: beam/contrib/reversion/templates/beam_reversion/version_list.html:21
+#: contrib/reversion/templates/beam_reversion/version_list.html:21
 msgid "user"
 msgstr "Benutzer"
 
-#: beam/contrib/reversion/templates/beam_reversion/version_list.html:22
+#: contrib/reversion/templates/beam_reversion/version_list.html:22
 msgid "action"
 msgstr "Aktion"
 
-#: beam/contrib/reversion/views.py:39
+#: contrib/reversion/views.py:39
 msgid "revert to version {}"
 msgstr "Zurücksetzen auf Version {}"
 
-#: beam/contrib/reversion/viewsets.py:37
+#: contrib/reversion/viewsets.py:37
 msgid "show version"
 msgstr "Version zeigen"
 
-#: beam/themes/bootstrap4/templates/beam/dashboard.html:19
+#: themes/bootstrap4/templates/beam/dashboard.html:19
 msgid "List"
 msgstr "Liste"
 
-#: beam/themes/bootstrap4/templates/beam/dashboard.html:22
+#: themes/bootstrap4/templates/beam/dashboard.html:22
 msgid "Create"
 msgstr "Anlegen"
 
-#: beam/themes/bootstrap4/templates/beam/delete.html:14
+#: themes/bootstrap4/templates/beam/delete.html:14
 #, python-format
 msgid "Delete %(object)s"
 msgstr "Lösche %(object)s"
 
-#: beam/themes/bootstrap4/templates/beam/delete.html:23
+#: themes/bootstrap4/templates/beam/delete.html:23
 #, python-format
 msgid ""
 "You can't delete <em>%(object_name)s</em> because the following objects "
@@ -77,161 +97,206 @@ msgstr ""
 "<em>%(object_name)s</em> kann nicht gelöscht werden, da die folgenden "
 "Objekte davon abhängen:"
 
-#: beam/themes/bootstrap4/templates/beam/delete.html:29
+#: themes/bootstrap4/templates/beam/delete.html:29
 #, python-format
 msgid "Are you sure you want to delete <em>%(object_name)s</em>?"
 msgstr "Sind Sie sicher, dass sie <em>%(object_name)s</em> löschen wollen?"
 
-#: beam/themes/bootstrap4/templates/beam/delete.html:32
+#: themes/bootstrap4/templates/beam/delete.html:32
 msgid "The following objects will also be deleted:"
 msgstr "Die folgenden Objekte werden ebenfalls gelöscht:"
 
-#: beam/themes/bootstrap4/templates/beam/delete.html:38
+#: themes/bootstrap4/templates/beam/delete.html:38
 msgid "Yes, I'm sure"
 msgstr "Ja, ich bin sicher"
 
-#: beam/themes/bootstrap4/templates/beam/delete.html:40
+#: themes/bootstrap4/templates/beam/delete.html:40
 msgid "No, go back."
 msgstr "Nein, zurück gehen."
 
-#: beam/themes/bootstrap4/templates/beam/detail.html:52
+#: themes/bootstrap4/templates/beam/detail.html:52
 msgid "There aren't any."
 msgstr "Es gibt keine."
 
-#: beam/themes/bootstrap4/templates/beam/form.html:25
-#: beam/themes/bootstrap4/templates/beam/partials/form_layout.html:47
+#: themes/bootstrap4/templates/beam/form.html:25
+#: themes/bootstrap4/templates/beam/partials/form_layout.html:47
 #, python-format
 msgid "Create %(verbose_name)s"
 msgstr "%(verbose_name)s anlegen"
 
-#: beam/themes/bootstrap4/templates/beam/form.html:34
-#: beam/themes/bootstrap4/templates/beam/form.html:78
+#: themes/bootstrap4/templates/beam/form.html:34
+#: themes/bootstrap4/templates/beam/form.html:78
 msgid "Save"
 msgstr "Speichern"
 
-#: beam/themes/bootstrap4/templates/beam/list.html:28
+#: themes/bootstrap4/templates/beam/list.html:29
+#: themes/bootstrap4/templates/beam/list.html:30
 msgid "Search the list below"
 msgstr "Die Liste durchsuchen"
 
-#: beam/themes/bootstrap4/templates/beam/list.html:32
+#: themes/bootstrap4/templates/beam/list.html:36
 msgid "Clear"
 msgstr "Zurücksetzen"
 
-#: beam/themes/bootstrap4/templates/beam/list.html:34
+#: themes/bootstrap4/templates/beam/list.html:38
 msgid "Search"
 msgstr "Suchen"
 
-#: beam/themes/bootstrap4/templates/beam/list.html:54
+#: themes/bootstrap4/templates/beam/list.html:52
+msgid "show/hide filters"
+msgstr "Filter ein-/ausblenden"
+
+#: themes/bootstrap4/templates/beam/list.html:62
+msgid "Clear filters"
+msgstr "Filter zurücksetzen"
+
+#: themes/bootstrap4/templates/beam/list.html:64
+msgid "Filter"
+msgstr "Filter"
+
+#: themes/bootstrap4/templates/beam/list.html:88
+msgid "Select all"
+msgstr "Alle auswählen"
+
+#: themes/bootstrap4/templates/beam/list.html:100
 msgid "reset sort"
 msgstr "Sortierung zurücksetzen"
 
-#: beam/themes/bootstrap4/templates/beam/list.html:62
-#: beam/themes/bootstrap4/templates/beam/partials/links.html:7
-#: beam/themes/bootstrap4/templates/beam/partials/list_links.html:7
+#: themes/bootstrap4/templates/beam/list.html:108
+#: themes/bootstrap4/templates/beam/partials/links.html:7
+#: themes/bootstrap4/templates/beam/partials/list_links.html:7
 msgid "Actions"
 msgstr "Aktionen"
 
-#: beam/themes/bootstrap4/templates/beam/list.html:89
+#: themes/bootstrap4/templates/beam/list.html:141
 #, python-format
 msgid "Could not find any %(name)s for query \"%(search_query)s\""
 msgstr "Keine %(name)s für Suche \"%(search_query)s\" gefunden"
 
-#: beam/themes/bootstrap4/templates/beam/list.html:91
+#: themes/bootstrap4/templates/beam/list.html:143
+#, python-format
+msgid "Could not find any %(name)s that match the current filters"
+msgstr "Keine %(name)s für aktuelle Filter gefunden"
+
+#: themes/bootstrap4/templates/beam/list.html:145
 #, python-format
 msgid "Could not find any %(name)s"
 msgstr "Keine %(name)s gefunden"
 
-#: beam/themes/bootstrap4/templates/beam/list.html:103
-#, python-format
-msgid "Showing %(start)s to %(end)s of %(total)s %(name)s"
-msgstr "%(name)s %(start)s bis %(end)s von %(total)s"
+#: themes/bootstrap4/templates/beam/partials/actions.html:5
+msgid "Action"
+msgstr "Aktion"
 
-#: beam/themes/bootstrap4/templates/beam/list.html:105
-#, python-format
-msgid "Showing %(total)s %(name_singular)s"
-msgstr "%(total)s %(name_singular)s"
+#: themes/bootstrap4/templates/beam/partials/actions.html:13
+msgid "Apply"
+msgstr "Anwenden"
 
-#: beam/themes/bootstrap4/templates/beam/list.html:107
-#, python-format
-msgid "Showing %(total)s %(name_plural)s"
-msgstr "%(total)s %(name_plural)s"
+#: themes/bootstrap4/templates/beam/partials/actions.html:14
+msgid "Selected COUNT of TOTAL."
+msgstr "Es sind COUNT von TOTAL ausgewählt."
 
-#: beam/themes/bootstrap4/templates/beam/list.html:113
-msgid "pagination"
-msgstr ""
+#: themes/bootstrap4/templates/beam/partials/actions.html:17
+msgid "Select all TOTAL."
+msgstr "Alle TOTAL auswählen."
 
-#: beam/themes/bootstrap4/templates/beam/list.html:120
-msgid "Previous"
-msgstr ""
+#: themes/bootstrap4/templates/beam/partials/actions.html:20
+msgid "Cancel selection"
+msgstr "Auswahl zurücksetzen"
 
-#: beam/themes/bootstrap4/templates/beam/list.html:133
-msgid "Next"
-msgstr ""
-
-#: beam/themes/bootstrap4/templates/beam/partials/detail_field.html:27
+#: themes/bootstrap4/templates/beam/partials/detail_field.html:27
 msgid "download"
 msgstr "runterladen"
 
-#: beam/themes/bootstrap4/templates/beam/partials/form_inline.html:40
-#: beam/themes/bootstrap4/templates/beam/partials/form_inline.html:55
-#: beam/viewsets.py:199
-msgid "delete"
-msgstr "löschen"
-
-#: beam/themes/bootstrap4/templates/beam/partials/form_inline.html:66
+#: themes/bootstrap4/templates/beam/partials/form_inline.html:66
 #, python-format
 msgid "add %(name)s"
 msgstr "%(name)s hinzufügen"
 
-#: beam/themes/bootstrap4/templates/beam/partials/messages.html:8
+#: themes/bootstrap4/templates/beam/partials/messages.html:8
 msgid "Close"
-msgstr ""
+msgstr "Schließen"
 
-#: beam/themes/bootstrap4/templates/beam/partials/navigation.html:8
+#: themes/bootstrap4/templates/beam/partials/navigation.html:8
 msgid "Home"
 msgstr "Home"
 
-#: beam/themes/bootstrap4/templates/beam/partials/navigation.html:59
+#: themes/bootstrap4/templates/beam/partials/navigation.html:59
 msgid "Change password"
-msgstr ""
+msgstr "Passwort ändern"
 
-#: beam/themes/bootstrap4/templates/beam/partials/navigation.html:64
+#: themes/bootstrap4/templates/beam/partials/navigation.html:64
 msgid "Log out"
-msgstr ""
+msgstr "Abmelden"
 
-#: beam/themes/bootstrap4/templates/beam/update.html:11
+#: themes/bootstrap4/templates/beam/partials/pagination.html:7
+#, python-format
+msgid "Showing %(start)s to %(end)s of %(total)s %(name)s"
+msgstr "%(name)s %(start)s bis %(end)s von %(total)s"
+
+#: themes/bootstrap4/templates/beam/partials/pagination.html:9
+#, python-format
+msgid "Showing %(total)s %(name_singular)s"
+msgstr "%(total)s %(name_singular)s"
+
+#: themes/bootstrap4/templates/beam/partials/pagination.html:11
+#, python-format
+msgid "Showing %(total)s %(name_plural)s"
+msgstr "%(total)s %(name_plural)s"
+
+#: themes/bootstrap4/templates/beam/partials/pagination.html:18
+msgid "pagination"
+msgstr "Seiten-Nummerierung"
+
+#: themes/bootstrap4/templates/beam/partials/pagination.html:24
+msgid "Previous"
+msgstr "Zurück"
+
+#: themes/bootstrap4/templates/beam/partials/pagination.html:79
+msgid "Next"
+msgstr "Weiter"
+
+#: themes/bootstrap4/templates/beam/update.html:11
 #, python-format
 msgid "Update %(object)s"
 msgstr "%(object)s bearbeiten"
 
-#: beam/views.py:165
+#: views.py:168
 #, python-brace-format
 msgid "The {model} \"{name}\" was added successfully."
 msgstr "{model} \"{name}\" wurde erfolgreich hinzugefügt."
 
-#: beam/views.py:199
+#: views.py:202
 #, python-brace-format
 msgid "The {model} \"{name}\" was changed successfully."
 msgstr "{model} \"{name}\" wurde erfolgreich geändert."
 
-#: beam/views.py:338
+#: views.py:378
+msgid ""
+"There was an error finding the objects you selected. This could be caused by "
+"another user changing them concurrently. Please try again."
+msgstr ""
+"Bei dem Versuch die gewählten Objekte zu finden ist ein Fehler aufgetreten. "
+"Dies kann auftreten, wenn andere Nutzer diese gleichzeitig bearbeiten. Bitte "
+"versuchen Sie es erneut."
+
+#: views.py:482
 #, python-brace-format
 msgid "The {model} \"{name}\" was deleted successfully."
 msgstr "{model} \"{name}\" wurde erfolgreich gelöscht."
 
-#: beam/viewsets.py:121
+#: viewsets.py:123
 msgid "list"
 msgstr "alle zeigen"
 
-#: beam/viewsets.py:146
+#: viewsets.py:149
 msgid "create"
 msgstr "anlegen"
 
-#: beam/viewsets.py:164
+#: viewsets.py:167
 msgid "update"
 msgstr "bearbeiten"
 
-#: beam/viewsets.py:182
+#: viewsets.py:185
 msgid "detail"
 msgstr "Detail-Ansicht"
 

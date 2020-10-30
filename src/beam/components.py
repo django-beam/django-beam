@@ -1,8 +1,11 @@
 import inspect
-from typing import List, Mapping, Optional, Set
+from typing import List, Mapping, Optional, Set, Type
 
 import django_filters
 from django.urls import reverse
+
+from .actions import Action
+from .utils import check_permission
 
 
 class BaseComponent:
@@ -50,17 +53,7 @@ class BaseComponent:
         return {name: getattr(self, name) for name in self.get_arguments()}
 
     def has_perm(self, user, obj=None):
-        return self._has_perm(self.permission, user, obj=obj)
-
-    def _has_perm(self, permission, user, obj):
-        if permission is None:
-            return True
-        if not user:
-            return False
-        if callable(permission):
-            return permission(user, obj=obj)
-        # the ModelBackend returns False as soon as we supply an obj so we can't pass that here
-        return user.has_perm(permission)
+        return check_permission(permission=self.permission, user=user, obj=obj)
 
     def reverse(self, obj=None, extra_kwargs=None):
         if not obj:
@@ -143,7 +136,10 @@ class ListComponent(Component):
         list_sort_fields: Optional[List[str]] = None,
         list_sort_fields_columns: Optional[Mapping[str, str]] = None,
         list_filterset_fields: Optional[List[str]] = None,
-        list_filterset_class: Optional[django_filters.filterset.BaseFilterSet] = None,
+        list_filterset_class: Optional[
+            Type[django_filters.filterset.BaseFilterSet]
+        ] = None,
+        list_action_classes: Optional[List[Type[Action]]] = None,
         **kwargs
     ):
         self.list_search_fields = list_search_fields
@@ -153,6 +149,7 @@ class ListComponent(Component):
         self.list_sort_fields_columns = list_sort_fields_columns
         self.list_filterset_fields = list_filterset_fields
         self.list_filterset_class = list_filterset_class
+        self.list_actions_classes = list_action_classes
         super().__init__(**kwargs)
 
 
