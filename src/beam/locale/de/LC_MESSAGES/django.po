@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-30 13:05+0100\n"
+"POT-Creation-Date: 2020-11-02 12:53+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions.py:78 themes/bootstrap4/templates/beam/partials/form_inline.html:40
-#: themes/bootstrap4/templates/beam/partials/form_inline.html:55
+#: actions.py:78 themes/bootstrap4/templates/beam/partials/form_inline.html:41
+#: themes/bootstrap4/templates/beam/partials/form_inline.html:56
 #: viewsets.py:202
 msgid "delete"
 msgstr "löschen"
@@ -114,10 +114,6 @@ msgstr "Ja, ich bin sicher"
 msgid "No, go back."
 msgstr "Nein, zurück gehen."
 
-#: themes/bootstrap4/templates/beam/detail.html:52
-msgid "There aren't any."
-msgstr "Es gibt keine."
-
 #: themes/bootstrap4/templates/beam/form.html:25
 #: themes/bootstrap4/templates/beam/partials/form_layout.html:47
 #, python-format
@@ -142,43 +138,31 @@ msgstr "Zurücksetzen"
 msgid "Search"
 msgstr "Suchen"
 
-#: themes/bootstrap4/templates/beam/list.html:52
-msgid "show/hide filters"
-msgstr "Filter ein-/ausblenden"
-
-#: themes/bootstrap4/templates/beam/list.html:62
-msgid "Clear filters"
-msgstr "Filter zurücksetzen"
-
 #: themes/bootstrap4/templates/beam/list.html:64
-msgid "Filter"
-msgstr "Filter"
-
-#: themes/bootstrap4/templates/beam/list.html:88
 msgid "Select all"
 msgstr "Alle auswählen"
 
-#: themes/bootstrap4/templates/beam/list.html:100
+#: themes/bootstrap4/templates/beam/list.html:76
 msgid "reset sort"
 msgstr "Sortierung zurücksetzen"
 
-#: themes/bootstrap4/templates/beam/list.html:108
+#: themes/bootstrap4/templates/beam/list.html:84
 #: themes/bootstrap4/templates/beam/partials/links.html:7
 #: themes/bootstrap4/templates/beam/partials/list_links.html:7
 msgid "Actions"
 msgstr "Aktionen"
 
-#: themes/bootstrap4/templates/beam/list.html:141
+#: themes/bootstrap4/templates/beam/list.html:117
 #, python-format
 msgid "Could not find any %(name)s for query \"%(search_query)s\""
 msgstr "Keine %(name)s für Suche \"%(search_query)s\" gefunden"
 
-#: themes/bootstrap4/templates/beam/list.html:143
+#: themes/bootstrap4/templates/beam/list.html:119
 #, python-format
 msgid "Could not find any %(name)s that match the current filters"
 msgstr "Keine %(name)s für aktuelle Filter gefunden"
 
-#: themes/bootstrap4/templates/beam/list.html:145
+#: themes/bootstrap4/templates/beam/list.html:121
 #, python-format
 msgid "Could not find any %(name)s"
 msgstr "Keine %(name)s gefunden"
@@ -207,7 +191,27 @@ msgstr "Auswahl zurücksetzen"
 msgid "download"
 msgstr "runterladen"
 
-#: themes/bootstrap4/templates/beam/partials/form_inline.html:66
+#: themes/bootstrap4/templates/beam/partials/detail_inline.html:17
+msgid "There aren't any that match the current filters."
+msgstr "Nichts für aktuelle Filter gefunden"
+
+#: themes/bootstrap4/templates/beam/partials/detail_inline.html:19
+msgid "There aren't any."
+msgstr "Es gibt keine."
+
+#: themes/bootstrap4/templates/beam/partials/filters.html:9
+msgid "show/hide filters"
+msgstr "Filter ein-/ausblenden"
+
+#: themes/bootstrap4/templates/beam/partials/filters.html:19
+msgid "Clear filters"
+msgstr "Filter zurücksetzen"
+
+#: themes/bootstrap4/templates/beam/partials/filters.html:21
+msgid "Filter"
+msgstr "Filter"
+
+#: themes/bootstrap4/templates/beam/partials/form_inline.html:67
 #, python-format
 msgid "add %(name)s"
 msgstr "%(name)s hinzufügen"

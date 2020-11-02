@@ -29,26 +29,26 @@ class ViewTest(WebTest):
 
     def test_list_pagination_small_numbers(self):
         for i in range(DragonflyViewSet.list_paginate_by * 3):
-            Dragonfly.objects.create(name="dragonfly-{}".format(i), age=100)
+            Dragonfly.objects.create(name="dragonfly-{:02}".format(i), age=100)
 
         first_page = self.app.get(
             DragonflyViewSet().links["list"].reverse(),
             user=user_with_perms(["testapp.view_dragonfly"]),
         )
-        self.assertContains(first_page, "dragonfly-0")
-        self.assertContains(first_page, "dragonfly-1")
-        self.assertContains(first_page, "dragonfly-2")
-        self.assertContains(first_page, "dragonfly-3")
-        self.assertContains(first_page, "dragonfly-4")
-        self.assertNotContains(first_page, "dragonfly-5")
+        self.assertContains(first_page, "dragonfly-00")
+        self.assertContains(first_page, "dragonfly-01")
+        self.assertContains(first_page, "dragonfly-02")
+        self.assertContains(first_page, "dragonfly-03")
+        self.assertContains(first_page, "dragonfly-04")
+        self.assertNotContains(first_page, "dragonfly-05")
 
         second_page = first_page.click("2")
-        self.assertNotContains(second_page, "dragonfly-4")
-        self.assertContains(second_page, "dragonfly-5")
-        self.assertContains(second_page, "dragonfly-6")
-        self.assertContains(second_page, "dragonfly-7")
-        self.assertContains(second_page, "dragonfly-8")
-        self.assertContains(second_page, "dragonfly-9")
+        self.assertNotContains(second_page, "dragonfly-04")
+        self.assertContains(second_page, "dragonfly-05")
+        self.assertContains(second_page, "dragonfly-06")
+        self.assertContains(second_page, "dragonfly-07")
+        self.assertContains(second_page, "dragonfly-08")
+        self.assertContains(second_page, "dragonfly-09")
         self.assertNotContains(second_page, "dragonfly-10")
 
     def test_list_pagination_large_numbers(self):
@@ -359,3 +359,93 @@ class ViewTest(WebTest):
         self.assertContains(response, detail_url)
         self.assertContains(response, detail_url + "?_popup=id_test")
         self.assertNotContains(response, detail_url + "?_popup=id_test&not_preserved")
+
+    def test_detail_filter_inlines(self):
+        user = user_with_perms(["testapp.view_dragonfly"])
+        dragonfly = Dragonfly.objects.create(name="alpha", age=12)
+
+        Sighting.objects.create(name="sighting-one", dragonfly=dragonfly)
+        Sighting.objects.create(name="sighting-two", dragonfly=dragonfly)
+
+        response = self.app.get(
+            DragonflyViewSet().links["detail"].reverse(dragonfly), user=user,
+        )
+
+        self.assertContains(response, "sighting-one")
+        self.assertContains(response, "sighting-two")
+
+        response.form["sighting_set-filter-name"] = "sighting-one"
+        filtered = response.form.submit()
+
+        self.assertContains(filtered, "sighting-one")
+        self.assertNotContains(filtered, "sighting-two")
+
+
+class InlinePaginationTest(WebTest):
+    def test_paginated_detail_inlines(self):
+        user = user_with_perms(["testapp.view_dragonfly"])
+
+        dragonfly = Dragonfly.objects.create(name="alpha", age=12)
+        for i in range(6):  # SightingInline.paginate_by + 1
+            Sighting.objects.create(
+                name="sighting-at-{}".format(i), dragonfly=dragonfly
+            )
+
+        response = self.app.get(
+            DragonflyViewSet().links["detail"].reverse(dragonfly), user=user,
+        )
+
+        self.assertContains(response, "sighting-at-0")
+        self.assertContains(response, "sighting-at-1")
+        self.assertContains(response, "sighting-at-2")
+        self.assertContains(response, "sighting-at-3")
+        self.assertContains(response, "sighting-at-4")
+        self.assertNotContains(response, "sighting-at-5")
+
+        next_page = response.click("Next")
+
+        self.assertNotContains(next_page, "sighting-at-0")
+        self.assertNotContains(next_page, "sighting-at-1")
+        self.assertNotContains(next_page, "sighting-at-2")
+        self.assertNotContains(next_page, "sighting-at-3")
+        self.assertNotContains(next_page, "sighting-at-4")
+        self.assertContains(next_page, "sighting-at-5")
+
+    def test_paginated_update_inlines(self):
+        user = user_with_perms(["testapp.view_dragonfly", "testapp.change_dragonfly"])
+
+        dragonfly = Dragonfly.objects.create(name="alpha", age=12)
+        for i in range(6):  # SightingInline.paginate_by + 1
+            Sighting.objects.create(
+                name="sighting-at-{}".format(i), dragonfly=dragonfly
+            )
+
+        response = self.app.get(
+            DragonflyViewSet().links["update"].reverse(dragonfly), user=user,
+        )
+
+        self.assertContains(response, "sighting-at-0")
+        self.assertContains(response, "sighting-at-1")
+        self.assertContains(response, "sighting-at-2")
+        self.assertContains(response, "sighting-at-3")
+        self.assertContains(response, "sighting-at-4")
+        self.assertNotContains(response, "sighting-at-5")
+
+        form = response.form
+        form["sighting_set-0-name"] = "sighting-at-0-changed"
+        form["sighting_set-1-DELETE"] = True
+        update_response = form.submit()
+        self.assertRedirects(
+            update_response, DragonflyViewSet().links["detail"].reverse(dragonfly)
+        )
+
+        self.assertSetEqual(
+            set(dragonfly.sighting_set.values_list("name", flat=True)),
+            {
+                "sighting-at-0-changed",
+                "sighting-at-2",
+                "sighting-at-3",
+                "sighting-at-4",
+                "sighting-at-5",
+            },
+        )

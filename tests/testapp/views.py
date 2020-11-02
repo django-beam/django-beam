@@ -12,6 +12,8 @@ class SightingInline(RelatedInline):
     fields = ["name"]
     model = Sighting
     foreign_key_field = "dragonfly"
+    paginate_by = 5
+    filterset_fields = ["name"]
 
 
 class ExtraView(DetailView):
@@ -50,3 +52,4 @@ class SightingViewSet(ViewSet):
     model = Sighting
     fields = ["name", "dragonfly"]
     list_filterset_fields = ["name"]
+    queryset = Sighting.objects.order_by("pk")
