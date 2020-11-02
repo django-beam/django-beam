@@ -2,7 +2,7 @@ from beam.actions import DeleteAction
 from django.test import TestCase
 from django_webtest import WebTest
 from test_views import user_with_perms
-from testapp.models import Dragonfly
+from testapp.models import Dragonfly, ProtectedSighting, Sighting
 from testapp.views import DragonFlyUpdateAction, DragonflyViewSet
 
 
@@ -180,3 +180,197 @@ class ActionViewTest(WebTest):
 
         self.assertTrue(Dragonfly.objects.filter(name="alpha").exists())
         self.assertFalse(Dragonfly.objects.filter(name="omega").exists())
+
+
+class InlineActionViewTest(WebTest):
+    def setUp(self):
+        self.dragonfly = Dragonfly.objects.create(name="alpha", age=12)
+        Sighting.objects.create(dragonfly=self.dragonfly, name="regular-sighting-0")
+        Sighting.objects.create(dragonfly=self.dragonfly, name="regular-sighting-1")
+        ProtectedSighting.objects.create(
+            dragonfly=self.dragonfly, name="protected-sighting-0"
+        )
+
+    def test_action_shown_only_where_permission(self):
+        detail_page = self.app.get(
+            DragonflyViewSet().links["detail"].reverse(self.dragonfly),
+            user=user_with_perms(
+                [
+                    "testapp.view_dragonfly",
+                    "testapp.delete_sighting",
+                    "testapp.delete_protectedsighting",
+                ],
+                username="user-0",
+            ),
+        )
+        self.assertContains(detail_page, "sighting_set-0-delete")
+        self.assertContains(detail_page, "protectedsighting_set-0-delete")
+
+        detail_page_only_sighting = self.app.get(
+            DragonflyViewSet().links["detail"].reverse(self.dragonfly),
+            user=user_with_perms(
+                ["testapp.view_dragonfly", "testapp.delete_sighting",],
+                username="user-1",
+            ),
+        )
+        self.assertContains(detail_page_only_sighting, "sighting_set-0-delete")
+        self.assertNotContains(
+            detail_page_only_sighting, "protectedsighting_set-0-delete"
+        )
+
+        detail_page_only_protected_sighting = self.app.get(
+            DragonflyViewSet().links["detail"].reverse(self.dragonfly),
+            user=user_with_perms(
+                ["testapp.view_dragonfly", "testapp.delete_protectedsighting",],
+                username="user-2",
+            ),
+        )
+        self.assertContains(
+            detail_page_only_protected_sighting, "sighting_set-0-delete"
+        )
+        self.assertContains(
+            detail_page_only_protected_sighting, "protectedsighting_set-0-delete"
+        )
+
+    def test_action_with_selection(self):
+        detail_page = self.app.get(
+            DragonflyViewSet().links["detail"].reverse(self.dragonfly),
+            user=user_with_perms(
+                ["testapp.view_dragonfly", "testapp.delete_sighting",]
+            ),
+        )
+        form = detail_page.forms["sighting_set-action-form"]
+        form["_action_choice"] = "sighting_set-0-delete"
+        form["_action_select[]"] = [Sighting.objects.get(name="regular-sighting-0").pk]
+        response = form.submit().follow()
+        self.assertContains(response, "Deleted 1 sighting")
+        self.assertNotContains(response, "regular-sighting-0")
+        self.assertContains(response, "regular-sighting-1")
+
+        self.assertEqual(Sighting.objects.count(), 1)
+
+    def test_selection_across_page_boundary(self):
+        Sighting.objects.create(dragonfly=self.dragonfly, name="regular-sighting-2")
+        Sighting.objects.create(dragonfly=self.dragonfly, name="regular-sighting-3")
+        Sighting.objects.create(dragonfly=self.dragonfly, name="regular-sighting-4")
+        Sighting.objects.create(dragonfly=self.dragonfly, name="regular-sighting-5")
+        detail_page = self.app.get(
+            DragonflyViewSet().links["detail"].reverse(self.dragonfly),
+            user=user_with_perms(
+                ["testapp.view_dragonfly", "testapp.delete_sighting",]
+            ),
+        )
+        form = detail_page.forms["sighting_set-action-form"]
+        form["_action_choice"] = "sighting_set-0-delete"
+        form["_action_select_across"] = "all"
+        response = form.submit().follow()
+
+        self.assertNotContains(response, "regular-sighting-0")
+        self.assertNotContains(response, "regular-sighting-1")
+
+        self.assertEqual(Sighting.objects.count(), 0)
+
+    def test_mass_update_form(self):
+        detail_page = self.app.get(
+            DragonflyViewSet().links["detail"].reverse(self.dragonfly),
+            user=user_with_perms(
+                [
+                    "testapp.view_dragonfly",
+                    "testapp.delete_sighting",
+                    "testapp.change_sighting",
+                ]
+            ),
+        )
+        form = detail_page.forms["sighting_set-action-form"]
+        form["_action_choice"] = "sighting_set-1-update_selected"
+        form["_action_select_across"] = "all"
+        form["sighting_set-1-update_selected-name"] = "a new name"
+        response = form.submit().follow()
+
+        self.assertNotContains(response, "regular-sighting-0")
+        self.assertEqual(Sighting.objects.filter(name="a new name").count(), 2)
+        self.assertEqual(Sighting.objects.exclude(name="a new name").count(), 0)
+
+    def test_no_interaction_with_multiple_inlines(self):
+        self.dragonfly.sighting_set.create(name="interaction-test-sighting", pk=999)
+        self.dragonfly.protectedsighting_set.create(
+            name="interaction-test-protected-sighting", pk=999
+        )
+        detail_page = self.app.get(
+            DragonflyViewSet().links["detail"].reverse(self.dragonfly),
+            user=user_with_perms(
+                [
+                    "testapp.view_dragonfly",
+                    "testapp.delete_sighting",
+                    "testapp.delete_protectedsighting",
+                ]
+            ),
+        )
+        self.assertTrue(Sighting.objects.filter(pk=999).exists())
+        self.assertTrue(ProtectedSighting.objects.filter(pk=999).exists())
+
+        sighting_form = detail_page.forms["sighting_set-action-form"]
+        sighting_form["_action_choice"] = "sighting_set-0-delete"
+        sighting_form["_action_select[]"] = [999]
+        sighting_response = sighting_form.submit().follow()
+        self.assertContains(sighting_response, "Deleted 1 sighting")
+
+        self.assertFalse(Sighting.objects.filter(pk=999).exists())
+        self.assertTrue(ProtectedSighting.objects.filter(pk=999).exists())
+
+        protected_sighting_form = detail_page.forms["protectedsighting_set-action-form"]
+        protected_sighting_form["_action_choice"] = "protectedsighting_set-0-delete"
+        protected_sighting_form["_action_select[]"] = ["999"]
+        protected_sighting_response = protected_sighting_form.submit().follow()
+        self.assertContains(protected_sighting_response, "Deleted 1 protected sighting")
+
+        self.assertFalse(Sighting.objects.filter(pk=999).exists())
+        self.assertFalse(ProtectedSighting.objects.filter(pk=999).exists())
+
+    def test_filter_interaction(self):
+        user = user_with_perms(["testapp.view_dragonfly", "testapp.delete_sighting"],)
+
+        detail_page = self.app.get(
+            DragonflyViewSet().links["detail"].reverse(self.dragonfly), user=user,
+        )
+
+        self.assertContains(detail_page, "regular-sighting-0")
+        self.assertContains(detail_page, "regular-sighting-1")
+
+        filter_form = detail_page.forms["sighting_set-filter-form"]
+        filter_form["sighting_set-filter-name"] = "regular-sighting-0"
+
+        filtered_page = filter_form.submit()
+
+        self.assertContains(filtered_page, "regular-sighting-0")
+        self.assertNotContains(filtered_page, "regular-sighting-1")
+
+        action_form = filtered_page.forms["sighting_set-action-form"]
+        action_form["_action_choice"] = "sighting_set-0-delete"
+        action_form["_action_select_across"] = "all"
+        action_response = action_form.submit().follow()
+
+        self.assertContains(action_response, "Deleted 1 sighting")
+
+        self.assertFalse(Sighting.objects.filter(name="regular-sighting-0").exists())
+        self.assertTrue(Sighting.objects.filter(name="regular-sighting-1").exists())
+
+    def test_http_response_from_action(self):
+        user = user_with_perms(["testapp.view_dragonfly", "testapp.view_sighting"],)
+
+        detail_page = self.app.get(
+            DragonflyViewSet().links["detail"].reverse(self.dragonfly), user=user,
+        )
+
+        form = detail_page.forms["sighting_set-action-form"]
+        form["_action_choice"] = "sighting_set-2-csv_export"
+        form["_action_select_across"] = "all"
+        response = form.submit()
+        self.assertEqual(
+            response.content.decode("utf-8"),
+            "{},regular-sighting-0\r\n"
+            "{},regular-sighting-1\r\n".format(
+                Sighting.objects.get(name="regular-sighting-0").pk,
+                Sighting.objects.get(name="regular-sighting-1").pk,
+            ),
+        )

@@ -1,10 +1,42 @@
+import csv
+from typing import Optional
+
 import django_filters
 from beam import RelatedInline, ViewSet, actions
-from beam.actions import DeleteAction
+from beam.actions import Action, DeleteAction, MassUpdateAction
 from beam.views import DetailView
 from beam.viewsets import Component
+from django.db.models import QuerySet
+from django.http import HttpResponse
 
-from .models import Dragonfly, Sighting
+from .models import Dragonfly, ProtectedSighting, Sighting
+
+
+class CsvExportAction(Action):
+    name = "csv_export"
+    fields = ["id", "name"]
+    permission = "{app_label}.view_{model_name}"
+
+    def apply(self, queryset: QuerySet) -> Optional[HttpResponse]:
+        values = queryset.values_list(*self.fields)
+
+        response = HttpResponse(content_type="text/csv")
+        writer = csv.writer(response)
+        writer.writerows(values)
+        return response
+
+
+class NameUpdateAction(MassUpdateAction):
+    form_fields = ["name"]
+
+
+class ProtectedSightingInline(RelatedInline):
+    title = "Title of protected sightings"
+    fields = ["name"]
+    model = ProtectedSighting
+    foreign_key_field = "dragonfly"
+    paginate_by = 5
+    action_classes = [DeleteAction]
 
 
 class SightingInline(RelatedInline):
@@ -14,6 +46,7 @@ class SightingInline(RelatedInline):
     foreign_key_field = "dragonfly"
     paginate_by = 5
     filterset_fields = ["name"]
+    action_classes = [DeleteAction, NameUpdateAction, CsvExportAction]
 
 
 class ExtraView(DetailView):
@@ -34,7 +67,7 @@ class DragonFlyUpdateAction(actions.MassUpdateAction):
 
 
 class DragonflyViewSet(ViewSet):
-    inline_classes = [SightingInline]
+    inline_classes = [SightingInline, ProtectedSightingInline]
     model = Dragonfly
     list_search_fields = ["name"]
     fields = ["name", "age"]

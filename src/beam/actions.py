@@ -34,6 +34,8 @@ class Action:
         self._form: Optional[BaseForm] = None
         self._permission: Optional[str] = None
 
+        assert self.name, "you have to set a name when subclassing action"
+
     def get_form(self):
         if self._form is None:
             form_class = self.get_form_class()
