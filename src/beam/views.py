@@ -355,7 +355,64 @@ class FiltersetMixin(ComponentMixin):
         return context
 
 
-class ListActionMixin(ComponentMixin):
+class InlineActionMixin(InlinesMixin):
+    def get_action_qs(self, inline):
+        ids = self.request.POST.getlist("_action_select[]")
+        select_across = self.request.POST.get("_action_select_across") == "all"
+
+        objects = inline.get_queryset()
+        if not select_across:
+            objects = objects.filter(pk__in=ids)
+
+        if not select_across and len(objects) != len(ids):
+            messages.error(
+                self.request,
+                _(
+                    "There was an error finding the objects you selected. "
+                    "This could be caused by another user changing them concurrently. "
+                    "Please try again."
+                ),
+            )
+            return objects.none()
+
+        return objects
+
+    def get_action(self):
+        for inline in self.get_inlines(self.get_object()):
+            action = inline.get_action()
+            if action and action.is_bound:
+                return inline, action
+        return None, None
+
+    def handle_action(self, inline, action):
+        form = action.get_form()
+
+        if form and not form.is_valid():
+            return None
+
+        result: Optional[HttpResponse] = action.apply(
+            queryset=self.get_action_qs(inline)
+        )
+        success_message: str = action.get_success_message()
+
+        if success_message:
+            messages.success(self.request, success_message)
+
+        if result:
+            return result
+
+        return redirect(self.request.get_full_path())
+
+    def post(self, request, *args, **kwargs):
+        inline, action = self.get_action()
+        if action:
+            response = self.handle_action(inline, action)
+            if response:
+                return response
+        return self.get(request, *args, **kwargs)
+
+
+class ListActionsMixin(ComponentMixin):
     component: ListComponent
 
     def get_context_data(self, **kwargs):
@@ -384,19 +441,19 @@ class ListActionMixin(ComponentMixin):
 
         return objects
 
-    def get_actions(self, request):
-        selected_action = request.POST.get("_action_choice")
+    def get_actions(self):
+        selected_action = self.request.POST.get("_action_choice")
         actions = []
         action_class: Type[Action]
         for index, action_class in enumerate(self.component.list_actions_classes):
             action_id = "{}-{}".format(index, action_class.name)
             action = action_class(
-                data=request.POST if action_id == selected_action else None,
+                data=self.request.POST if action_id == selected_action else None,
                 model=self.model,
                 id=action_id,
-                request=request,
+                request=self.request,
             )
-            if action.has_perm(request.user):
+            if action.has_perm(self.request.user):
                 actions.append(action)
         return actions
 
@@ -424,7 +481,7 @@ class ListActionMixin(ComponentMixin):
         return redirect(self.request.get_full_path())
 
     def dispatch(self, request, *args, **kwargs):
-        self.actions = self.get_actions(request)
+        self.actions = self.get_actions()
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -437,7 +494,7 @@ class ListActionMixin(ComponentMixin):
 
 
 class ListView(
-    ListActionMixin,
+    ListActionsMixin,
     FiltersetMixin,
     SearchableListMixin,
     SortableListMixin,
@@ -466,7 +523,7 @@ class ListView(
         return context
 
 
-class DetailView(ComponentMixin, InlinesMixin, generic.DetailView):
+class DetailView(InlineActionMixin, ComponentMixin, InlinesMixin, generic.DetailView):
     def get_template_names(self):
         return super().get_template_names() + ["beam/detail.html"]
 

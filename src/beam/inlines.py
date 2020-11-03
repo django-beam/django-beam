@@ -1,5 +1,6 @@
-from typing import List, Optional
+from typing import List, Optional, Type
 
+from beam.actions import Action
 from django.core.paginator import Page, Paginator
 from django.db.models import Model
 from django.db.models.options import Options
@@ -219,5 +220,38 @@ class FilterSetMixin(BaseRelatedInline):
             return super().get_queryset()
 
 
-class RelatedInline(FilterSetMixin, PaginationMixin, BaseRelatedInline):
+class ActionsMixin(BaseRelatedInline):
+    action_classes: List[Type[Action]] = []
+
+    def __init__(self, parent_instance=None, parent_model=None, request=None) -> None:
+        super().__init__(parent_instance, parent_model, request)
+        self.actions = self.get_actions()
+
+    def get_action(self):
+        for action in self.actions:
+            if action.is_bound:
+                return action
+        return None
+
+    def get_actions(self):
+        if not self.action_classes:
+            return []
+
+        selected_action = self.request.POST.get("_action_choice")
+        actions = []
+        action_class: Type[Action]
+        for index, action_class in enumerate(self.action_classes):
+            action_id = "{}-{}-{}".format(self.prefix, index, action_class.name)
+            action = action_class(
+                data=self.request.POST if action_id == selected_action else None,
+                model=self.model,
+                id=action_id,
+                request=self.request,
+            )
+            if action.has_perm(self.request.user):
+                actions.append(action)
+        return actions
+
+
+class RelatedInline(ActionsMixin, FilterSetMixin, PaginationMixin, BaseRelatedInline):
     pass

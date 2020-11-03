@@ -380,6 +380,40 @@ class ViewTest(WebTest):
         self.assertContains(filtered, "sighting-one")
         self.assertNotContains(filtered, "sighting-two")
 
+    def test_detail_filter_multiple_inlines(self):
+        user = user_with_perms(["testapp.view_dragonfly"])
+        dragonfly = Dragonfly.objects.create(name="alpha", age=12)
+
+        Sighting.objects.create(name="regular-sighting-one", dragonfly=dragonfly)
+        Sighting.objects.create(name="regular-sighting-two", dragonfly=dragonfly)
+
+        ProtectedSighting.objects.create(
+            name="protected-sighting-one", dragonfly=dragonfly
+        )
+        ProtectedSighting.objects.create(
+            name="protected-sighting-two", dragonfly=dragonfly
+        )
+
+        response = self.app.get(
+            DragonflyViewSet().links["detail"].reverse(dragonfly), user=user,
+        )
+
+        self.assertContains(response, "regular-sighting-one")
+        self.assertContains(response, "regular-sighting-two")
+
+        self.assertContains(response, "protected-sighting-one")
+        self.assertContains(response, "protected-sighting-two")
+
+        form = response.forms["sighting_set-filter-form"]
+        form["sighting_set-filter-name"] = "regular-sighting-one"
+        filtered = form.submit()
+
+        self.assertContains(filtered, "regular-sighting-one")
+        self.assertNotContains(filtered, "regular-sighting-two")
+
+        self.assertContains(filtered, "protected-sighting-one")
+        self.assertContains(filtered, "protected-sighting-two")
+
 
 class InlinePaginationTest(WebTest):
     def test_paginated_detail_inlines(self):

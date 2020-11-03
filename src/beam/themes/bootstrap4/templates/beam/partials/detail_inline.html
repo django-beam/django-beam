@@ -1,27 +1,54 @@
 {% load i18n %}
-<section id="{%  if inline.prefix %}{{ inline.prefix }}-related-inline{% endif %}" class="related-inline">
+<section id="{% if inline.prefix %}{{ inline.prefix }}-related-inline{% endif %}" class="related-inline">
     <div class="container">
         <h2>{{ inline.get_title|capfirst }}</h2>
         {% if inline.filterset %}
             {% include "beam/partials/filters.html" with filterset=inline.filterset %}
         {% endif %}
-        {% with inline.page as page %}
-            <div class="card mb-4">
-                <ul class="list-group list-group-flush mb-0">
-                    {% for object in page.object_list %}
-                        <li class="list-group-item bg-light">
-                            {% include "beam/partials/layout.html" with object=object layout=inline.layout fields=inline.fields %}
+        {% with actions=inline.actions %}
+            {% if actions %}
+                <form method="post" id="{{ inline.prefix }}-action-form">
+                {% csrf_token %}
+                {% block actions %}
+                    {% include "beam/partials/actions.html" %}
+                {% endblock %}
+            {% endif %}
+
+            {% with inline.page as page %}
+                <div class="card mb-4">
+                    <ul class="list-group list-group-flush mb-0">
+                        {% if actions %}
+                        <li class="list-group-item">
+                            <input class="beam-action-select-across" name="_action_select_across" type="hidden" value="">
+                            <input title={% trans "Select all" %} class="beam-action-select-all" type="checkbox">
                         </li>
-                    {% empty %}
-                        {% if inline.filterset.is_bound %}
-                            <li class="list-group-item bg-light">{% blocktrans with title=inline.get_title %}There aren't any that match the current filters.{% endblocktrans %}</li>
-                        {% else %}
-                            <li class="list-group-item bg-light">{% blocktrans with title=inline.get_title %}There aren't any.{% endblocktrans %}</li>
                         {% endif %}
-                    {% endfor %}
-                </ul>
-            </div>
-            {% include "beam/partials/pagination.html" with page_param=inline.page_param paginator=page.paginator is_paginated=page.has_other_pages page_obj=page page_number=page.number object_list=page.object_list options=inline.model_options %}
+
+                        {% for object in page.object_list %}
+                            <li class="list-group-item bg-light">
+                                {% if actions %}
+                                    <input type="checkbox" class="beam-action-select-item" name="_action_select[]"
+                                           value="{{ object.pk }}">
+                                {% endif %}
+                                {% include "beam/partials/layout.html" with object=object layout=inline.layout fields=inline.fields %}
+                            </li>
+                        {% empty %}
+                            {% if inline.filterset.is_bound %}
+                                <li class="list-group-item bg-light">{% blocktrans with title=inline.get_title %}There
+                                    aren't any that match the current filters.{% endblocktrans %}</li>
+                            {% else %}
+                                <li class="list-group-item bg-light">{% blocktrans with title=inline.get_title %}There
+                                    aren't any.{% endblocktrans %}</li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% include "beam/partials/pagination.html" with page_param=inline.page_param paginator=page.paginator is_paginated=page.has_other_pages page_obj=page page_number=page.number object_list=page.object_list options=inline.model_options %}
+            {% endwith %}
+
+            {% if actions %}
+                </form>
+            {% endif %}
         {% endwith %}
     </div>
 </section>
