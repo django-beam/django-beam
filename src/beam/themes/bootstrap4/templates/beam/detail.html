@@ -39,8 +39,7 @@
 
     {% block inlines %}
         {% for inline in inlines %}
-            {% include "beam/partials/detail_inline.html" %}
-
+            {% include inline.detail_template_name|default:"beam/partials/detail_inline.html" %}
         {% endfor %}
     {% endblock %}
 

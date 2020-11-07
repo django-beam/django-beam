@@ -20,6 +20,8 @@ class BaseRelatedInline(object):
     order_field: str = ""
     queryset = None
     form_class = ModelForm
+    detail_template_name = ""
+    form_template_name = ""
 
     def __init__(self, parent_instance=None, parent_model=None, request=None) -> None:
         super().__init__()

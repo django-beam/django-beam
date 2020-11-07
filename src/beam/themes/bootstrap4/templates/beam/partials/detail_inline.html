@@ -1,20 +1,28 @@
 {% load i18n %}
 <section id="{% if inline.prefix %}{{ inline.prefix }}-related-inline{% endif %}" class="related-inline">
     <div class="container">
-        <h2>{{ inline.get_title|capfirst }}</h2>
-        {% if inline.filterset %}
+
+        {% block title %}
+            <h2>{{ inline.get_title|capfirst }}</h2>
+        {% endblock %}
+
+        {% block filters %}
             {% include "beam/partials/filters.html" with filterset=inline.filterset %}
-        {% endif %}
+        {% endblock %}
+
         {% with actions=inline.actions %}
             {% if actions %}
                 <form method="post" id="{{ inline.prefix }}-action-form">
                 {% csrf_token %}
+
                 {% block actions %}
                     {% include "beam/partials/actions.html" %}
                 {% endblock %}
             {% endif %}
 
             {% with inline.page as page %}
+
+                {% block page %}
                 <div class="card mb-4">
                     <ul class="list-group list-group-flush mb-0">
                         {% if actions %}
@@ -43,7 +51,12 @@
                         {% endfor %}
                     </ul>
                 </div>
-                {% include "beam/partials/pagination.html" with page_param=inline.page_param paginator=page.paginator is_paginated=page.has_other_pages page_obj=page page_number=page.number object_list=page.object_list options=inline.model_options %}
+                {% endblock %}
+
+                {% block pagination %}
+                    {% include "beam/partials/pagination.html" with page_param=inline.page_param paginator=page.paginator is_paginated=page.has_other_pages page_obj=page page_number=page.number object_list=page.object_list options=inline.model_options %}
+                {% endblock %}
+
             {% endwith %}
 
             {% if actions %}

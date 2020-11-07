@@ -63,7 +63,7 @@
 
         {% block inlines %}
             {% for inline in inlines %}
-                {% include "beam/partials/form_inline.html" %}
+                {% include inline.form_template_name|default:"beam/partials/form_inline.html" %}
             {% endfor %}
         {% endblock %}
 
