@@ -12,7 +12,7 @@
 
         {% with actions=inline.actions %}
             {% if actions %}
-                <form method="post" id="{{ inline.prefix }}-action-form">
+                <form method="post" id="{{ inline.prefix }}-action-form" novalidate>
                 {% csrf_token %}
 
                 {% block actions %}
