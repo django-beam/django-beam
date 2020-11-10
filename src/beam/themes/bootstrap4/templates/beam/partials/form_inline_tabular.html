@@ -1,0 +1,50 @@
+{% extends "beam/partials/form_inline.html" %}
+{% load i18n %}
+{% load beam_tags %}
+
+
+{% block formset %}
+    <div class="table-responsive">
+    <table class="table table-sm table-striped" id="{{ inline.prefix }}-table">
+
+        <thead>
+            <tr>
+                {% if inline.can_order %}<th scope="col"></th>{% endif %}
+
+                {% for field in inline.fields %}
+                    <th scope="col">
+                        {{ inline.model|field_verbose_name:field|capfirst }}
+                    </th>
+                {% endfor %}
+
+                {% if inline.formset.can_delete %}<th scope="col"></th>{% endif %}
+            </tr>
+        </thead>
+
+        <tbody class="related-inline-group">
+
+            {% if form.non_field_errors %}
+                <tr {% if rowcolor %}class="table-{{ rowcolor }}"{% endif %}>
+                    {% if inline.can_order  %}<td></td>{% endif %}
+                    <td class="p-0" colspan="{{ inline.fields|length }}">
+                        <ul class="mb-0 mt-4 alert-danger">
+                            {{ form.non_field_errors|unordered_list }}
+                        </ul>
+                    </td>
+                    {% if inline.formset.can_delete %}<td></td>{% endif %}
+                </tr>
+            {% endif %}
+
+            {% for form in inline.formset %}
+                {% include "beam/partials/form_inline_tabular_row.html" with form=form fields=inline.fields inline_item_id=forloop.counter0 %}
+            {% endfor %}
+
+        </tbody>
+
+        <tbody class="d-none">
+            {% include "beam/partials/form_inline_tabular_row.html" with form=inline.formset.empty_form fields=inline.fields inline_item_id="__prefix__" empty_form=True %}
+        </tbody>
+
+    </table>
+    </div>
+{% endblock %}

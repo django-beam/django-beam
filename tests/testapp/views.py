@@ -4,12 +4,13 @@ from typing import Optional
 import django_filters
 from beam import RelatedInline, ViewSet, actions
 from beam.actions import Action, DeleteAction, MassUpdateAction
+from beam.inlines import TabularRelatedInline
 from beam.views import DetailView
 from beam.viewsets import Component
 from django.db.models import QuerySet
 from django.http import HttpResponse
 
-from .models import Dragonfly, ProtectedSighting, Sighting
+from .models import Dragonfly, ProtectedSighting, Sighting, CascadingSighting
 
 
 class CsvExportAction(Action):
@@ -41,6 +42,14 @@ class ProtectedSightingInline(RelatedInline):
     action_classes = [DeleteAction]
 
 
+class CascadingSightingInline(TabularRelatedInline):
+    title = "Title of cascading sightings"
+    fields = ["name"]
+    model = CascadingSighting
+    foreign_key_field = "dragonfly"
+    paginate_by = 5
+
+
 class SightingInline(RelatedInline):
     title = "Title of sightings"
     fields = ["name"]
@@ -69,7 +78,7 @@ class DragonFlyUpdateAction(actions.MassUpdateAction):
 
 
 class DragonflyViewSet(ViewSet):
-    inline_classes = [SightingInline, ProtectedSightingInline]
+    inline_classes = [SightingInline, ProtectedSightingInline, CascadingSightingInline]
     model = Dragonfly
     list_search_fields = ["name"]
     fields = ["name", "age"]
