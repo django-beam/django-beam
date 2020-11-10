@@ -38,10 +38,12 @@ Should end up at  https://django-beam.readthedocs.io/en/latest/
     import beam
 
     class PersonViewSet(beam.ViewSet):
+        model = Person
         fields = ['name', 'groups']
 
 
     class GroupViewSet(beam.ViewSet):
+        model = Group
         fields = ['name']
 
 
@@ -56,7 +58,7 @@ Should end up at  https://django-beam.readthedocs.io/en/latest/
     INSTALLED_APPS += [
         "beam",
         "beam.themes.bootstrap4",  # or choose any theme you like
-        "crispy_forms",
+        "crispy_forms",  # required by the bootstrap4 theme
     ]
 ```
 
@@ -127,13 +129,15 @@ If you e.g. want the create view to be the only one shown at the top of the list
 
 ```
 class ContactDataInline(beam.RelatedInline):
+    model = ContactData
+    foreign_key_field = 'person'
     fields = ["medium", "value"]
-    fk_field_name = 'person'
 
 
 class PersonViewSet(beam.ViewSet):
-    create_inline_viewset_classes = []
-    inline_viewset_classes = [ContactDataInline]
+    model = Person
+    create_inline_classes = []
+    inline_classes = [ContactDataInline]
 
 ```
 
