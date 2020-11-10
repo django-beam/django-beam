@@ -360,6 +360,21 @@ class ViewTest(WebTest):
         self.assertContains(response, detail_url + "?_popup=id_test")
         self.assertNotContains(response, detail_url + "?_popup=id_test&not_preserved")
 
+    def test_custom_detail_template_for_inline(self):
+        user = user_with_perms(["testapp.view_dragonfly"])
+        dragonfly = Dragonfly.objects.create(name="alpha", age=12)
+        response = self.app.get(
+            DragonflyViewSet().links["detail"].reverse(dragonfly), user=user,
+        )
+        self.assertContains(response, "Awesome extra custom template title")
+
+    def test_custom_form_template_for_inline(self):
+        user = user_with_perms(["testapp.view_dragonfly", "testapp.add_dragonfly"])
+        response = self.app.get(
+            DragonflyViewSet().links["create"].reverse(), user=user,
+        )
+        self.assertContains(response, "Awesome extra custom template title")
+
     def test_detail_filter_inlines(self):
         user = user_with_perms(["testapp.view_dragonfly"])
         dragonfly = Dragonfly.objects.create(name="alpha", age=12)

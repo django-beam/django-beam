@@ -32,6 +32,8 @@ class NameUpdateAction(MassUpdateAction):
 
 class ProtectedSightingInline(RelatedInline):
     title = "Title of protected sightings"
+    detail_template_name = "custom_detail_inline.html"
+    form_template_name = "custom_form_inline.html"
     fields = ["name"]
     model = ProtectedSighting
     foreign_key_field = "dragonfly"
