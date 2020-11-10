@@ -429,6 +429,36 @@ class ViewTest(WebTest):
         self.assertContains(filtered, "protected-sighting-one")
         self.assertContains(filtered, "protected-sighting-two")
 
+    def test_tabular_inline_detail(self):
+        user = user_with_perms(["testapp.view_dragonfly"])
+        dragonfly = Dragonfly.objects.create(name="alpha", age=12)
+
+        CascadingSighting.objects.create(name="sighting-one", dragonfly=dragonfly)
+        CascadingSighting.objects.create(name="sighting-two", dragonfly=dragonfly)
+
+        response = self.app.get(
+            DragonflyViewSet().links["detail"].reverse(dragonfly), user=user,
+        )
+
+        self.assertContains(response, "sighting-one")
+        self.assertContains(response, "sighting-two")
+        self.assertContains(response, "cascadingsighting_set-table")
+
+    def test_tabular_inline_form(self):
+        user = user_with_perms(["testapp.view_dragonfly", "testapp.change_dragonfly"])
+        dragonfly = Dragonfly.objects.create(name="alpha", age=12)
+
+        CascadingSighting.objects.create(name="sighting-one", dragonfly=dragonfly)
+        CascadingSighting.objects.create(name="sighting-two", dragonfly=dragonfly)
+
+        response = self.app.get(
+            DragonflyViewSet().links["update"].reverse(dragonfly), user=user,
+        )
+
+        self.assertContains(response, "sighting-one")
+        self.assertContains(response, "sighting-two")
+        self.assertContains(response, "cascadingsighting_set-table")
+
 
 class InlinePaginationTest(WebTest):
     def test_paginated_detail_inlines(self):

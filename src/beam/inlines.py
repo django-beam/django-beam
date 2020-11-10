@@ -257,3 +257,8 @@ class ActionsMixin(BaseRelatedInline):
 
 class RelatedInline(ActionsMixin, FilterSetMixin, PaginationMixin, BaseRelatedInline):
     pass
+
+
+class TabularRelatedInline(RelatedInline):
+    detail_template_name = "beam/partials/detail_inline_tabular.html"
+    form_template_name = "beam/partials/form_inline_tabular.html"
