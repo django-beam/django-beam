@@ -78,7 +78,9 @@ RelatedInline.prototype.render = function () {
             jQuery(item.orderInput).closest(".field-group").append("<label class='handle col-form-label btn' style='cursor: grab'>↕</label>")
         }
         if (this.canDelete && item.deleteInput === undefined) {
-            item.deleteInput = jQuery('<input type="hidden" name="' + this.prefix + '-' + item.id + '-DELETE">').appendTo(jQuery(item.elem))[0]
+            jQuery(item.elem).find('[name="' + this.prefix + '-' + item.id + '-DELETE"]').closest(".beam-field-DELETE").remove()
+            item.deleteInput = jQuery('<input type="hidden" name="' + this.prefix + '-' + item.id + '-DELETE">')[0]
+            jQuery(item.elem).find(".related-inline-item-remove").after(item.deleteInput)
         }
 
         if (item.deleted) {
