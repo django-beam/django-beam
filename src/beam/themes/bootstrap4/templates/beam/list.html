@@ -49,7 +49,7 @@
             {% endblock %}
 
             {% if actions %}
-            <form method="post" id="list-action-form">
+            <form method="post" id="list-action-form" novalidate>
                 {% csrf_token %}
                 {% block actions %}
                     {% include "beam/partials/actions.html" %}
