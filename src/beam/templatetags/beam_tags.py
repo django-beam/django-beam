@@ -6,7 +6,8 @@ from beam.layouts import layout_links
 from beam.registry import default_registry, get_viewset_for_model
 from django import template
 from django.apps import apps
-from django.db.models import FieldDoesNotExist, Manager, Model, QuerySet
+from django.core.exceptions import FieldDoesNotExist
+from django.db.models import Manager, Model, QuerySet
 from django.db.models.fields.files import FieldFile, ImageFieldFile
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.template import RequestContext
