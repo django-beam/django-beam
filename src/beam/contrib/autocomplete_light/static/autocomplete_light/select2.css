@@ -1,27 +1,37 @@
 /* this file exists mostly to override django-autocomplete-light2s broken defaults and provides defaults for bootstrap */
 .select2-container {
-    width: 100%;
+  width: 100%;
 }
 
 .select2-selection {
-    /* same as .form-control */
-    height: calc(2.25rem + 2px) !important;
+  /* same as .form-control */
+  height: calc(2.25rem + 2px) !important;
 }
 
-.select2-container--default .select2-selection--single .select2-selection__rendered {
-line-height: unset !important;
+.select2-container--default
+  .select2-selection--single
+  .select2-selection__rendered {
+  line-height: unset !important;
 }
 
 .select2-selection--multiple .select2-selection__choice {
-margin-top: 0 !important;
+  margin-top: 0 !important;
 }
 
 /* default bootstrap border color $gray-300 */
 .select2-container--default .select2-selection--single {
-  border-color:  #dee2e6 !important;
+  border-color: #dee2e6 !important;
 }
 
 /* compensate for border in multi select */
-.beam .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+.beam
+  .select2-container--default
+  .select2-selection--multiple
+  .select2-selection__rendered {
   margin-top: -1px;
+}
+
+/* work around bug where select2 width is too small to use */
+.select2-container {
+  min-width: 20em;
 }
