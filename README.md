@@ -8,19 +8,23 @@ applications.
 
 The goal is having the functionality provided by django's own admin, but in a way that integrates with your other frontend code.
 
-## This project is still in early development. 
+## This project is still in early development.
+
 Most of the core concepts have stabilized and it is being used in production. However there may
 still be breaking changes going forward
 
 ## Features
+
 - CRUD operations based on class based views
 - Easily extensible
 - Extensions for common use cases and popular third party packages
 
 ## Documentation
-Should end up at  https://django-beam.readthedocs.io/en/latest/
+
+Should end up at https://django-beam.readthedocs.io/en/latest/
 
 ## Example
+
 ```
     # people/models.py
     class Group(models.Model):
@@ -63,20 +67,23 @@ Should end up at  https://django-beam.readthedocs.io/en/latest/
 ```
 
 ## Core concepts
+
 There are a few pieces beyond standard django that you need to understand to use beam.
 The first one are **ViewSets**. They are used to group and configure several views for a single model (similar to
 `django-rest-framework`). Specifying e.g. `fields = ["name", "age"]` will pass those fields to all views for the specified model. They also allow you to specify and override configuration for single views, by setting e.g. `update_fields = ["name"]` the update view will be restricted to just the name.
 
 The next concept are **Components**. Components are used to group and pass relevant attributes from
-the viewset to the individual views. A view is only passed data that it's component expects in 
-`__init__`. 
+the viewset to the individual views. A view is only passed data that it's component expects in
+`__init__`.
 
 The viewset figures out which attributes should be passed to a component and also takes into account
 the specificity. If you specify both `fields` and `detail_fields`, the detail component will receive
 the latter, while all other components will be passed the former.
 
-### Example of using a custom component 
-Below you can see an example of adding a custom view 
+### Example of using a custom component
+
+Below you can see an example of adding a custom view
+
 ```
 class CustomerCallView(beam.views.ComponentMixin, MyBaseView):
     phone = None
@@ -94,9 +101,10 @@ class CustomerViewSet(beam.ViewSet):
 ## Layouts
 
 ### Form layouts
-Beam layouts are a simple way to give forms and detail views 
+
+Beam layouts are a simple way to give forms and detail views
 some structure without the use of custom templates.
-By specifying a tripple nested list on the viewset, fields can be grouped into 
+By specifying a tripple nested list on the viewset, fields can be grouped into
 rows and columns. The default theme supports up to 4 columns per row.
 
 ```
@@ -115,6 +123,7 @@ layout = [
 FIXME IMAGE
 
 ### Link layouts
+
 Beam shows links to other views in the viewset both at the top of all pages
 as well as next to items in the list page.
 In order to specify which links should be visible at the top of the detail page,
@@ -141,18 +150,19 @@ class PersonViewSet(beam.ViewSet):
 
 ```
 
-
 ## Themes
+
 We currently ship only one theme.
-* `beam.themes.bootstrap4`
+
+- `beam.themes.bootstrap4`
   Using default Bootstrap v4 markup and include a basic Bootstrap CSS file.
 
   In order to use the bootstrap4 theme you have to install the optional dependency
   `django-crispy-forms` and add it to your `INSTALLED_APPS` in settings.py:
+
   ```
   INSTALLED_APPS = (..., 'crispy_forms')
   ```
-
 
 ## beam.contrib
 
@@ -163,21 +173,22 @@ We include a `beam.contrib` package that provides integration with several third
 Provides a base viewset for integration with `django-reversion`.
 
 #### Usage
+
 First add `reversion` and `beam.contrib.reversion` to your installed apps.
-Either use `beam.contrib.reversion.VersionViewSet` as the base class for the 
+Either use `beam.contrib.reversion.VersionViewSet` as the base class for the
 models where you want reversion or use the `VersionViewSetMixin`.
 
-By default create and update views are tracked. You can use the `versioned_component_names` 
+By default create and update views are tracked. You can use the `versioned_component_names`
 class attribute to control which components are tracked.
 
 If you do not manually register your models with reversion then `VersionViewSet.model` is registered
 following all the inlines specified for the `versioned_component_names`.
 
-### beam.contrib.autocomplete\_light
+### beam.contrib.autocomplete_light
 
 Provides a viewset mixin for integration with `django-autocomplete-light`.
 It also provides some bootstrap compatible css to override django-autocomplete-light defaults. To use those
-you'll have to add `beam.contrib.autocomplete_light` to your installed apps *before* `django-autocomplete-light`.
+you'll have to add `beam.contrib.autocomplete_light` to your installed apps _before_ `django-autocomplete-light`.
 
 #### Usage
 
@@ -187,8 +198,8 @@ example by overriding the widget dicts.
 ```python
 # settings.py
 INSTALLED_APPS = [
-    "dal",
     "beam.contrib.autocomplete_light",
+    "dal",
     "dal_select2",
     ...
 ]
@@ -217,4 +228,3 @@ class PersonForm(forms.ModelForm):
             ),
         }
 ```
-
