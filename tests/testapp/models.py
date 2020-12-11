@@ -40,3 +40,7 @@ class CascadingSighting(models.Model):
     dragonfly = models.ForeignKey(Dragonfly, on_delete=models.CASCADE)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class SightingReference(models.Model):
+    sighting = models.ForeignKey(Sighting, on_delete=models.PROTECT)
