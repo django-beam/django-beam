@@ -95,6 +95,11 @@ def is_file(model_field):
     return isinstance(model_field, FieldFile)
 
 
+@register.filter
+def is_bool(model_field):
+    return isinstance(model_field, bool)
+
+
 @register.simple_tag
 def get_options(instance_or_model):
     """

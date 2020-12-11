@@ -28,6 +28,8 @@
     {% else %}
         &nbsp;
     {% endif %}
+{% elif value|is_bool %}
+    {{ value|yesno }}
 {% else %}
     {{ value|default:"&nbsp;" }}
 {% endif %}
