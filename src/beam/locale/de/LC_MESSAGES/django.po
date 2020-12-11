@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-02 12:53+0100\n"
+"POT-Creation-Date: 2020-12-11 08:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,22 +17,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions.py:78 themes/bootstrap4/templates/beam/partials/form_inline.html:41
-#: themes/bootstrap4/templates/beam/partials/form_inline.html:56
+#: actions.py:80 themes/bootstrap4/templates/beam/partials/form_inline.html:52
+#: themes/bootstrap4/templates/beam/partials/form_inline.html:70
+#: themes/bootstrap4/templates/beam/partials/form_inline_tabular_row.html:43
 #: viewsets.py:202
 msgid "delete"
 msgstr "löschen"
 
-#: actions.py:95
+#: actions.py:97
 #, python-brace-format
 msgid "Deleted {count} {name}"
 msgstr "Es wurden {count} {name} gelöscht"
 
-#: actions.py:102
+#: actions.py:104
 msgid "update selected"
 msgstr "Auswahl bearbeiten"
 
-#: actions.py:143
+#: actions.py:145
 #, python-brace-format
 msgid "Updated {count} {name}"
 msgstr "Es wurden {count} {name} aktualisiert"
@@ -75,6 +76,26 @@ msgstr "Zurücksetzen auf Version {}"
 msgid "show version"
 msgstr "Version zeigen"
 
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
+#: inlines.py:86
+#, python-brace-format
+msgid "{class_name} {instance}"
+msgstr "{class_name} {instance}"
+
+#: inlines.py:93
+msgid "and"
+msgstr "und"
+
+#: inlines.py:95
+#, python-brace-format
+msgid ""
+"Deleting {class_name} {instance} would require deleting the following "
+"protected related objects: {related_objects}"
+msgstr ""
+"Das Löschen des {class_name}-Objekts „{instance}“ würde ein Löschen der "
+"folgenden geschützten verwandten Objekte erfordern: {related_objects}"
+
 #: themes/bootstrap4/templates/beam/dashboard.html:19
 msgid "List"
 msgstr "Liste"
@@ -115,6 +136,7 @@ msgid "No, go back."
 msgstr "Nein, zurück gehen."
 
 #: themes/bootstrap4/templates/beam/form.html:25
+#: themes/bootstrap4/templates/beam/partials/form_inline_tabular_row.html:29
 #: themes/bootstrap4/templates/beam/partials/form_layout.html:47
 #, python-format
 msgid "Create %(verbose_name)s"
@@ -125,44 +147,46 @@ msgstr "%(verbose_name)s anlegen"
 msgid "Save"
 msgstr "Speichern"
 
-#: themes/bootstrap4/templates/beam/list.html:29
-#: themes/bootstrap4/templates/beam/list.html:30
+#: themes/bootstrap4/templates/beam/list.html:32
+#: themes/bootstrap4/templates/beam/list.html:33
 msgid "Search the list below"
 msgstr "Die Liste durchsuchen"
 
-#: themes/bootstrap4/templates/beam/list.html:36
+#: themes/bootstrap4/templates/beam/list.html:39
 msgid "Clear"
 msgstr "Zurücksetzen"
 
-#: themes/bootstrap4/templates/beam/list.html:38
+#: themes/bootstrap4/templates/beam/list.html:41
 msgid "Search"
 msgstr "Suchen"
 
-#: themes/bootstrap4/templates/beam/list.html:64
+#: themes/bootstrap4/templates/beam/list.html:67
+#: themes/bootstrap4/templates/beam/partials/detail_inline.html:31
+#: themes/bootstrap4/templates/beam/partials/detail_inline_tabular.html:15
 msgid "Select all"
 msgstr "Alle auswählen"
 
-#: themes/bootstrap4/templates/beam/list.html:76
+#: themes/bootstrap4/templates/beam/list.html:79
 msgid "reset sort"
 msgstr "Sortierung zurücksetzen"
 
-#: themes/bootstrap4/templates/beam/list.html:84
+#: themes/bootstrap4/templates/beam/list.html:87
 #: themes/bootstrap4/templates/beam/partials/links.html:7
 #: themes/bootstrap4/templates/beam/partials/list_links.html:7
 msgid "Actions"
 msgstr "Aktionen"
 
-#: themes/bootstrap4/templates/beam/list.html:117
+#: themes/bootstrap4/templates/beam/list.html:120
 #, python-format
 msgid "Could not find any %(name)s for query \"%(search_query)s\""
 msgstr "Keine %(name)s für Suche \"%(search_query)s\" gefunden"
 
-#: themes/bootstrap4/templates/beam/list.html:119
+#: themes/bootstrap4/templates/beam/list.html:122
 #, python-format
 msgid "Could not find any %(name)s that match the current filters"
 msgstr "Keine %(name)s für aktuelle Filter gefunden"
 
-#: themes/bootstrap4/templates/beam/list.html:121
+#: themes/bootstrap4/templates/beam/list.html:124
 #, python-format
 msgid "Could not find any %(name)s"
 msgstr "Keine %(name)s gefunden"
@@ -191,12 +215,29 @@ msgstr "Auswahl zurücksetzen"
 msgid "download"
 msgstr "runterladen"
 
-#: themes/bootstrap4/templates/beam/partials/detail_inline.html:17
-msgid "There aren't any that match the current filters."
+#: themes/bootstrap4/templates/beam/partials/detail_inline.html:45
+msgid ""
+"There\n"
+"                                    aren't any that match the current "
+"filters."
 msgstr "Nichts für aktuelle Filter gefunden"
 
-#: themes/bootstrap4/templates/beam/partials/detail_inline.html:19
-msgid "There aren't any."
+#: themes/bootstrap4/templates/beam/partials/detail_inline.html:48
+msgid ""
+"There\n"
+"                                    aren't any."
+msgstr "Es gibt keine."
+
+#: themes/bootstrap4/templates/beam/partials/detail_inline_tabular.html:49
+msgid ""
+"There\n"
+"                            aren't any that match the current filters."
+msgstr "Nichts für aktuelle Filter gefunden"
+
+#: themes/bootstrap4/templates/beam/partials/detail_inline_tabular.html:52
+msgid ""
+"There\n"
+"                            aren't any."
 msgstr "Es gibt keine."
 
 #: themes/bootstrap4/templates/beam/partials/filters.html:9
@@ -211,7 +252,7 @@ msgstr "Filter zurücksetzen"
 msgid "Filter"
 msgstr "Filter"
 
-#: themes/bootstrap4/templates/beam/partials/form_inline.html:67
+#: themes/bootstrap4/templates/beam/partials/form_inline.html:85
 #, python-format
 msgid "add %(name)s"
 msgstr "%(name)s hinzufügen"
@@ -274,7 +315,7 @@ msgstr "{model} \"{name}\" wurde erfolgreich hinzugefügt."
 msgid "The {model} \"{name}\" was changed successfully."
 msgstr "{model} \"{name}\" wurde erfolgreich geändert."
 
-#: views.py:378
+#: views.py:371 views.py:435
 msgid ""
 "There was an error finding the objects you selected. This could be caused by "
 "another user changing them concurrently. Please try again."
@@ -283,7 +324,7 @@ msgstr ""
 "Dies kann auftreten, wenn andere Nutzer diese gleichzeitig bearbeiten. Bitte "
 "versuchen Sie es erneut."
 
-#: views.py:482
+#: views.py:539
 #, python-brace-format
 msgid "The {model} \"{name}\" was deleted successfully."
 msgstr "{model} \"{name}\" wurde erfolgreich gelöscht."
@@ -303,6 +344,9 @@ msgstr "bearbeiten"
 #: viewsets.py:185
 msgid "detail"
 msgstr "Detail-Ansicht"
+
+#~ msgid "There aren't any."
+#~ msgstr "Es gibt keine."
 
 #~ msgid "There are no %(title)s"
 #~ msgstr "Es gibt keine(n) %(title)s"

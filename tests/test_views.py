@@ -1,7 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django_webtest import WebTest
-from testapp.models import CascadingSighting, Dragonfly, ProtectedSighting, Sighting
+from testapp.models import (
+    CascadingSighting,
+    Dragonfly,
+    ProtectedSighting,
+    Sighting,
+    SightingReference,
+)
 from testapp.views import DragonflyViewSet, SightingViewSet
 
 
@@ -82,7 +88,10 @@ class ViewTest(WebTest):
 
     def test_list_redirects_on_login_required(self):
         Dragonfly.objects.create(name="alpha", age=12)
-        response = self.app.get(DragonflyViewSet().links["list"].reverse(), user=None,)
+        response = self.app.get(
+            DragonflyViewSet().links["list"].reverse(),
+            user=None,
+        )
         self.assertRedirects(
             response, "/accounts/login/?next=/dragonfly/", fetch_redirect_response=False
         )
@@ -156,7 +165,8 @@ class ViewTest(WebTest):
         Dragonfly.objects.create(name="omega", age=99)
 
         response = self.app.get(
-            DragonflyViewSet().links["list"].reverse() + "?o=-name", user=user,
+            DragonflyViewSet().links["list"].reverse() + "?o=-name",
+            user=user,
         )
         self.assertGreater(
             response.content.index(b"alpha"), response.content.index(b"omega")
@@ -207,7 +217,9 @@ class ViewTest(WebTest):
         alpha = Dragonfly.objects.create(name="alpha", age=47)
         links = DragonflyViewSet().links
         self.app.get(
-            links["detail"].reverse(alpha), user=user_with_perms([]), status=403,
+            links["detail"].reverse(alpha),
+            user=user_with_perms([]),
+            status=403,
         )
 
     def test_update(self):
@@ -215,7 +227,10 @@ class ViewTest(WebTest):
         response = self.app.get(
             DragonflyViewSet().links["update"].reverse(alpha),
             user=user_with_perms(
-                ["testapp.view_dragonfly", "testapp.change_dragonfly",]
+                [
+                    "testapp.view_dragonfly",
+                    "testapp.change_dragonfly",
+                ]
             ),
         )
         self.assertContains(response, "alpha")
@@ -277,7 +292,8 @@ class ViewTest(WebTest):
 
         delete_url = DragonflyViewSet().links["delete"].reverse(alpha)
         response = self.app.get(
-            delete_url, user=user_with_perms(["testapp.delete_dragonfly"]),
+            delete_url,
+            user=user_with_perms(["testapp.delete_dragonfly"]),
         )
         self.assertContains(response, "The following objects")
         self.assertContains(response, "sighting")
@@ -298,7 +314,10 @@ class ViewTest(WebTest):
         ProtectedSighting.objects.create(dragonfly=alpha, name="A related sighting")
 
         delete_url = DragonflyViewSet().links["delete"].reverse(alpha)
-        response = self.app.get(delete_url, user=user,)
+        response = self.app.get(
+            delete_url,
+            user=user,
+        )
         self.assertContains(response, "You can't delete")
         self.assertContains(response, "the following objects depend")
         self.assertContains(response, "sighting")
@@ -364,14 +383,16 @@ class ViewTest(WebTest):
         user = user_with_perms(["testapp.view_dragonfly"])
         dragonfly = Dragonfly.objects.create(name="alpha", age=12)
         response = self.app.get(
-            DragonflyViewSet().links["detail"].reverse(dragonfly), user=user,
+            DragonflyViewSet().links["detail"].reverse(dragonfly),
+            user=user,
         )
         self.assertContains(response, "Awesome extra custom template title")
 
     def test_custom_form_template_for_inline(self):
         user = user_with_perms(["testapp.view_dragonfly", "testapp.add_dragonfly"])
         response = self.app.get(
-            DragonflyViewSet().links["create"].reverse(), user=user,
+            DragonflyViewSet().links["create"].reverse(),
+            user=user,
         )
         self.assertContains(response, "Awesome extra custom template title")
 
@@ -383,7 +404,8 @@ class ViewTest(WebTest):
         Sighting.objects.create(name="sighting-two", dragonfly=dragonfly)
 
         response = self.app.get(
-            DragonflyViewSet().links["detail"].reverse(dragonfly), user=user,
+            DragonflyViewSet().links["detail"].reverse(dragonfly),
+            user=user,
         )
 
         self.assertContains(response, "sighting-one")
@@ -410,7 +432,8 @@ class ViewTest(WebTest):
         )
 
         response = self.app.get(
-            DragonflyViewSet().links["detail"].reverse(dragonfly), user=user,
+            DragonflyViewSet().links["detail"].reverse(dragonfly),
+            user=user,
         )
 
         self.assertContains(response, "regular-sighting-one")
@@ -437,7 +460,8 @@ class ViewTest(WebTest):
         CascadingSighting.objects.create(name="sighting-two", dragonfly=dragonfly)
 
         response = self.app.get(
-            DragonflyViewSet().links["detail"].reverse(dragonfly), user=user,
+            DragonflyViewSet().links["detail"].reverse(dragonfly),
+            user=user,
         )
 
         self.assertContains(response, "sighting-one")
@@ -452,12 +476,61 @@ class ViewTest(WebTest):
         CascadingSighting.objects.create(name="sighting-two", dragonfly=dragonfly)
 
         response = self.app.get(
-            DragonflyViewSet().links["update"].reverse(dragonfly), user=user,
+            DragonflyViewSet().links["update"].reverse(dragonfly),
+            user=user,
         )
 
         self.assertContains(response, "sighting-one")
         self.assertContains(response, "sighting-two")
         self.assertContains(response, "cascadingsighting_set-table")
+
+    def test_delete_inline(self):
+        user = user_with_perms(["testapp.view_dragonfly", "testapp.change_dragonfly"])
+
+        dragonfly = Dragonfly.objects.create(name="alpha", age=12)
+        Sighting.objects.create(name="a-sighting", dragonfly=dragonfly)
+
+        response = self.app.get(
+            DragonflyViewSet().links["update"].reverse(dragonfly),
+            user=user,
+        )
+
+        self.assertContains(response, "a-sighting")
+
+        form = response.form
+        form["sighting_set-0-DELETE"] = True
+        delete_response = form.submit()
+
+        self.assertRedirects(
+            delete_response, DragonflyViewSet().links["detail"].reverse(dragonfly)
+        )
+
+        self.assertFalse(dragonfly.sighting_set.exists())
+
+    def test_delete_protected_inline(self):
+        user = user_with_perms(["testapp.view_dragonfly", "testapp.change_dragonfly"])
+
+        dragonfly = Dragonfly.objects.create(name="alpha", age=12)
+        sighting = Sighting.objects.create(name="a-sighting", dragonfly=dragonfly)
+        SightingReference.objects.create(sighting=sighting)
+
+        response = self.app.get(
+            DragonflyViewSet().links["update"].reverse(dragonfly),
+            user=user,
+        )
+
+        self.assertContains(response, "a-sighting")
+
+        form = response.form
+        form["sighting_set-0-DELETE"] = True
+        delete_response = form.submit()
+
+        self.assertContains(
+            delete_response,
+            "would require deleting the following protected related objects",
+        )
+
+        self.assertTrue(dragonfly.sighting_set.exists())
 
 
 class InlinePaginationTest(WebTest):
@@ -471,7 +544,8 @@ class InlinePaginationTest(WebTest):
             )
 
         response = self.app.get(
-            DragonflyViewSet().links["detail"].reverse(dragonfly), user=user,
+            DragonflyViewSet().links["detail"].reverse(dragonfly),
+            user=user,
         )
 
         self.assertContains(response, "sighting-at-0")
@@ -500,7 +574,8 @@ class InlinePaginationTest(WebTest):
             )
 
         response = self.app.get(
-            DragonflyViewSet().links["update"].reverse(dragonfly), user=user,
+            DragonflyViewSet().links["update"].reverse(dragonfly),
+            user=user,
         )
 
         self.assertContains(response, "sighting-at-0")

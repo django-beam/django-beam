@@ -1,11 +1,18 @@
 from typing import List, Optional, Type
 
 from beam.actions import Action
+from django.contrib.admin.utils import NestedObjects
+from django.core.exceptions import ValidationError
 from django.core.paginator import Page, Paginator
+from django.db import router
 from django.db.models import Model
 from django.db.models.options import Options
 from django.forms import ModelForm, inlineformset_factory
+from django.utils.text import get_text_list
+from django.utils.translation import ugettext as _
 from django_filters.filterset import filterset_factory
+
+DELETION_FIELD_NAME = "DELETE"
 
 
 class BaseRelatedInline(object):
@@ -50,6 +57,57 @@ class BaseRelatedInline(object):
             .replace("+", "")
         )
 
+    def _construct_form_class(self):
+        """
+        Build a form class based on self.form_class that handles deletion of nested objects.
+
+        Implementation from django.contrib.admin.options.get_formset.
+        """
+
+        class DeleteProtectedModelForm(self.form_class):
+            def hand_clean_DELETE(self):
+                """
+                We don't validate the 'DELETE' field itself because on
+                templates it's not rendered using the field information.
+                """
+                if self.cleaned_data.get(DELETION_FIELD_NAME, False):
+                    using = router.db_for_write(self._meta.model)
+                    collector = NestedObjects(using=using)
+                    if self.instance._state.adding:
+                        return
+                    collector.collect([self.instance])
+                    if collector.protected:
+                        objs = []
+                        for p in collector.protected:
+                            objs.append(
+                                # Translators: Model verbose name and instance representation,
+                                # suitable to be an item in a list.
+                                _("{class_name} {instance}").format(
+                                    class_name=p._meta.verbose_name, instance=p
+                                )
+                            )
+                        msg = _(
+                            "Deleting {class_name} {instance} would require "
+                            "deleting the following protected related objects: "
+                            "{related_objects}"
+                        ).format(
+                            class_name=self._meta.model._meta.verbose_name,
+                            instance=self.instance,
+                            related_objects=get_text_list(objs, _("and")),
+                        )
+                        raise ValidationError(msg, code="deleting_protected")
+
+            def clean(self):
+                cleaned_data = super().clean() or self.cleaned_data
+                try:
+                    self.hand_clean_DELETE()
+                except ValidationError as e:
+                    cleaned_data.pop(DELETION_FIELD_NAME)
+                    raise e
+                return cleaned_data
+
+        return DeleteProtectedModelForm
+
     def get_formset_class(self):
         if self.extra is not None:
             extra = self.extra
@@ -60,7 +118,7 @@ class BaseRelatedInline(object):
 
         return inlineformset_factory(
             parent_model=self.parent_model,
-            form=self.form_class,
+            form=self._construct_form_class(),
             model=self.model,
             fk_name=self.foreign_key_field,
             extra=extra,
