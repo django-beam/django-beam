@@ -35,3 +35,8 @@
 .select2-container {
   min-width: 20em;
 }
+
+/* make it smaller if three fields show up in a row */
+.col-md-4 .row.field-group .select2-container {
+  min-width: 10em;
+}
