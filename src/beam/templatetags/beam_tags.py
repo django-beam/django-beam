@@ -18,12 +18,17 @@ from django.utils.http import urlencode
 register = template.Library()
 
 
-@register.simple_tag
-def get_link_url(component: BaseComponent, obj=None, **extra_kwargs):
+@register.simple_tag(takes_context=True)
+def get_link_url(
+    context: RequestContext, component: BaseComponent, obj=None, **override_kwargs
+):
+    request = getattr(context, "request", None)
     if not component:
         return None
     try:
-        return component.reverse(obj, extra_kwargs)
+        return component.reverse(
+            obj=obj, request=request, override_kwargs=override_kwargs
+        )
     except NoReverseMatch:
         return None
 
@@ -61,7 +66,7 @@ def is_queryset(value):
 
 
 @register.simple_tag(takes_context=True)
-def get_url_for_related(context, instance, component_name):
+def get_url_for_related(context, instance, component_name, **override_kwargs):
     if not instance:
         return None
 
@@ -82,7 +87,11 @@ def get_url_for_related(context, instance, component_name):
     if component_name not in components:
         return None
 
-    return components[component_name].reverse(instance)
+    request = getattr(context, "request", None)
+    try:
+        return components[component_name].reverse(instance, request, override_kwargs)
+    except NoReverseMatch:
+        return None
 
 
 @register.filter
@@ -240,12 +249,12 @@ def get_visible_links(
     links: Dict[str, BaseComponent],
     link_layout: List[str],
     obj: Model = None,
-    **extra_kwargs
+    **override_kwargs
 ) -> List[Tuple[BaseComponent, str]]:
 
     get_params = {}
-    if context and hasattr(context, "request"):
-        request = context.request
+    request = getattr(context, "request", None)
+    if request:
         for param in PRESERVED_GET_PARAMS:
             value = request.GET.get(param)
             if value:
@@ -253,10 +262,12 @@ def get_visible_links(
 
     visible_links = []
     for link in layout_links(links, link_layout):
-        if not link.has_perm(user, obj=obj):
+        if not link.has_perm(
+            user, obj=obj, request=request, override_kwargs=override_kwargs
+        ):
             continue
         try:
-            url = link.reverse(obj, extra_kwargs=extra_kwargs)
+            url = link.reverse(obj, request=request, override_kwargs=override_kwargs)
         except NoReverseMatch:
             url = None
 

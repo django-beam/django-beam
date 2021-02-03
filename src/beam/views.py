@@ -162,11 +162,14 @@ class CreateView(ComponentMixin, CreateWithInlinesMixin, generic.CreateView):
         return super().get_template_names() + ["beam/create.html"]
 
     def get_success_url(self):
-        return self.viewset.links["detail"].reverse(obj=self.object)
+        return self.viewset.links["detail"].reverse(
+            obj=self.object, request=self.request
+        )
 
     def get_success_message(self):
         return _('The {model} "{name}" was added successfully.').format(
-            model=self.model._meta.verbose_name, name=str(self.object),
+            model=self.model._meta.verbose_name,
+            name=str(self.object),
         )
 
     def form_valid(self, form, inlines):
@@ -200,7 +203,8 @@ class UpdateView(ComponentMixin, UpdateWithInlinesMixin, generic.UpdateView):
 
     def get_success_message(self):
         return _('The {model} "{name}" was changed successfully.').format(
-            model=self.model._meta.verbose_name, name=str(self.object),
+            model=self.model._meta.verbose_name,
+            name=str(self.object),
         )
 
     def form_valid(self, form, inlines):
@@ -211,7 +215,9 @@ class UpdateView(ComponentMixin, UpdateWithInlinesMixin, generic.UpdateView):
         return response
 
     def get_success_url(self):
-        return self.viewset.links["detail"].reverse(obj=self.object)
+        return self.viewset.links["detail"].reverse(
+            obj=self.object, request=self.request
+        )
 
 
 class SortableListMixin(ComponentMixin):
@@ -533,7 +539,7 @@ class DeleteView(ComponentMixin, InlinesMixin, generic.DeleteView):
         return super().get_template_names() + ["beam/delete.html"]
 
     def get_success_url(self):
-        return self.viewset.links["list"].reverse()
+        return self.viewset.links["list"].reverse(request=self.request)
 
     def get_success_message(self):
         return _('The {model} "{name}" was deleted successfully.').format(

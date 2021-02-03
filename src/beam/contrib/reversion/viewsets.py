@@ -1,26 +1,26 @@
 from contextlib import contextmanager
 from typing import Iterable, List
 
+from beam import RelatedInline, ViewSet
+from beam.urls import UrlKwargDict
+from beam.viewsets import BaseViewSet, Component
 from django.utils.translation import ugettext_lazy as _
 from reversion import (
-    register,
     create_revision,
-    set_user,
-    is_registered,
-    set_comment,
     get_comment,
+    is_registered,
+    register,
+    set_comment,
+    set_user,
 )
 
-from beam import RelatedInline
-from beam import ViewSet
-from beam.viewsets import BaseViewSet, Component
-from .views import VersionRestoreView, VersionDetailView, VersionListView
+from .views import VersionDetailView, VersionListView, VersionRestoreView
 
 
 class VersionRestoreMixin(BaseViewSet):
     version_restore_view_class = VersionRestoreView
     version_restore_url = "<str:pk>/versions/<str:version_id>/restore/"
-    version_restore_url_kwargs = ["pk"]
+    version_restore_url_kwargs: UrlKwargDict = {"pk": "pk"}
     version_restore_verbose_name = None
     version_restore_url_name = None
     version_restore_link_layout: List[str] = []
@@ -33,7 +33,7 @@ class VersionRestoreMixin(BaseViewSet):
 class VersionDetailMixin(BaseViewSet):
     version_detail_view_class = VersionDetailView
     version_detail_url = "<str:pk>/versions/<str:version_id>/"
-    version_detail_url_kwargs = ["pk"]
+    version_detail_url_kwargs: UrlKwargDict = {"pk": "pk"}
     version_detail_verbose_name = _("show version")
     version_detail_url_name = None
     version_detail_link_layout = ["version_list"]
@@ -46,7 +46,7 @@ class VersionDetailMixin(BaseViewSet):
 class VersionListMixin(BaseViewSet):
     version_list_view_class = VersionListView
     version_list_url = "<str:pk>/versions/"
-    version_list_url_kwargs = ["pk"]
+    version_list_url_kwargs: UrlKwargDict = {"pk": "pk"}
     version_list_verbose_name = _("history")
     version_list_url_name = None
     version_list_link_layout = ["detail"]
@@ -96,14 +96,17 @@ class VersionViewSetMixin(VersionDetailMixin, VersionRestoreMixin, VersionListMi
         self, model, inline_classes: Iterable[RelatedInline]
     ):
         """
-        Register the model and all inline models with reversion iff they haven't been registered before.
+        Register the model and all inline models with reversion
+        iff they haven't been registered before.
 
-        If you want full control over which models are versioned together, register them with reversion manually.
+        If you want full control over which models are versioned together,
+        register them with reversion manually.
         """
         if is_registered(model):
             return
 
-        # we collect all inline fields so that reversion knows which inline instances to include in revisions.
+        # we collect all inline fields so that reversion knows
+        # which inline instances to include in revisions.
         inline_fields = []
         for inline_class in inline_classes:
             inline_model = inline_class.model
@@ -121,8 +124,10 @@ class VersionViewSetMixin(VersionDetailMixin, VersionRestoreMixin, VersionListMi
             # register the inline model
             self._register_model_with_parents(inline_model)
 
-            # if the remote field has an accessor name that we can follow from our model (not is_hidden())
-            # we want reversion to follow that accessor when creating a revision for our model
+            # if the remote field has an accessor name that
+            # we can follow from our model (not is_hidden())
+            # we want reversion to follow that accessor when
+            # creating a revision for our model
             if not inline_model._meta.get_field(
                 inline_class.foreign_key_field
             ).remote_field.is_hidden():
@@ -148,7 +153,8 @@ class VersionViewSetMixin(VersionDetailMixin, VersionRestoreMixin, VersionListMi
 
     def _get_view(self, component):
         """
-        Ensure that the views in `self.versioned_component_names` are wrapped with the create_revision context_manager
+        Ensure that the views in `self.versioned_component_names`
+        are wrapped with the create_revision context_manager
         """
         view = super()._get_view(component)
         if component.name not in self.versioned_component_names:
