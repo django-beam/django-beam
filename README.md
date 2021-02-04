@@ -1,5 +1,6 @@
 [![CircleCI](https://circleci.com/gh/django-beam/django-beam.svg?style=svg)](https://circleci.com/gh/django-beam/django-beam)
 [![ReadTheDocs](https://readthedocs.org/projects/django-beam/badge/)](https://django-beam.readthedocs.io/en/latest/)
+[![codecov](https://codecov.io/gh/django-beam/django-beam/branch/master/graph/badge.svg?token=U0C27SY9XM)](https://codecov.io/gh/django-beam/django-beam)
 
 # django-beam
 
