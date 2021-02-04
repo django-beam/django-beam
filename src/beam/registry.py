@@ -1,6 +1,6 @@
 import warnings
 from collections import OrderedDict
-from typing import Dict, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, Type
 
 if TYPE_CHECKING:
     from .viewsets import BaseViewSet
@@ -8,10 +8,12 @@ else:
     BaseViewSet = type
 
 
-RegistryType = Dict[str, Dict[str, BaseViewSet]]
+RegistryType = Dict[str, Dict[str, Type[BaseViewSet]]]
+
+test: RegistryType = {"foo": {"bar": BaseViewSet}}
 
 
-def register(registry: RegistryType, viewset: BaseViewSet):
+def register(registry: RegistryType, viewset: Type[BaseViewSet]):
     model = viewset.model
     app_label = model._meta.app_label
     model_name = model._meta.model_name
@@ -61,7 +63,7 @@ class ViewsetMetaClass(type):
                 current_component_classes.append((key[: -len("_component")], value))
         attrs["_declared_component_classes"] = OrderedDict(current_component_classes)
 
-        new_class: BaseViewSet = super().__new__(mcs, name, bases, attrs)
+        new_class: Type[BaseViewSet] = super().__new__(mcs, name, bases, attrs)
 
         # Walk through the MRO.
         declared_component_classes = OrderedDict()
