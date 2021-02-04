@@ -1,5 +1,6 @@
 *.swp
 .idea
+.venv
 env/
 *.pyc
 */__pycache__/*
@@ -9,3 +10,5 @@ dist/
 .tox
 .mypy_cache
 .pytest_cache
+.coverage
+coverage.xml
