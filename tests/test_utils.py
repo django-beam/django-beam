@@ -1,7 +1,11 @@
-from beam.utils import check_permission, navigation_component_entry
+from unittest import mock
+
 from django.test import TestCase
+from django.urls import NoReverseMatch
 from test_views import user_with_perms
 from testapp.views import DragonflyViewSet, SightingViewSet
+
+from beam.utils import check_permission, navigation_component_entry, reverse_component
 
 
 class CheckPermissionsTest(TestCase):
@@ -57,4 +61,45 @@ class CheckPermissionsTest(TestCase):
         )
         self.assertEqual(
             navigation_component_entry(SightingViewSet().links["list"], user=user), None
+        )
+
+    def test_reverse_component_returns_url(self):
+        url = reverse_component(
+            component=DragonflyViewSet().links["list"],
+            request=None,
+            obj=None,
+            override_kwargs=None,
+        )
+        self.assertEqual(url, "/dragonfly/")
+
+    def test_reverse_component_raises_no_reverse_match_if_no_reverse_match(self):
+        with self.assertRaises(NoReverseMatch) as e:
+            reverse_component(
+                component=DragonflyViewSet().links["detail"],
+                request=None,
+                obj=None,
+                override_kwargs=None,
+            )
+        self.assertIsInstance(e.exception, NoReverseMatch)
+        self.assertTrue(
+            str(e.exception).startswith(
+                "Unable to reverse url to "
+                "<Component testapp.views.DragonflyViewSet 'detail'>: "
+                "Reverse"
+            )
+        )
+
+    def test_reverse_component_raises_on_all_exceptions(self):
+        component = DragonflyViewSet().links["detail"]
+        with mock.patch.object(
+            component, "resolve_url", side_effect=ValueError("FAIL")
+        ):
+            with self.assertRaises(Exception) as e:
+                reverse_component(
+                    component=component, request=None, obj=None, override_kwargs=None
+                )
+        self.assertNotIsInstance(e.exception, NoReverseMatch)
+        self.assertEqual(
+            str(e.exception),
+            "Unable to reverse url to <Component testapp.views.DragonflyViewSet 'detail'>: FAIL",
         )

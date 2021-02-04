@@ -76,11 +76,11 @@ class UrlTest(TestCase):
     def test_links_that_require_an_instance_raise_if_missing(self):
         links = DragonflyViewSet().links
         with self.assertRaises(NoReverseMatch):
-            self.assertEqual(get_link_url(None, links["detail"], None), None)
+            get_link_url(None, links["detail"], None)
         with self.assertRaises(NoReverseMatch):
-            self.assertEqual(get_link_url(None, links["update"], None), None)
+            get_link_url(None, links["update"], None)
         with self.assertRaises(NoReverseMatch):
-            self.assertEqual(get_link_url(None, links["delete"], None), None)
+            get_link_url(None, links["delete"], None)
 
     def test_component_url_with_extra_context(self):
         instance = Dragonfly(pk=123)
