@@ -88,10 +88,13 @@ def get_url_for_related(context, instance, component_name, **override_kwargs):
         return None
 
     request = getattr(context, "request", None)
+    component = components[component_name]
     try:
-        return components[component_name].reverse(instance, request, override_kwargs)
+        return component.reverse(instance, request, override_kwargs)
     except NoReverseMatch:
         return None
+    except BaseException as e:
+        raise ValueError("Unable to reverse url to {}".format(component)) from e
 
 
 @register.filter
@@ -270,6 +273,8 @@ def get_visible_links(
             url = link.reverse(obj, request=request, override_kwargs=override_kwargs)
         except NoReverseMatch:
             url = None
+        except BaseException as e:
+            raise ValueError("Unable to reverse url to {}".format(link)) from e
 
         if url and get_params:
             url = _add_params_to_url_if_new(url, get_params)

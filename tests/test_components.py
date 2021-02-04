@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import Mock
 
 from beam.components import BaseComponent, Component
+from testapp.views import DragonflyViewSet
 
 
 class ComponentTest(TestCase):
@@ -63,3 +64,9 @@ class ComponentTest(TestCase):
 
         assert "new_arg_1" in SubSubComponent.get_arguments()
         assert "new_arg_2" in SubSubComponent.get_arguments()
+
+    def test_component_has_a_sensible_string_representation(self):
+        self.assertEqual(
+            str(DragonflyViewSet().links["detail"]),
+            "<Component DragonflyViewSet.detail_component>",
+        )
