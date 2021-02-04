@@ -11,7 +11,7 @@
 
 
         <section class="beam-main">
-            <div class="container">
+            <div class="container-fluid">
                 {% block links %}
                     <div class="float-right beam-links">
                         {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
@@ -19,7 +19,7 @@
                 {% endblock %}
 
                 {% block heading %}
-                    <h1>
+                    <h1 class="d-inline-block">
                         {% if heading %}{{ heading }}{% else %}
                         {% get_options component.model as options %}
                         {% blocktrans with verbose_name=options.verbose_name %}Create {{ verbose_name }}{% endblocktrans %}
@@ -47,6 +47,7 @@
                     {% endif %}
                 {% endblock %}
 
+                {% block details_card %}
                 <div class="card bg-light mb-4">
                     <div class="card-body">
                         <div class="card-text">
@@ -56,6 +57,7 @@
                         </div>
                     </div>
                 </div>
+                {% endblock %}
             </div>
         </section>
 
@@ -70,7 +72,7 @@
         {% block below_inlines %}{% endblock %}
 
         <section>
-            <div class="container">
+            <div class="container-fluid">
                 {% block form_buttons %}
                     <div class="container-fluid mb-2">
                         <div class="row">
