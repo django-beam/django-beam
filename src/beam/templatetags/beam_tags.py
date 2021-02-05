@@ -266,3 +266,15 @@ def get_visible_links(
         if url:
             visible_links.append((link, url))
     return visible_links
+
+
+@register.filter
+def wrap_list(item):
+    return [item]
+
+
+@register.filter
+def get(dictionary, key):
+    if key not in dictionary:
+        return None
+    return dictionary[key]

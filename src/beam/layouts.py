@@ -1,5 +1,7 @@
 from typing import Dict, List
 
+from django.template.defaultfilters import striptags, slugify
+
 from beam.components import BaseComponent
 
 
@@ -8,6 +10,9 @@ class HTML:
 
     def __init__(self, content):
         self.content = content
+
+    def __str__(self):
+        return slugify(striptags(self.content))[:20]
 
 
 class VirtualField:

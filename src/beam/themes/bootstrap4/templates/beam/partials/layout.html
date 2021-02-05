@@ -1,39 +1,52 @@
 {% load beam_tags %}
 
+
 {% if not layout %}
     {% fields_to_layout fields as layout %}
 {% endif %}
 
-{% for row in layout %}
-    <div class="row">
-    {% for col in row %}
-        {% if row|length_is:1 %}
-            <div class="col-md-12">
-        {% elif row|length_is:2 %}
-            <div class="col-md-6">
-        {% elif row|length_is:3 %}
-            <div class="col-md-4">
-        {% elif row|length_is:4 %}
-            <div class="col-md-3">
-        {% endif %}
-    <div class="row">
-        {% for field in col %}
-            {% if field.is_html %}
-                <div class="col-sm-12 beam-field-{{ field }}">
-                    {{ field.content|safe }}
-                </div>
-            {% else %}
-                <div class="col-sm-4 col-md-4 col-lg-4 text-md-right font-weight-bold beam-field-label-{{ field }}">
-                    {{ object|field_verbose_name:field|capfirst }}
-                </div>
-                <div class="col-sm-8 col-md-8 col-lg-8 beam-field-{{ field }}">
-                    {% include "beam/partials/detail_field.html" with object=object field=field %}
-                </div>
-            {% endif %}
-        {% endfor %}
-    </div>
-    </div>
-    {% endfor %}
-</div>
-{% endfor %}
 
+{% block detail_layout %}
+{% for row in layout %}
+    {% block detail_layout__row %}
+    <div class="row">
+        {% block detail_layout__columns %}
+        {% for col in row %}
+            {% block detail_layout__column %}
+            <div class="col">
+                {% block detail_layout__fields %}
+                {% for field in col %}
+                    {% block detail_layout__field %}
+                    <div class="row">
+                        {% if field.is_html %}
+                            {% block detail_layout__html_field %}
+                            <div class="col-sm-12 beam-field-{{ field }}">
+                                {{ field.content|safe }}
+                            </div>
+                            {% endblock %}
+                        {% else %}
+                            {% block detail_layout__detail_field %}
+                            <div class="col-sm-4 col-md-4 col-lg-4 text-md-right font-weight-bold beam-field-label-{{ field }}">
+                                {% block form_layout__detail_field_label %}
+                                {{ object|field_verbose_name:field|capfirst }}
+                                {% endblock %}
+                            </div>
+                            <div class="col-sm-8 col-md-8 col-lg-8 beam-field-{{ field }}">
+                                {% block form_layout__detail_field_field %}
+                                {% include "beam/partials/detail_field.html" with object=object field=field %}
+                                {% endblock %}
+                            </div>
+                            {% endblock %}
+                        {% endif %}
+                    </div>
+                    {% endblock %}
+                {% endfor %}
+                {% endblock %}
+            </div>
+            {% endblock %}
+        {% endfor %}
+        {% endblock %}
+    </div>
+    {% endblock %}
+{% endfor %}
+{% endblock %}
