@@ -1,12 +1,12 @@
 from typing import List
 
+from beam.components import Component
+from beam.urls import UrlKwargDict
+from beam.views import ComponentMixin
+from beam.viewsets import BaseViewSet
 from dal import autocomplete
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
-
-from beam.components import Component
-from beam.views import ComponentMixin
-from beam.viewsets import BaseViewSet
 
 
 class BaseAutocomplete(ComponentMixin, autocomplete.Select2QuerySetView):
@@ -80,7 +80,7 @@ class AutocompleteMixin(BaseViewSet):
 
     autocomplete_view_class = BaseAutocomplete
     autocomplete_url = "autocomplete/"
-    autocomplete_url_kwargs: List[str] = []
+    autocomplete_url_kwargs: UrlKwargDict = {}
     autocomplete_url_name = None
     autocomplete_verbose_name = _("autocomplete")
 

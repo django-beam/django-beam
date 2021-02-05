@@ -18,6 +18,7 @@ class BaseComponent:
         url_name=None,
         url_kwargs=None,
         permission=None,
+        resolve_url=None,
         **kwargs
     ):
         if not name:
@@ -26,7 +27,8 @@ class BaseComponent:
         self.name = name
         self.verbose_name = verbose_name or self.name
         self.url_name = url_name
-        self.url_kwargs = url_kwargs
+        self.url_kwargs = url_kwargs or {}
+        self.resolve_url = resolve_url or reverse
 
         if isinstance(permission, str):
             context = {"component": self}
@@ -42,6 +44,9 @@ class BaseComponent:
     def get_arguments(cls) -> Set[str]:
         """
         Get a list of arguments that can be passed from the viewset.
+
+        These arguments will be used by ViewSet._get_components
+        when instantiating components.
         """
         arguments = set()
         for class_ in inspect.getmro(cls):
@@ -49,24 +54,55 @@ class BaseComponent:
                 arguments.add(arg)
         return arguments
 
-    def get_context(self):
-        return {name: getattr(self, name) for name in self.get_arguments()}
+    def has_perm(self, user, obj=None, request=None, override_kwargs=None) -> bool:
+        """
+        Check whether a given user has access to this component.
+        The optional parameters mirror those for reverse so that
+        every possible url can be checked as well.
 
-    def has_perm(self, user, obj=None):
+        :param obj: An optional model instance
+        :param request: An optional request
+        :param override_kwargs: An optional dict overriding url kwargs
+
+        :return: A boolean, is the user allowed to interact with this component?
+        """
         return check_permission(permission=self.permission, user=user, obj=obj)
 
-    def reverse(self, obj=None, extra_kwargs=None):
-        if not obj:
-            return reverse(self.url_name)
+    def reverse(self, obj=None, request=None, override_kwargs=None):
+        """
+        Get a url for this component.
 
-        if not obj and self.url_kwargs:
-            return
+        :param obj: An optional model instance
+        :param request: An optional request
+        :param override_kwargs: An optional dict overriding url kwargs
+        :return: A url
+        """
+        kwargs = self.resolve_url_kwargs(obj, request, override_kwargs)
+        return self.resolve_url(self.url_name, kwargs=kwargs)
 
-        kwargs = {kwarg: getattr(obj, kwarg) for kwarg in self.url_kwargs}
-        if extra_kwargs:
-            kwargs.update(extra_kwargs)
+    def resolve_url_kwargs(self, obj=None, request=None, override_kwargs=None):
+        """
+        Used to build the url kwargs that Component.reverse passed to django's reverse.
 
-        return reverse(self.url_name, kwargs=kwargs)
+        Keys with None values are dropped from the result so you can't have urls
+        with None in them.
+
+        :param obj: An optional model instance
+        :param request: An optional request
+        :param override_kwargs: An optional dict overriding url kwargs
+        :return: A dict of url kwargs that can be passed to django's reverse.
+        """
+        override_kwargs = override_kwargs or {}
+        kwargs = {}
+        assert self.url_kwargs is not None, str(self.__dict__)
+        for kwarg, name_or_callable in self.url_kwargs.items():
+            if callable(name_or_callable):
+                kwargs[kwarg] = name_or_callable(obj, request)
+            elif hasattr(obj, kwarg):
+                kwargs[kwarg] = getattr(obj, kwarg)
+        kwargs.update(override_kwargs)
+
+        return {k: v for k, v in kwargs.items() if v is not None}
 
 
 class Component(BaseComponent):
@@ -158,29 +194,4 @@ class Link(BaseComponent):
     A component class that can be added to ViewSet.links to add links to external views.
     """
 
-    show_link = True
-
-    def __init__(
-        self,
-        name=None,
-        verbose_name=None,
-        url_name=None,
-        url_kwargs=None,
-        permission=None,
-        **kwargs
-    ):
-        self.resolve_url = kwargs.pop("resolve_url", reverse)
-        super().__init__(name, verbose_name, url_name, url_kwargs, permission, **kwargs)
-
-    def reverse(self, obj=None, extra_kwargs=None):
-        if not obj:
-            return self.resolve_url(self.url_name)
-
-        if not obj and self.url_kwargs:
-            return
-
-        kwargs = {kwarg: getattr(obj, kwarg) for kwarg in self.url_kwargs}
-        if extra_kwargs:
-            kwargs.update(extra_kwargs)
-
-        return self.resolve_url(self.url_name, kwargs=kwargs)
+    pass

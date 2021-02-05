@@ -5,12 +5,13 @@ import django_filters
 from beam import RelatedInline, ViewSet, actions
 from beam.actions import Action, DeleteAction, MassUpdateAction
 from beam.inlines import TabularRelatedInline
+from beam.urls import request_kwarg
 from beam.views import DetailView
 from beam.viewsets import Component
 from django.db.models import QuerySet
 from django.http import HttpResponse
 
-from .models import Dragonfly, ProtectedSighting, Sighting, CascadingSighting
+from .models import CascadingSighting, Dragonfly, ProtectedSighting, Sighting
 
 
 class CsvExportAction(Action):
@@ -89,7 +90,7 @@ class DragonflyViewSet(ViewSet):
     extra_component = ExtraComponent
     extra_view_class = ExtraView
     extra_url = "extra/<str:id>/<str:special>/"
-    extra_url_kwargs = ["id"]
+    extra_url_kwargs = {"id": "id", "special": request_kwarg("special")}
 
 
 class SightingViewSet(ViewSet):

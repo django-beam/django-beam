@@ -15,6 +15,7 @@ from django.views import View
 from .actions import Action
 from .components import BaseComponent, Component, FormComponent, ListComponent
 from .inlines import RelatedInline
+from .urls import UrlKwargDict
 from .views import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 logger = getLogger(__name__)
@@ -119,7 +120,7 @@ class ListMixin(BaseViewSet):
     list_view_class = ListView
     list_url = ""
     list_url_name: str
-    list_url_kwargs: List[str] = []
+    list_url_kwargs: UrlKwargDict = {}
     list_verbose_name = _("list")
 
     list_sort_fields: List[str]
@@ -144,7 +145,7 @@ class CreateMixin(BaseViewSet):
     create_component = FormComponent
     create_view_class = CreateView
     create_url = "create/"
-    create_url_kwargs: List[str] = []
+    create_url_kwargs: UrlKwargDict = {}
     create_url_name: str
     create_verbose_name = _("create")
 
@@ -162,7 +163,7 @@ class UpdateMixin(BaseViewSet):
     update_component = FormComponent
     update_view_class = UpdateView
     update_url = "<str:pk>/update/"
-    update_url_kwargs = ["pk"]
+    update_url_kwargs: UrlKwargDict = {"pk": "pk"}
     update_url_name: str
     update_verbose_name = _("update")
 
@@ -181,7 +182,7 @@ class DetailMixin(BaseViewSet):
     detail_view_class: View = DetailView
     detail_url: str = "<str:pk>/"
     detail_url_name: str
-    detail_url_kwargs: List[str] = ["pk"]
+    detail_url_kwargs: UrlKwargDict = {"pk": "pk"}
     detail_verbose_name = _("detail")
 
     detail_model: Model
@@ -198,7 +199,7 @@ class DeleteMixin(BaseViewSet):
     delete_view_class = DeleteView
     delete_url = "<str:pk>/delete/"
     delete_url_name: str
-    delete_url_kwargs = ["pk"]
+    delete_url_kwargs: UrlKwargDict = {"pk": "pk"}
     delete_verbose_name = _("delete")
 
     delete_model: Model
