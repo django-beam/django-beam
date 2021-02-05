@@ -5,11 +5,11 @@
 {% block body_classes %}{{ block.super }} beam-update{% if component.model %}{% get_options component.model as options %} beam-update-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
 
 {% block heading %}
-    <h1>
-        {% if heading %}{{ heading }}{% else %}
+    {% if heading %}
+        {{ heading }}
+    {% else %}
         {% get_options component.model as options %}
         {% blocktrans %}Update {{ object }}{% endblocktrans %}
         <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
-        {% endif %}
-    </h1>
+    {% endif %}
 {% endblock %}

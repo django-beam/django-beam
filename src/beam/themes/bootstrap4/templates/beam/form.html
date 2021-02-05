@@ -7,80 +7,94 @@
 
 {% block content %}
     <form method="post" enctype="multipart/form-data" novalidate>
+        {% block form %}
         {% csrf_token %}
 
+        {% block main_container %}
+        <main class="beam-main">
+            {% block main %}
 
-        <section class="beam-main">
-            <div class="container">
-                {% block links %}
+                {% block links_container %}
                     <div class="float-right beam-links">
-                        {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
+                        {% block links %}
+                            {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
+                        {% endblock %}
                     </div>
                 {% endblock %}
 
-                {% block heading %}
+                {% block heading_container %}
                     <h1>
-                        {% if heading %}{{ heading }}{% else %}
-                        {% get_options component.model as options %}
-                        {% blocktrans with verbose_name=options.verbose_name %}Create {{ verbose_name }}{% endblocktrans %}
-                        {% endif %}
+                        {% block heading %}
+                            {% if heading %}
+                                {{ heading }}
+                            {% else %}
+                                {% get_options component.model as options %}
+                                {% blocktrans with verbose_name=options.verbose_name %}Create {{ verbose_name }}{% endblocktrans %}
+                            {% endif %}
+                        {% endblock %}
                     </h1>
                 {% endblock %}
 
-                {% block form_buttons_top %}
-                    <div class="container-fluid mb-2">
-                        <div class="row">
-                            <div class="btn-group ml-auto">
+                {% block form_buttons_top_container %}
+                    <div class="clearfix">
+                        <div class="btn-group float-right mb-2">
+                            {% block form_buttons_top %}
                                 <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-                            </div>
+                            {% endblock %}
                         </div>
                     </div>
                 {% endblock %}
 
-                {% block form_errors %}
+                {% block form_errors_container %}
                     {% if form.non_field_errors %}
                         <div class="alert alert-block alert-danger">
                             <ul class="mb-0">
-                                {{ form.non_field_errors|unordered_list }}
+                                {% block form_errors %}
+                                    {{ form.non_field_errors|unordered_list }}
+                                {% endblock %}
                             </ul>
                         </div>
                     {% endif %}
                 {% endblock %}
 
-                <div class="card bg-light mb-4">
-                    <div class="card-body">
-                        <div class="card-text">
-                            {% block details %}
-                                {% include "beam/partials/form_layout.html" with form=form fields=component.fields layout=component.layout %}
-                            {% endblock %}
+                {% block details_container %}
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <div class="card-text">
+                                {% block details %}
+                                    {% include "beam/partials/form_layout.html" with form=form fields=component.fields layout=component.layout %}
+                                {% endblock %}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
+                {% endblock %}
+
+            {% endblock %}
+        </main>
+        {% endblock %}
 
         {% block above_inlines %}{% endblock %}
 
         {% block inlines %}
             {% for inline in inlines %}
-                {% include inline.form_template_name|default:"beam/partials/form_inline.html" %}
+                {% block inline %}
+                    {% include inline.form_template_name|default:"beam/partials/form_inline.html" %}
+                {% endblock %}
             {% endfor %}
         {% endblock %}
 
         {% block below_inlines %}{% endblock %}
 
-        <section>
-            <div class="container">
-                {% block form_buttons %}
-                    <div class="container-fluid mb-2">
-                        <div class="row">
-                            <div class="btn-group ml-auto">
-                                <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-                            </div>
-                        </div>
-                    </div>
-                {% endblock %}
+        {% block form_buttons_container %}
+            <div class="clearfix">
+                <div class="btn-group float-right mb-2">
+                    {% block form_buttons %}
+                        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+                    {% endblock %}
+                </div>
             </div>
-        </section>
+        {% endblock %}
+
+        {% endblock %}
     </form>
 {% endblock %}

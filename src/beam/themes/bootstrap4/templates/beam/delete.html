@@ -7,13 +7,17 @@
 {% block content %}
     <section class="beam-main">
         <div class="container">
-            {% block heading %}
+            {% block heading_container %}
                 <h1>
-                    {% if heading %}{{ heading }}{% else %}
-                    {% get_options component.model as options %}
-                    {% blocktrans %}Delete {{ object }}{% endblocktrans %}
-                    <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
-                    {% endif %}
+                    {% block heading %}
+                        {% if heading %}
+                            {{ heading }}
+                        {% else %}
+                            {% get_options component.model as options %}
+                            {% blocktrans %}Delete {{ object }}{% endblocktrans %}
+                            <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
+                        {% endif %}
+                    {% endblock %}
                 </h1>
             {% endblock %}
 

@@ -3,12 +3,12 @@
 {% load beam_tags %}
 
 {% block heading %}
-    <h1>
-        {% if heading %}{{ heading }}{% else %}
+    {% if heading %}
+        {{ heading }}
+    {% else %}
         {{ version }}
         <small>{% blocktrans with date=version.revision.date_created %}Version as of {{ date }}{% endblocktrans %}</small>
-        {% endif %}
-    </h1>
+    {% endif %}
 {% endblock %}
 
 {% block below_inlines %}

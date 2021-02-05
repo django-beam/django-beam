@@ -1,63 +1,119 @@
 {% load beam_tags %}
 {% load i18n %}
 
+
 {% if fields and not layout %}
     {% fields_to_layout form.fields as layout %}
 {% elif not fields and not layout %}
     {% fields_to_layout form.fields as layout %}
 {% endif %}
 
+
+{% block layout %}
 {% for row in layout %}
+
+    {% block row %}
     <div class="row">
+        {% block columns %}
         {% for col in row %}
-            <div class="{% if row|length_is:1 %}col-md-12{% elif row|length_is:2 %}col-md-6{% elif row|length_is:3 %}col-md-4{% elif row|length_is:4 %}col-md-3{% endif %}">
+
+            {% block column %}
+            <div class="col">
+                {% block fields %}
                 {% for field in col %}
-                    <div class="row field-group">
-                        {% if field.is_html %}
-                            <div class="col-sm-12 beam-field-{{ field }}">
+
+                    {% block field %}
+                    {% if field.is_html %}
+
+                        {% block html_field_container %}
+                        <div class="beam-field-{{ field }}">
+                            {% block html_field %}
                                 {{ field.content|safe }}
+                            {% endblock %}
+                        </div>
+                        {% endblock %}
+
+                    {% else %}
+
+                        {% get_form_field form field as form_field %}
+                        {% if form_field is None %}
+
+                            {% block detail_field_container %}
+                            <div class="row">
+                                <div class="col-sm-4 text-md-right beam-field-label-{{ field }} ">
+
+                                    {% block detail_field_label %}
+                                        <label>
+                                            {{ form.instance|field_verbose_name:field|capfirst }}
+                                        </label>
+                                    {% endblock %}
+
+                                </div>
+                                <div class="col-sm-8 beam-field-{{ field }} ">
+
+                                    {% block detail_field %}
+                                        {% include "beam/partials/detail_field.html" with object=form.instance field=field %}
+                                    {% endblock %}
+
+                                </div>
                             </div>
-                        {% else %}
-                            {% get_form_field form field as form_field %}
-                            {% if form_field is None %}
-                                <div class="col-sm-4 col-md-4 col-lg-4 text-right beam-field-label-{{ field }} ">
-                                    <label class="col-form-label">
-                                        {{ form.instance|field_verbose_name:field|capfirst }}
-                                    </label>
-                                </div>
-                                <div class="col-sm-8 col-md-8 col-lg-8 beam-field-{{ field }} ">
-                                    <div class="form-group">
-                                        <div class="form-control-plaintext">
-                                            {% include "beam/partials/detail_field.html" with object=form.instance field=field %}
-                                        </div>
-                                    </div>
-                                </div>
-                            {% elif not form_field.is_hidden %}
+                            {% endblock %}
 
-                                {% get_url_for_related form_field.field.queryset.model "create" as create_url %}
-                                {% get_options form_field.field.queryset.model as related_options %}
+                        {% elif not form_field.is_hidden %}
 
-                                <div class="col-sm-4 col-md-4 col-lg-4 text-right beam-field-label-{{ field }}">
-                                    <label class="col-form-label" for="{{ form_field.auto_id }}">
-                                        {{ form_field.label }}<span class="text-muted small">{% if form_field.field.required %}*{% else %}&nbsp;{% endif %}</span>
-                                    </label>
+                            {% get_url_for_related form_field.field.queryset.model "create" as create_url %}
+                            {% get_options form_field.field.queryset.model as related_options %}
+
+                            {% block form_field_container %}
+                            <div class="row field-group">
+                                <div class="col-sm-4 text-md-right beam-field-label-{{ field }}">
+
+                                    {% block form_field_label %}
+                                        <label class="col-form-label" for="{{ form_field.auto_id }}">
+                                            {{ form_field.label }}<span class="text-muted small">{% if form_field.field.required %}*{% else %}&nbsp;{% endif %}</span>
+                                        </label>
+                                    {% endblock %}
+
                                 </div>
 
-                                <div class="col-sm-8 col-md-8 col-lg-8 beam-field-{{ field }}"{% if create_url %}
-                                     data-create-text="{% blocktrans with verbose_name=related_options.verbose_name|capfirst %}Create {{ verbose_name }}{% endblocktrans %}"
-                                     data-create-url="{{ create_url }}?_popup={{ form_field.auto_id }}"
-                                {% endif %}>
-                                    {% include "bootstrap4/field.html" with field=form_field form_show_errors=True %}
+                                <div class="col-sm-8 beam-field-{{ field }}"
+                                        {% if create_url %}
+                                             data-create-text="{% blocktrans with verbose_name=related_options.verbose_name|capfirst %}Create {{ verbose_name }}{% endblocktrans %}"
+                                             data-create-url="{{ create_url }}?_popup={{ form_field.auto_id }}"
+                                        {% endif %}>
+
+                                    {% block form_field %}
+                                        {% include "bootstrap4/field.html" with field=form_field form_show_errors=True %}
+                                    {% endblock %}
+
                                 </div>
+                            </div>
+                            {% endblock %}
 
-
-                            {% endif %}
                         {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endfor %}
-        {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
-    </div>
-{% endfor %}
 
+                    {% endif %}
+                    {% endblock %}
+
+                {% endfor %}
+                {% endblock %}
+            </div>
+            {% endblock %}
+
+        {% endfor %}
+        {% endblock %}
+
+    </div>
+    {% endblock %}
+
+{% endfor %}
+{% endblock %}
+
+
+{% block hidden_fields %}
+    {% for hidden in form.hidden_fields %}
+        {% block hidden_field %}
+            {{ hidden }}
+        {% endblock %}
+    {% endfor %}
+{% endblock %}
