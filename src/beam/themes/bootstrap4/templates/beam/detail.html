@@ -8,41 +8,55 @@
 {% block extra_styles %}{{ block.super }}{% for inline in inlines %}{{ inline.filterset.form.media.css }}{% for action in inline.actions %}{{ action.get_form.media.css }}{% endfor %}{% endfor %}{% endblock %}
 
 {% block content %}
-    <section class="beam-main">
-        <div class="container">
-            {% block links %}
+    {% block main_container %}
+    <main class="beam-main">
+        {% block main %}
+
+            {% block links_container %}
                 <div class="float-right beam-links">
-                    {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
+                    {% block links %}
+                        {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
+                    {% endblock %}
                 </div>
             {% endblock %}
 
-            {% block heading %}
+            {% block heading_container %}
                 <h1>
-                    {% if heading %}{{ heading }}{% else %}
-                    {% get_options component.model as options %}
-                    {{ object }}
-                    <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
-                    {% endif %}
+                    {% block heading %}
+                        {% if heading %}
+                            {{ heading }}
+                        {% else %}
+                            {% get_options component.model as options %}
+                            {{ object }}
+                            <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
+                        {% endif %}
+                    {% endblock %}
                 </h1>
             {% endblock %}
 
-            <div class="card bg-light mb-4 beam-model-fields">
-                <div class="card-body">
-                <div class="card-text">
-                    {% block details %}
-                        {% include "beam/partials/layout.html" with object=object layout=component.layout fields=component.fields %}
-                    {% endblock %}
+            {% block details_container %}
+                <div class="card bg-light mb-4 beam-model-fields">
+                    <div class="card-body">
+                    <div class="card-text">
+                        {% block details %}
+                            {% include "beam/partials/layout.html" with object=object layout=component.layout fields=component.fields %}
+                        {% endblock %}
+                    </div>
+                    </div>
                 </div>
-                </div>
-            </div>
-        </div>
-    </section>
+            {% endblock %}
+
+        {% endblock %}
+    </main>
+    {% endblock %}
 
     {% block above_inlines %}{% endblock %}
 
     {% block inlines %}
         {% for inline in inlines %}
-            {% include inline.detail_template_name|default:"beam/partials/detail_inline.html" %}
+            {% block inline %}
+                {% include inline.detail_template_name|default:"beam/partials/detail_inline.html" %}
+            {% endblock %}
         {% endfor %}
     {% endblock %}
 

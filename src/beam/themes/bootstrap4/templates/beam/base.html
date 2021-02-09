@@ -1,37 +1,84 @@
 {% load beam_tags static %}
 <!doctype html>
 <html lang="en">
+
+
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% block meta %}
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
-    {% block extra_styles %}{% endblock %}
+        {% block extra_meta %}{% endblock %}
+    {% endblock %}
 
     <title>{% block title %}{% endblock %}</title>
+
+    {% block styles %}
+        {% block bootstrap_styles %}
+            <!-- Bootstrap CSS -->
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        {% endblock %}
+
+        {% block extra_styles %}{% endblock %}
+    {% endblock %}
+
+    {% block extra_head %}{% endblock %}
+
 </head>
 
-<body class="beam {% if popup %}popup {% endif %}{% block body_classes %}{% endblock %}">
-{% block layout %}
-    {% block navigation %}
-        {% render_navigation %}
-    {% endblock %}
-    {% block messages %}{% include "beam/partials/messages.html" %}{% endblock %}
-    {% block content %}{% endblock %}
-{% endblock %}
 
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-<script src="{% static "beam/js/sortable.min.js" %}"></script>  {# add/remove for formsets #}
-<script src="{% static "beam/js/inlines.js" %}"></script>  {# add/remove for formsets #}
-<script src="{% static "beam/js/add_related.js" %}"></script>  {# add/remove for dynamic add related #}
-<script src="{% static "beam/js/actions.js" %}"></script>  {# add/remove for actions #}
-{% block extra_scripts %}{% endblock %}
+<body class="beam {% if popup %}popup {% endif %}{% block body_classes %}{% endblock %}">
+
+    {% block layout %}
+
+        {% block navigation %}
+            {% render_navigation %}
+        {% endblock %}
+
+        {% block messages_container %}
+            {% if messages %}
+                <div class="container">
+                    {% block messages %}
+                        {% include "beam/partials/messages.html" %}
+                    {% endblock %}
+                </div>
+            {% endif %}
+        {% endblock %}
+
+        {% block content_container %}
+            <div class="container">
+                {% block content %}{% endblock %}
+            </div>
+        {% endblock %}
+
+    {% endblock %}
+
+
+    {% block scripts %}
+        <!-- Optional JavaScript -->
+        {% block jquery %}
+            <!-- jQuery first -->
+            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        {% endblock %}
+
+        {% block bootstrap_scripts %}
+            <!-- then Popper.js, then Bootstrap JS -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        {% endblock %}
+
+        {% block beam_scripts %}
+            <!-- then beam JS -->
+            <script src="{% static "beam/js/sortable.min.js" %}"></script>  {# add/remove for formsets #}
+            <script src="{% static "beam/js/inlines.js" %}"></script>  {# add/remove for formsets #}
+            <script src="{% static "beam/js/add_related.js" %}"></script>  {# add/remove for dynamic add related #}
+            <script src="{% static "beam/js/actions.js" %}"></script>  {# add/remove for actions #}
+        {% endblock %}
+
+        {% block extra_scripts %}{% endblock %}
+
+    {% endblock %}
+
 </body>
 </html>

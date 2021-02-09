@@ -4,14 +4,15 @@
 
 
 {% block heading %}
-    <h1>
-        {% if heading %}{{ heading }}{% else %}
+    {% if heading %}
+        {{ heading }}
+    {% else %}
         {% get_options component.model as options %}
         {{ object }}
         <small class="text-muted">{% trans "history"|capfirst %}</small>
-        {% endif %}
-    </h1>
+    {% endif %}
 {% endblock %}
+
 
 {% block table %}
     <table class="table table-striped">

@@ -11,16 +11,22 @@
     {% get_options component.model as options %}
     <section class="beam-main">
         <div class="container">
-            {% block links %}
+            {% block links_container %}
                 <div class="float-right beam-links">
-                    {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
+                    {% block links %}
+                        {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
+                    {% endblock %}
                 </div>
             {% endblock %}
-            {% block heading %}
+            {% block heading_container %}
                 <h1>
-                    {% if heading %}{{ heading }}{% else %}
-                    {{ options.verbose_name_plural|capfirst }}
-                    {% endif %}
+                    {% block heading %}
+                        {% if heading %}
+                            {{ heading }}
+                        {% else %}
+                            {{ options.verbose_name_plural|capfirst }}
+                        {% endif %}
+                    {% endblock %}
                 </h1>
             {% endblock %}
 
