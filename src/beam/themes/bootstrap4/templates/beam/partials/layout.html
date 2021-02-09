@@ -23,7 +23,7 @@
                     {% if field.is_html %}
 
                         {% block html_field_container %}
-                        <div class="beam-field-{{ field }}">
+                        <div class="beam-field-{{ field.name|default:"html" }}">
                             {% block html_field %}
                                 {{ field.content|safe }}
                             {% endblock %}
