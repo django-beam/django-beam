@@ -3,58 +3,80 @@
 {% load beam_tags %}
 
 
-{% block page %}
+{% block inline_group_container %}
     <div class="table-responsive">
     <table class="table table-sm table-striped" id="{{ inline.prefix }}-table">
-
-        <thead>
-            <tr>
-                {% if actions %}
-                <th scope="col">
-                    <input class="beam-action-select-across" name="_action_select_across" type="hidden" value="">
-                    <input title={% trans "Select all" %} class="beam-action-select-all" type="checkbox">
-                </th>
-                {% endif %}
-
-                {% for field in inline.fields %}
-                    <th scope="col">
-                        {{ inline.model|field_verbose_name:field|capfirst }}
-                    </th>
-                {% endfor %}
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for object in page.object_list %}
+        {% block inline_group %}
+            {% block inline_group_head %}
+            <thead>
                 <tr>
                     {% if actions %}
-                        <td><input type="checkbox" class="beam-action-select-item" name="_action_select[]"
-                                   value="{{ object.pk }}"></td>
+                        <th scope="col">
+                            {% block select_all %}{{ block.super }}{% endblock %}
+                        </th>
                     {% endif %}
 
                     {% for field in inline.fields %}
-                        <td class="beam-field-{{ field }}">
-                            {% if field.is_html %}
-                                {{ field.content|safe }}
-                            {% else %}
-                                {% include "beam/partials/detail_field.html" with object=object field=field %}
-                            {% endif %}
-                        </td>
+                        {% block label_container %}
+                        <th scope="col">
+                            {% block label %}
+                                {{ inline.model|field_verbose_name:field|capfirst }}
+                            {% endblock %}
+                        </th>
+                        {% endblock %}
                     {% endfor %}
                 </tr>
-            {% empty %}
-                <tr>
-                    {% if actions %}<td></td>{% endif %}
-                    {% if inline.filterset.is_bound %}
-                        <td colspan="inline.fields|length">{% blocktrans with title=inline.get_title %}There
-                            aren't any that match the current filters.{% endblocktrans %}</td>
-                    {% else %}
-                        <td colspan="inline.fields|length">{% blocktrans with title=inline.get_title %}There
-                            aren't any.{% endblocktrans %}</td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-        </tbody>
+            </thead>
+            {% endblock %}
+
+            {% block inline_items %}
+            <tbody>
+                {% for object in page.object_list %}
+                    {% block inline_item_container %}
+                    <tr>
+                        {% if actions %}
+                            <td>
+                                {% block select_item %}{{ block.super }}{% endblock %}
+                            </td>
+                        {% endif %}
+
+                        {% block inline_item %}
+                        {% for field in inline.fields %}
+                            {% block field_container %}
+                            <td class="beam-field-{{ field }}">
+                                {% block field %}
+                                    {% if field.is_html %}
+                                        {{ field.content|safe }}
+                                    {% else %}
+                                        {% include "beam/partials/detail_field.html" with object=object field=field %}
+                                    {% endif %}
+                                {% endblock %}
+                            </td>
+                            {% endblock %}
+                        {% endfor %}
+                        {% endblock %}
+                    </tr>
+                    {% endblock %}
+                {% empty %}
+                    {% block empty_container %}
+                    <tr>
+                        {% if actions %}<td></td>{% endif %}
+                        {% if inline.filterset.is_bound %}
+                            <td colspan="inline.fields|length">
+                                {% block empty_filters %}{{ block.super }}{% endblock %}
+                            </td>
+                        {% else %}
+                            <td colspan="inline.fields|length">
+                                {% block empty %}{{ block.super }}{% endblock %}
+                            </td>
+                        {% endif %}
+                    </tr>
+                    {% endblock %}
+                {% endfor %}
+            </tbody>
+            {% endblock %}
+        {% endblock %}
+
     </table>
     </div>
 {% endblock %}
