@@ -2,45 +2,68 @@
 {% load beam_tags %}
 
 
+{% block inline_item_container %}
 <tr data-inline-id="{{ inline_item_id }}" id="{{ inline.prefix }}-{{ inline_item_id }}"
     class="related-inline-item {% if empty_form %}empty-form{% endif %}">
 
-    {% if inline.can_order  %}
-        <td class="field-group">{% get_form_field form inline.order_field as order_field %}
-            <div class="d-none">{{ order_field }}</div></td>
-    {% endif %}
+    {% block inline_item %}
 
-    {% for field in form.fields %}
-        {% if field.is_html %}
-            <td class="beam-field-{{ field }}">
-                {{ field.content|safe }}
+        {% block order_container %}
+        {% if inline.can_order  %}
+            <td class="field-group">
+                {% block order_field %}
+                    {% get_form_field form inline.order_field as order_field %}
+                    <div class="d-none">{{ order_field }}</div>
+                {% endblock %}
             </td>
-        {% else %}
-            {% get_form_field form field as form_field %}
-            {% if form_field is None %}
-                <td class="beam-field-{{ field }}">
-                    {% include "beam/partials/detail_field.html" with object=form.instance field=field %}
-                </td>
-            {% elif not form_field.is_hidden %}
-                {% get_url_for_related form_field.field.queryset.model "create" as create_url %}
-                {% get_options form_field.field.queryset.model as related_options %}
-
-                <td class="beam-field-{{ field }}"{% if create_url %}
-                     data-create-text="{% blocktrans with verbose_name=related_options.verbose_name|capfirst %}Create {{ verbose_name }}{% endblocktrans %}"
-                     data-create-url="{{ create_url }}?_popup={{ form_field.auto_id }}"
-                {% endif %}>
-                    {% include "bootstrap4/field.html" with field=form_field form_show_errors=True wrapper_class="mb-0" %}
-                </td>
-
-            {% endif %}
         {% endif %}
-    {% endfor %}
+        {% endblock %}
 
-    {% for hidden in form.hidden_fields %}<td class="d-none">{{ hidden }}</td>{% endfor %}
+        {% block inline_layout %}
+        {% for field in form.fields %}
+            {% if field.is_html %}
+                <td class="beam-field-{{ field }}">
+                    {{ field.content|safe }}
+                </td>
+            {% else %}
+                {% get_form_field form field as form_field %}
+                {% if form_field is None %}
+                    <td class="beam-field-{{ field }}">
+                        {% include "beam/partials/detail_field.html" with object=form.instance field=field %}
+                    </td>
+                {% elif not form_field.is_hidden %}
+                    {% get_url_for_related form_field.field.queryset.model "create" as create_url %}
+                    {% get_options form_field.field.queryset.model as related_options %}
 
-    {% if inline.formset.can_delete %}
-        <td><button class="btn btn-outline-danger related-inline-item-remove d-none float-right">
-                {% trans "delete" %}</button></td>
-    {% endif %}
+                    <td class="beam-field-{{ field }}"{% if create_url %}
+                         data-create-text="{% blocktrans with verbose_name=related_options.verbose_name|capfirst %}Create {{ verbose_name }}{% endblocktrans %}"
+                         data-create-url="{{ create_url }}?_popup={{ form_field.auto_id }}"
+                    {% endif %}>
+                        {% include "bootstrap4/field.html" with field=form_field form_show_errors=True wrapper_class="mb-0" %}
+                    </td>
+
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        {% endblock %}
+
+        {% block hidden_fields %}
+            {% for hidden in form.hidden_fields %}<td class="d-none">{{ hidden }}</td>{% endfor %}
+        {% endblock %}
+
+        {% block delete_container %}
+        {% if inline.formset.can_delete %}
+            <td>
+                {% block delete %}
+                <button class="btn btn-outline-danger related-inline-item-remove d-none float-right">
+                    {% trans "delete" %}
+                </button>
+                {% endblock %}
+            </td>
+        {% endif %}
+        {% endblock %}
+
+    {% endblock %}
 
 </tr>
+{% endblock %}

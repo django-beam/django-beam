@@ -1,62 +1,101 @@
 {% load i18n %}
 {% load beam_tags  %}
+
+
+{% block inline_container %}
 {% with inline.page as page %}
 <section id="{{ inline.prefix }}-related-inline" class="related-inline"
          data-related-inline-js
          {% if inline.can_order %}data-can-order="true" data-order-field="{{ inline.order_field }}"{% endif %}
          {% if inline.can_delete %}data-can-delete="true"{% endif %}
-         data-prefix="{{ inline.prefix }}"
->
-    <div class="container">
+         data-prefix="{{ inline.prefix }}">
+    {% block inline %}
 
-        {% block title %}
-            <h2 class="pt-2">{{ inline.get_title|capfirst }}</h2>
+        {% block title_container %}
+            <h2>
+                {% block title %}
+                    {{ inline.get_title|capfirst }}
+                {% endblock %}
+            </h2>
         {% endblock %}
 
-        {{ inline.formset.management_form }}
+        {% block management_form %}
+            {{ inline.formset.management_form }}
+        {% endblock %}
 
-        {% block formset_non_field_errors %}
+        {% block formset_errors_container %}
             {% if inline.formset.non_field_errors %}
                 <div class="alert alert-block alert-danger">
                     <ul class="mb-0">
-                        {{ inline.formset.non_field_errors|unordered_list }}
+                        {% block formset_errors %}
+                            {{ inline.formset.non_field_errors|unordered_list }}
+                        {% endblock %}
                     </ul>
                 </div>
             {% endif %}
         {% endblock %}
 
-        {% block formset %}
+        {% block inline_group_container %}
         <div class="card mb-4">
             <ul class="related-inline-group list-group list-group-flush mb-0">
+
+                {% block inline_group %}
                 {% for form in inline.formset %}
+
+                    {% block inline_item_container %}
                     <li data-inline-id="{{ forloop.counter0 }}" id="{{ inline.prefix }}-{{ forloop.counter0 }}"
                         class="related-inline-item list-group-item bg-light pt-4">
 
-                        {% if inline.can_order  %}
-                            <div class="field-group float-left">
-                                {% get_form_field form inline.order_field as order_field %}
-                                <div class="d-none">{{ order_field }}</div>
-                            </div>
-                        {% endif %}
+                        {% block inline_item %}
 
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-block alert-danger">
-                                <ul class="mb-0">
-                                    {{ form.non_field_errors|unordered_list }}
-                                </ul>
-                            </div>
-                        {% endif %}
+                            {% block order_container %}
+                            {% if inline.can_order  %}
+                                <div class="field-group float-left">
+                                    {% block order_field %}
+                                    {% get_form_field form inline.order_field as order_field %}
+                                    <div class="d-none">{{ order_field }}</div>
+                                    {% endblock %}
+                                </div>
+                            {% endif %}
+                            {% endblock %}
 
-                        {% if inline.formset.can_delete %}
-                            <button class="btn btn-outline-danger related-inline-item-remove d-none float-right">
-                                {% trans "delete" %}</button>
-                        {% endif %}
-                        {% include "beam/partials/form_layout.html" with form=form fields=inline.fields layout=inline.layout %}
+                            {% block form_errors_container %}
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-block alert-danger">
+                                    <ul class="mb-0">
+                                        {% block form_errors %}
+                                        {{ form.non_field_errors|unordered_list }}
+                                        {% endblock %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            {% endblock %}
+
+                            {% block delete_container %}
+                            {% if inline.formset.can_delete %}
+                                {% block delete %}
+                                <button class="btn btn-outline-danger related-inline-item-remove d-none float-right">
+                                    {% trans "delete" %}
+                                </button>
+                                {% endblock %}
+                            {% endif %}
+                            {% endblock %}
+
+                            {% block inline_layout %}
+                                {% include "beam/partials/form_layout.html" with form=form fields=inline.fields layout=inline.layout %}
+                            {% endblock %}
+
+                        {% endblock %}
 
                     </li>
+                    {% endblock %}
+
                 {% endfor %}
+                {% endblock %}
+
             </ul>
             <ul class="d-none">
+                {% block empty_form %}
                 <li data-inline-id="__prefix__" id="{{ inline.prefix }}-__prefix__"
                     class="related-inline-item list-group-item bg-light pt-4 empty-form">
                     {% if inline.can_order  %}
@@ -71,6 +110,7 @@
                     {% endif %}
                     {% include "beam/partials/form_layout.html" with form=inline.formset.empty_form fields=inline.fields layout=inline.layout %}
                 </li>
+                {% endblock %}
             </ul>
         </div>
         {% endblock %}
@@ -94,6 +134,7 @@
             {% include "beam/partials/pagination.html" with page_param=inline.page_param paginator=page.paginator is_paginated=page.has_other_pages page_obj=page page_number=page.number object_list=page.object_list options=inline.model_options %}
         {% endblock %}
 
-    </div>
+    {% endblock %}
 </section>
 {% endwith %}
+{% endblock %}
