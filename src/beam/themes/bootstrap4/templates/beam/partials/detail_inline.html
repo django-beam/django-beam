@@ -95,7 +95,7 @@
             {% include "beam/partials/pagination.html" with page_param=inline.page_param paginator=page.paginator is_paginated=page.has_other_pages page_obj=page page_number=page.number object_list=page.object_list options=inline.model_options %}
         {% endblock %}
 
-        {% block actions_end %}
+        {% block actions_container_end %}
             {% if actions %}
                 </form>
             {% endif %}
