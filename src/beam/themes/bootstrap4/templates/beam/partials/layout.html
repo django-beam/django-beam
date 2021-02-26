@@ -23,7 +23,7 @@
                     {% if field.is_html %}
 
                         {% block html_field_container %}
-                        <div class="beam-field-{{ field.name|default:"html" }}">
+                        <div class="beam-field beam-html-field beam-field-{{ field.name|default:"html" }}">
                             {% block html_field %}
                                 {{ field.content|safe }}
                             {% endblock %}
@@ -34,14 +34,14 @@
 
                         {% block detail_field_container %}
                         <div class="row">
-                            <div class="col-sm-4 text-md-right font-weight-bold beam-field-label-{{ field }}">
+                            <div class="col-sm-4 text-md-right font-weight-bold beam-field-label beam-detail-field-label beam-field-label-{{ field }}">
 
                                 {% block detail_field_label %}
                                     {{ object|field_verbose_name:field|capfirst }}
                                 {% endblock %}
 
                             </div>
-                            <div class="col-sm-8 beam-field-{{ field }}">
+                            <div class="col-sm-8 beam-field beam-detail-field beam-field-{{ field }}">
 
                                 {% block detail_field %}
                                     {% include "beam/partials/detail_field.html" with object=object field=field %}
