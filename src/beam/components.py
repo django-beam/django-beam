@@ -98,8 +98,8 @@ class BaseComponent:
         for kwarg, name_or_callable in self.url_kwargs.items():
             if callable(name_or_callable):
                 kwargs[kwarg] = name_or_callable(obj, request)
-            elif hasattr(obj, kwarg):
-                kwargs[kwarg] = getattr(obj, kwarg)
+            elif hasattr(obj, name_or_callable):
+                kwargs[kwarg] = getattr(obj, name_or_callable)
         kwargs.update(override_kwargs)
 
         return {k: v for k, v in kwargs.items() if v is not None}
