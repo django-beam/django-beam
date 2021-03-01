@@ -1,35 +1,66 @@
 {% load i18n %}
 {% load beam_tags %}
 
+
+{% block detail_field_container %}
 {% get_attribute object field as value %}
-{% if value|is_queryset %}
-    {% for related in value %}
-        {% get_url_for_related related "detail" as related_url %}
-        {% if related_url %}<a href="{{ related_url }}">{{ related }}</a>{% else %}{{ related }}{% endif %}{% if not forloop.last %}, {% endif %}
-        {% empty %}
-            &nbsp;
-    {% endfor %}
-{% elif value.pk %}
-    {% get_url_for_related value "detail" as related_url %}
-    {% if related_url %}
-        <a href="{{ related_url }}">{{ value }}</a>
+
+    {% block detail_field %}
+    {% if value|is_queryset %}
+
+        {% block queryset %}
+            {% for related in value %}
+                {% get_url_for_related related "detail" as related_url %}
+                {% if related_url %}<a href="{{ related_url }}">{{ related }}</a>{% else %}{{ related }}{% endif %}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+                &nbsp;
+            {% endfor %}
+        {% endblock %}
+
+    {% elif value.pk %}
+
+        {% block foreign_key %}
+            {% get_url_for_related value "detail" as related_url %}
+            {% if related_url %}
+                <a href="{{ related_url }}">{{ value }}</a>
+            {% else %}
+                {{ value }}
+            {% endif %}
+        {% endblock %}
+
+    {% elif value|is_image %}
+
+        {% block image %}
+            {% if value %}
+                <img class="img-fluid" src="{{ value.url }}"/>
+            {% else %}
+                &nbsp;
+            {% endif %}
+        {% endblock %}
+
+    {% elif value|is_file %}
+
+        {% block file %}
+            {% if value %}
+                <a href="{{ value.url }}">{% trans "download" %}</a>
+            {% else %}
+                &nbsp;
+            {% endif %}
+        {% endblock %}
+
+    {% elif value|is_bool %}
+
+        {% block bool %}
+            {{ value|yesno }}
+        {% endblock %}
+
     {% else %}
-        {{ value }}
+
+        {% block else %}
+            {{ value|default:"&nbsp;" }}
+        {% endblock %}
+
     {% endif %}
-{% elif value|is_image %}
-    {% if value %}
-        <img class="img-fluid" src="{{ value.url }}"/>
-    {% else %}
-        &nbsp;
-    {% endif %}
-{% elif value|is_file %}
-    {% if value %}
-        <a href="{{ value.url }}">{% trans "download" %}</a>
-    {% else %}
-        &nbsp;
-    {% endif %}
-{% elif value|is_bool %}
-    {{ value|yesno }}
-{% else %}
-    {{ value|default:"&nbsp;" }}
-{% endif %}
+    {% endblock %}
+
+{% endblock %}
