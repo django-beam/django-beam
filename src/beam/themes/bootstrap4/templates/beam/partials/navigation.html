@@ -1,18 +1,29 @@
 {% load i18n %}
 {% load beam_tags %}
+
+{% block navigation_container %}
 <nav class="navbar navbar-expand-md navbar-light shadow-sm border-bottom bg-light mb-3">
     <div class="container">
+    {% block navigation %}
+
         {% block navbar_brand %}
             {% url "dashboard" as dashboard_url %}
             <a class="navbar-brand" href="{{ dashboard_url|default:'/' }}">
                 {% trans "Home" %}
             </a>
         {% endblock %}
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+
+        {% block navbar_toggler %}
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        {% endblock %}
+
+        {% block navbar_collapse %}
         <div class="collapse navbar-collapse" id="navbarNav">
             {% block navbar_nav %}
+                
+                {% block app_navigation %}
                 <ul class="navbar-nav mr-auto">
                     {% for app in apps %}
                         <li class="nav-item dropdown">
@@ -44,35 +55,61 @@
                         </li>
                     {% endfor %}
                 </ul>
+                {% endblock %}
+
+                
+                {% block user_navigation_container %}
                 {% if request.user.is_authenticated %}
                     <ul class="navbar-nav">
+                    {% block user_navigation %}
                         {% url "logout" as logout_url %}
                         {% url "password_change" as password_change_url %}
+                        
                         {% if logout_url or password_change_url %}
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbar-user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     {{ request.user }}
                                 </a>
+                            
+                                {% block user_navigation_items_container %}
                                 <div class="dropdown-menu" aria-labelledby="navbar-user">
-                                    {% if password_change_url and request.user.has_usable_password %}
-                                        <a class="dropdown-item" href="{{ password_change_url }}">
-                                            {% trans "Change password" %}
-                                        </a>
-                                    {% endif %}
-                                    {% if logout_url %}
-                                        <a class="dropdown-item" href="{{ logout_url }}">
-                                            {% trans "Log out" %}
-                                        </a>
-                                    {% endif %}
+                                    {% block user_navigation_items %}
+                                        
+                                        {% block password_change_item %}
+                                            {% if password_change_url and request.user.has_usable_password %}
+                                                <a class="dropdown-item" href="{{ password_change_url }}">
+                                                    {% trans "Change password" %}
+                                                </a>
+                                            {% endif %}
+                                        {% endblock %}
+                                        
+                                        {% block logout_item %}
+                                            {% if logout_url %}
+                                                <a class="dropdown-item" href="{{ logout_url }}">
+                                                    {% trans "Log out" %}
+                                                </a>
+                                            {% endif %}
+                                        {% endblock %}
+                                        
+                                    {% endblock %}
                                 </div>
+                                {% endblock %}
                             </li>
                         {% else %}
                             <li class="nav-link">{{ request.user }}</li>
 
                         {% endif %}
+                        
+                    {% endblock %}
                     </ul>
                 {% endif %}
+                {% endblock %}
+
             {% endblock %}
         </div>
+        {% endblock %}
+
+    {% endblock %}
     </div>
 </nav>
+{% endblock %}
