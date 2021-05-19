@@ -334,8 +334,8 @@ class FiltersetMixin(ComponentMixin):
         kwargs = {
             "data": self.request.GET or None,
             "request": self.request,
-            "queryset": self.get_queryset(),
             "prefix": "filter",
+            "queryset": self.component.queryset,
         }
         return kwargs
 
@@ -346,10 +346,10 @@ class FiltersetMixin(ComponentMixin):
         return filterset_class(**self.get_filterset_kwargs())
 
     def get_queryset(self):
+        qs = super().get_queryset()
         if self.filterset and self.filterset.is_bound and self.filterset.is_valid():
-            return self.filterset.qs
-        else:
-            return super().get_queryset()
+            qs = self.filterset.filter_queryset(qs)
+        return qs
 
     def dispatch(self, request, *args, **kwargs):
         self.filterset = self.get_filterset()
