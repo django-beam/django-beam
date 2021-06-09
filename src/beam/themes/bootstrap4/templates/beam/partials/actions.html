@@ -1,9 +1,9 @@
 {% load i18n %}
-<div class="border mb-2 p-4">
+<div class="beam-action border mb-2 p-4">
     <div class="form-inline">
         <label>
             {% trans "Action" %}
-            <select name="_action_choice" class="form-control ml-2 mr-2 beam-action-choice">
+            <select name="_action_choice" class="form-control ml-2 mr-2 beam-action__choice">
                 <option value="_no_action_selected">--------</option>
                 {% for action in actions %}
                     <option value="{{ action.id }}" {% if action.is_bound %}selected="selected"{% endif %}>{{ action.verbose_name }}</option>
@@ -12,13 +12,13 @@
         </label>
         <input class="btn btn-primary" type="submit" value="{% trans "Apply" %}"/>
         {% trans "Selected COUNT of TOTAL." as selected_text %}
-        <span class="beam-action-selected-items-text text-muted ml-2 mr-2" style="display: none"  data-text-template="{{ selected_text }}">{{ selected_text }}</span>
+        <span class="beam-action__selected-items-text text-muted ml-2 mr-2" style="display: none"  data-text-template="{{ selected_text }}">{{ selected_text }}</span>
 
         {% trans "Select all TOTAL." as select_across_text %}
-        <a href="#" class="beam-action-select-across-button" style="display: none" data-text-template="{{ select_across_text }}">{{ select_across_text }}</a>
+        <a href="#" class="beam-action__select-across-button" style="display: none" data-text-template="{{ select_across_text }}">{{ select_across_text }}</a>
 
         {% trans "Cancel selection" as cancel_text %}
-        <a href="#" class="beam-action-clear-selection-button" style="display: none" data-text-template="{{ cancel_text }}">{{ cancel_text }}</a>
+        <a href="#" class="beam-action__clear-selection-button" style="display: none" data-text-template="{{ cancel_text }}">{{ cancel_text }}</a>
 
     </div>
     {% for action in actions %}
