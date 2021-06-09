@@ -1,5 +1,9 @@
 {% extends "beam/base.html" %}
-{% load i18n beam_tags %}
+{% load i18n %}
+{% load beam_tags %}
+
+
+{% block title %}{% trans "Dashboard" %} | {{ block.super }}{% endblock %}
 
 
 {% block content %}

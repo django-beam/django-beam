@@ -2,10 +2,25 @@
 {% load i18n %}
 {% load beam_tags %}
 
+
 {% block body_classes %}{{ block.super }} beam-detail{% if component.model %}{% get_options component.model as options %} beam-detail-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
+
 
 {% block extra_scripts %}{{ block.super }}{% for inline in inlines %}{{ inline.filterset.form.media.js }}{% for action in inline.actions %}{{ action.get_form.media.js }}{% endfor %}{% endfor %}{% endblock %}
 {% block extra_styles %}{{ block.super }}{% for inline in inlines %}{{ inline.filterset.form.media.css }}{% for action in inline.actions %}{{ action.get_form.media.css }}{% endfor %}{% endfor %}{% endblock %}
+
+
+{% block title %}
+    {% if heading %}
+        {{ heading }}
+    {% else %}
+        {% get_options component.model as options %}
+        {{ object }}
+        | {{ options.verbose_name|capfirst }}
+    {% endif %}
+    | {{ block.super }}
+{% endblock %}
+
 
 {% block content %}
     {% block main_container %}

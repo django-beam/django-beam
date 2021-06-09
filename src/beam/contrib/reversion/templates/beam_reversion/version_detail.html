@@ -2,14 +2,27 @@
 {% load i18n %}
 {% load beam_tags %}
 
+
+{% block title %}
+    {% if heading %}
+        {{ heading }}
+    {% else %}
+        {{ version }}
+        | {% blocktrans with date=version.revision.date_created %}Version as of {{ date }}{% endblocktrans %}
+        | {{ block.super }}
+    {% endif %}
+{% endblock %}
+
+
 {% block heading %}
     {% if heading %}
         {{ heading }}
     {% else %}
         {{ version }}
-        <small>{% blocktrans with date=version.revision.date_created %}Version as of {{ date }}{% endblocktrans %}</small>
+        <small class="text-muted">{% blocktrans with date=version.revision.date_created %}Version as of {{ date }}{% endblocktrans %}</small>
     {% endif %}
 {% endblock %}
+
 
 {% block below_inlines %}
     <section class="border-top">

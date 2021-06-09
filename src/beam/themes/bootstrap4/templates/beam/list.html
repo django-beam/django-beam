@@ -7,6 +7,18 @@
 {% block extra_scripts %}{{ block.super }}{{ filterset.form.media.js }}{% for action in actions %}{{ action.get_form.media.js }}{% endfor %}{% endblock %}
 {% block extra_styles %}{{ block.super }}{{ filterset.form.media.css }}{% for action in actions %}{{ action.get_form.media.css }}{% endfor %}{% endblock %}
 
+
+{% block title %}
+    {% if heading %}
+        {{ heading }}
+    {% else %}
+        {% get_options component.model as options %}
+        {{ options.verbose_name_plural|capfirst }}
+    {% endif %}
+    | {{ block.super }}
+{% endblock %}
+
+
 {% block content %}
     {% get_options component.model as options %}
     <section class="beam-main">

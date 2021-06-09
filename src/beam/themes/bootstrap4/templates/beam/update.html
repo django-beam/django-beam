@@ -2,7 +2,21 @@
 {% load i18n %}
 {% load beam_tags %}
 
+
 {% block body_classes %}{{ block.super }} beam-update{% if component.model %}{% get_options component.model as options %} beam-update-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
+
+
+{% block title %}
+    {% if heading %}
+        {{ heading }}
+    {% else %}
+        {% get_options component.model as options %}
+        {% blocktrans %}Update {{ object }}{% endblocktrans %}
+        | {{ options.verbose_name|capfirst }}
+    {% endif %}
+    | {{ block.super }}
+{% endblock %}
+
 
 {% block heading %}
     {% if heading %}
