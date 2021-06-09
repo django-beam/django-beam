@@ -69,8 +69,8 @@
                     <tr>
                         {% if actions %}
                         <th>
-                            <input class="beam-action-select-across" name="_action_select_across" type="hidden" value="">
-                            <input title={% trans "Select all" %} class="beam-action-select-all" type="checkbox">
+                            <input class="beam-action__select-across" name="_action_select_across" type="hidden" value="">
+                            <input title={% trans "Select all" %} class="beam-action__select-all" type="checkbox">
                         </th>
                         {% endif %}
                         {% for field in component.fields %}
@@ -99,7 +99,7 @@
                         <tr>
                             {% if actions %}
                             <td>
-                                <input type="checkbox" class="beam-action-select-item" name="_action_select[]"
+                                <input type="checkbox" class="beam-action__select-item" name="_action_select[]"
                                        value="{{ object.pk }}">
                             </td>
                             {% endif %}

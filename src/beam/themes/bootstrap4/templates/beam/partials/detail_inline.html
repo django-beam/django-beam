@@ -39,8 +39,8 @@
                     {% if actions %}
                         <li class="list-group-item">
                             {% block select_all %}
-                                <input class="beam-action-select-across" name="_action_select_across" type="hidden" value="">
-                                <input title="{% trans "Select all" %}" class="beam-action-select-all" type="checkbox">
+                                <input class="beam-action__select-across" name="_action_select_across" type="hidden" value="">
+                                <input title="{% trans "Select all" %}" class="beam-action__select-all" type="checkbox">
                             {% endblock %}
                         </li>
                     {% endif %}
@@ -53,7 +53,7 @@
                         {% block inline_item %}
                             {% if actions %}
                                 {% block select_item %}
-                                    <input type="checkbox" class="beam-action-select-item" name="_action_select[]"
+                                    <input type="checkbox" class="beam-action__select-item" name="_action_select[]"
                                            value="{{ object.pk }}">
                                 {% endblock %}
                             {% endif %}
