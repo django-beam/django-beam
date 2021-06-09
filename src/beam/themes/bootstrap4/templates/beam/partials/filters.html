@@ -1,17 +1,17 @@
 {% load i18n %}
 {% if filterset %}
-    <div class="mt-2 mb-2">
+    <div class="beam-filterset mt-3 mb-3">
         <div class="input-group">
-            <button class="btn btn-outline-secondary ml-auto"
+            <button class="beam-filterset__toggler btn btn-outline-secondary ml-auto"
                     type="button" data-toggle="collapse"
                     data-target="#filter-form-container" aria-expanded="false"
                     aria-controls="filter-form-container">
                 {% trans "show/hide filters" %}
             </button>
         </div>
-        <div class="collapse {% if filterset.form.has_changed %}show{% endif %}"
+        <div class="beam-filterset__collapse collapse {% if filterset.form.has_changed %}show{% endif %} mt-3"
              id="filter-form-container">
-            <form method="get" id="{{ filterset.form.prefix }}-form">
+            <form method="get" id="{{ filterset.form.prefix }}-form" class="beam-filterset__form">
                 {% include "beam/partials/form_layout.html" with form=filterset.form %}
                 <input type="hidden" name="_has_beam_filter" value="1">
                 <div class="input-group">

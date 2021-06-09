@@ -6,7 +6,7 @@
 {% block extra_styles %}{{ block.super }}{{ form.media.css }}{% for inline in inlines %}{{ inline.formset.media.css }}{% endfor %}{% endblock %}
 
 {% block content %}
-    <form method="post" enctype="multipart/form-data" novalidate>
+    <form method="post" class="beam-form" enctype="multipart/form-data" novalidate>
         {% block form %}
         {% csrf_token %}
 
@@ -36,7 +36,7 @@
                 {% endblock %}
 
                 {% block form_buttons_top_container %}
-                    <div class="clearfix">
+                    <div class="beam-form__buttons-top clearfix">
                         <div class="btn-group float-right mb-2">
                             {% block form_buttons_top %}
                                 <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
@@ -47,7 +47,7 @@
 
                 {% block form_errors_container %}
                     {% if form.non_field_errors %}
-                        <div class="alert alert-block alert-danger">
+                        <div class="beam-form__errors alert alert-block alert-danger">
                             <ul class="mb-0">
                                 {% block form_errors %}
                                     {{ form.non_field_errors|unordered_list }}
@@ -86,7 +86,7 @@
         {% block below_inlines %}{% endblock %}
 
         {% block form_buttons_container %}
-            <div class="clearfix">
+            <div class="beam-form__buttons clearfix">
                 <div class="btn-group float-right mb-2">
                     {% block form_buttons %}
                         <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
