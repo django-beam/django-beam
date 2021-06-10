@@ -91,11 +91,15 @@ class DeleteAction(Action):
         self.count = 0
 
     def apply(self, queryset):
-        self.count = queryset.delete()[0]
+        # queryset may be distinct, so we can't use delete directly
+        # see https://code.djangoproject.com/ticket/32433
+        pks = queryset.values_list("pk", flat=True)
+        self.count = self.model._default_manager.filter(pk__in=pks).delete()[0]
 
     def get_success_message(self):
         return _("Deleted {count} {name}").format(
-            count=self.count, name=self.model._meta.verbose_name_plural,
+            count=self.count,
+            name=self.model._meta.verbose_name_plural,
         )
 
 
