@@ -215,6 +215,8 @@ class UpdateView(ComponentMixin, UpdateWithInlinesMixin, generic.UpdateView):
         return response
 
     def get_success_url(self):
+        if self.request.POST.get("submit", None) == "save_and_continue_editing":
+            return self.request.get_full_path()
         return self.viewset.links["detail"].reverse(
             obj=self.object, request=self.request
         )
