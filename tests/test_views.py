@@ -260,6 +260,28 @@ class ViewTest(WebTest):
             status=403,
         )
 
+    def test_update_and_continue_editing(self):
+        alpha = Dragonfly.objects.create(name="alpha", age=47)
+        links = DragonflyViewSet().links
+
+        response = self.app.get(
+            links["update"].reverse(alpha),
+            user=user_with_perms(
+                [
+                    "testapp.view_dragonfly",
+                    "testapp.change_dragonfly",
+                ]
+            ),
+        )
+        form = response.form
+        update_response = form.submit("submit", value="save_and_continue_editing")
+
+        self.assertRedirects(
+            update_response,
+            DragonflyViewSet().links["update"].reverse(obj=alpha),
+            fetch_redirect_response=False,
+        )
+
     def test_delete(self):
         alpha = Dragonfly.objects.create(name="alpha", age=47)
         delete_url = DragonflyViewSet().links["delete"].reverse(alpha)
