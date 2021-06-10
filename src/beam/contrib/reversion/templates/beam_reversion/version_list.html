@@ -3,11 +3,21 @@
 {% load beam_tags %}
 
 
+{% block title %}
+    {% if heading %}
+        {{ heading }}
+    {% else %}
+        {{ object }}
+        | {% trans "history"|capfirst %}
+        | {{ block.super }}
+    {% endif %}
+{% endblock %}
+
+
 {% block heading %}
     {% if heading %}
         {{ heading }}
     {% else %}
-        {% get_options component.model as options %}
         {{ object }}
         <small class="text-muted">{% trans "history"|capfirst %}</small>
     {% endif %}
