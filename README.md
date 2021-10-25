@@ -97,6 +97,7 @@ class CustomerViewSet(beam.ViewSet):
     call_component = Component
     call_url = "call/{phone}/"
     call_url_kwargs = {"phone": "phone"}
+    call_permission = "customers.view_customer"
 ```
 
 ## Layouts

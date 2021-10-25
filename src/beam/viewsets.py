@@ -39,6 +39,10 @@ class BaseViewSet(metaclass=ViewsetMetaClass):
     inline_classes: List[Type[RelatedInline]] = []
     form_class: Form
     link_layout: List[str]
+
+    # we default to change_ because it is a safe default
+    permission = "{app_label}.change_{model_name}"
+
     _component_classes: Sequence[Tuple[str, Type[Component]]] = []
 
     def get_component_classes(self) -> Sequence[Tuple[str, Type[Component]]]:

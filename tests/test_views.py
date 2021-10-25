@@ -260,6 +260,18 @@ class ViewTest(WebTest):
             status=403,
         )
 
+    def test_extra_component_requires_permission(self):
+        alpha = Dragonfly.objects.create(name="alpha", age=47)
+        self.app.get(
+            (
+                DragonflyViewSet()
+                .links["extra"]
+                .reverse(alpha, override_kwargs={"special": "param"})
+            ),
+            user=user_with_perms([]),
+            status=403,
+        )
+
     def test_update_and_continue_editing(self):
         alpha = Dragonfly.objects.create(name="alpha", age=47)
         links = DragonflyViewSet().links

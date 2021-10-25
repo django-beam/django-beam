@@ -89,8 +89,8 @@ class DragonflyViewSet(ViewSet):
 
     extra_component = ExtraComponent
     extra_view_class = ExtraView
-    extra_url = "extra/<str:id>/<str:special>/"
-    extra_url_kwargs = {"id": "id", "special": request_kwarg("special")}
+    extra_url = "extra/<str:pk>/<str:special>/"
+    extra_url_kwargs = {"pk": "id", "special": request_kwarg("special")}
 
 
 class SightingViewSet(ViewSet):

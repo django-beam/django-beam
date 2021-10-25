@@ -21,7 +21,7 @@ class UrlTest(TestCase):
             "testapp_dragonfly_detail": "<str:pk>/",
             "testapp_dragonfly_delete": "<str:pk>/delete/",
             "testapp_dragonfly_update": "<str:pk>/update/",
-            "testapp_dragonfly_extra": "extra/<str:id>/<str:special>/",
+            "testapp_dragonfly_extra": "extra/<str:pk>/<str:special>/",
         }
 
         for url in DragonflyViewSet().get_urls():
