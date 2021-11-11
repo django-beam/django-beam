@@ -1,9 +1,11 @@
 import csv
 from typing import Optional
 
+import beam.views
 import django_filters
 from beam import RelatedInline, ViewSet, actions
 from beam.actions import Action, DeleteAction, MassUpdateAction
+from beam.components import ListComponent
 from beam.inlines import TabularRelatedInline
 from beam.urls import request_kwarg
 from beam.views import DetailView
@@ -98,3 +100,9 @@ class SightingViewSet(ViewSet):
     fields = ["name", "dragonfly"]
     list_filterset_fields = ["name"]
     queryset = Sighting.objects.order_by("pk")
+
+    other_list_component = ListComponent
+    other_list_view_class = beam.views.ListView
+    other_list_url = "other/"
+    other_list_verbose_name = "Another list is possible"
+    other_list_permission = "testapp.view_sighting"

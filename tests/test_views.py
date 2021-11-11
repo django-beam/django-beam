@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.urls import reverse
 from django_webtest import WebTest
 from testapp.models import (
     CascadingSighting,
@@ -599,6 +600,27 @@ class ViewTest(WebTest):
         )
 
         self.assertTrue(dragonfly.sighting_set.exists())
+
+    def test_navigation(self):
+        user = user_with_perms(["testapp.view_dragonfly", "testapp.view_sighting"])
+        base_page = self.app.get(reverse("base-template"), user=user)
+        self.assertContains(base_page, "Testapp")
+        self.assertContains(base_page, DragonflyViewSet().links["list"].reverse())
+        self.assertContains(base_page, SightingViewSet().links["list"].reverse())
+
+    def test_navigation_respects_permissions(self):
+        user = user_with_perms(["testapp.view_sighting"])
+        base_page = self.app.get(reverse("base-template"), user=user)
+        self.assertNotContains(base_page, DragonflyViewSet().links["list"].reverse())
+        self.assertContains(base_page, SightingViewSet().links["list"].reverse())
+
+    def test_navigation_hides_empty_submenus(self):
+        user = user_with_perms([])
+        base_page = self.app.get(reverse("base-template"), user=user)
+        self.maxDiff = None
+        self.assertNotContains(base_page, "Testapp")
+        self.assertNotContains(base_page, SightingViewSet().links["list"].reverse())
+        self.assertNotContains(base_page, DragonflyViewSet().links["list"].reverse())
 
 
 class InlinePaginationTest(WebTest):
