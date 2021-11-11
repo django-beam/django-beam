@@ -102,7 +102,9 @@
                                 {% endwith %}
                             </th>
                         {% endfor %}
+                        {% if component.list_item_link_layout %}
                         <th>{% trans "Actions" %}</th>
+                        {% endif %}
                     </tr>
                     </thead>
                         {% endblock %}
@@ -121,9 +123,11 @@
                                 </td>
                             {% endfor %}
                             {% block list_item_links %}
+                                {% if component.list_item_link_layout %}
                                 <td class="pt-2">
                                     {% include "beam/partials/list_links.html" with links=viewset.links link_layout=component.list_item_link_layout object=object %}
                                 </td>
+                                {% endif %}
                             {% endblock %}
                         </tr>
                     {% endfor %}
