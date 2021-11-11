@@ -222,6 +222,40 @@ class ViewTest(WebTest):
             status=403,
         )
 
+    def test_detail_links_related(self):
+        alpha = Dragonfly.objects.create(name="alpha", age=47)
+        sighting = Sighting.objects.create(dragonfly=alpha)
+        links = SightingViewSet().links
+        detail_page = self.app.get(
+            links["detail"].reverse(sighting),
+            user=user_with_perms(
+                [
+                    "testapp.view_dragonfly",
+                    "testapp.view_sighting",
+                ]
+            ),
+        )
+        detail_page.click(
+            "alpha", href=DragonflyViewSet().links["detail"].reverse(alpha)
+        )
+
+    def test_detail_links_to_related_require_permission(self):
+        alpha = Dragonfly.objects.create(name="alpha", age=47)
+        sighting = Sighting.objects.create(dragonfly=alpha)
+        links = SightingViewSet().links
+        detail_page = self.app.get(
+            links["detail"].reverse(sighting),
+            user=user_with_perms(
+                [
+                    "testapp.view_sighting",
+                ]
+            ),
+        )
+        with self.assertRaises(IndexError):
+            detail_page.click(
+                "alpha", href=DragonflyViewSet().links["detail"].reverse(alpha)
+            )
+
     def test_update(self):
         alpha = Dragonfly.objects.create(name="alpha", age=47)
         response = self.app.get(
