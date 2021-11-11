@@ -22,59 +22,49 @@
         {% block navbar_collapse %}
         <div class="collapse navbar-collapse" id="navbarNav">
             {% block navbar_nav %}
-                
+
                 {% block app_navigation %}
                 <ul class="navbar-nav mr-auto">
                     {% for app in apps %}
+                        {% if app.entries|any %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbar-link-{{ app.app_config.label }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 {{ app.app_config.verbose_name|capfirst }}
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbar-link-{{ app.app_config.label }}">
-                                {% for viewset in app.viewsets %}
+                                {% for label_url in app.entries %}
+                                    {% if label_url %}
                                     {% block viewset_menu_entry %}
-                                        {% if viewset.show_link and viewset.url_name %}
-                                        {# this isn't a viewset, it is a component we want to link #}
-                                        {% with component=viewset %}
-                                            <a class="dropdown-item" href="{{ component.reverse }}">
-                                                {{ component.verbose_name }}
-                                            </a>
-                                        {% endwith %}
-                                        {% else %}
-                                            {% get_attribute viewset.model "_meta" as model_options %}
-                                            {% get_link_url viewset.links.list as list_url %}
-                                            {% if list_url %}
-                                                <a class="dropdown-item" href="{{ list_url }}">
-                                                    {{model_options.verbose_name_plural|capfirst }}
-                                                </a>
-                                            {% endif %}
-                                        {% endif %}
+                                        <a class="dropdown-item" href="{{ label_url.1 }}">
+                                            {{label_url.0|capfirst }}
+                                        </a>
                                     {% endblock %}
+                                    {% endif %}
                                 {% endfor %}
                             </div>
                         </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
                 {% endblock %}
 
-                
                 {% block user_navigation_container %}
                 {% if request.user.is_authenticated %}
                     <ul class="navbar-nav">
                     {% block user_navigation %}
                         {% url "logout" as logout_url %}
                         {% url "password_change" as password_change_url %}
-                        
+
                         {% if logout_url or password_change_url %}
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbar-user" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     {{ request.user }}
                                 </a>
-                            
+
                                 {% block user_navigation_items_container %}
                                 <div class="dropdown-menu" aria-labelledby="navbar-user">
                                     {% block user_navigation_items %}
-                                        
+
                                         {% block password_change_item %}
                                             {% if password_change_url and request.user.has_usable_password %}
                                                 <a class="dropdown-item" href="{{ password_change_url }}">
@@ -82,7 +72,7 @@
                                                 </a>
                                             {% endif %}
                                         {% endblock %}
-                                        
+
                                         {% block logout_item %}
                                             {% if logout_url %}
                                                 <a class="dropdown-item" href="{{ logout_url }}">
@@ -90,7 +80,7 @@
                                                 </a>
                                             {% endif %}
                                         {% endblock %}
-                                        
+
                                     {% endblock %}
                                 </div>
                                 {% endblock %}
@@ -99,7 +89,7 @@
                             <li class="nav-link">{{ request.user }}</li>
 
                         {% endif %}
-                        
+
                     {% endblock %}
                     </ul>
                 {% endif %}

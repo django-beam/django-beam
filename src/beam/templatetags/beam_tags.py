@@ -4,6 +4,7 @@ from urllib.parse import ParseResult, parse_qsl, urlparse
 from beam.components import BaseComponent
 from beam.layouts import layout_links
 from beam.registry import default_registry, get_viewset_for_model
+from beam.utils import navigation_component_entry
 from django import template
 from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
@@ -158,14 +159,35 @@ def field_verbose_name(instance, field):
     return getattr(value, "verbose_name", field.replace("_", " "))
 
 
+@register.filter(name="any")
+def any_filter(iterable):
+    if not iterable:
+        return False
+    return any(iterable)
+
+
 @register.simple_tag(takes_context=True)
 def render_navigation(context):
+    request = context.get("request", None)
+    user = request.user if request else None
+
     grouped = []
     for app_label, viewsets_dict in default_registry.items():
+        entries = []
+        for viewset in viewsets_dict.values():
+            entry = navigation_component_entry(
+                viewset().links.get("list"), user=user, request=request
+            )
+            if entry:
+                entries.append(entry)
+
+        if not entries:
+            continue
+
         group = {
             "app_label": app_label,
             "app_config": apps.get_app_config(app_label),
-            "viewsets": viewsets_dict.values(),
+            "entries": entries,
         }
         grouped.append(group)
     navigation_template = get_template("beam/partials/navigation.html")
