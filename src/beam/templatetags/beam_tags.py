@@ -88,8 +88,16 @@ def get_url_for_related(context, instance, component_name, **override_kwargs):
         return None
 
     request = getattr(context, "request", None)
+
+    component = components[component_name]
+
+    if request and not component.has_perm(
+        request.user, obj=instance, request=request, override_kwargs=override_kwargs
+    ):
+        return None
+
     try:
-        return components[component_name].reverse(instance, request, override_kwargs)
+        return component.reverse(instance, request, override_kwargs)
     except NoReverseMatch:
         return None
 
