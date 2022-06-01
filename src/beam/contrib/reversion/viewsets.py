@@ -4,7 +4,7 @@ from typing import Iterable, List
 from beam import RelatedInline, ViewSet
 from beam.urls import UrlKwargDict
 from beam.viewsets import BaseViewSet, Component
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from reversion import (
     create_revision,
     get_comment,

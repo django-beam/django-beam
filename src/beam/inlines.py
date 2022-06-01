@@ -9,7 +9,7 @@ from django.db.models import Model
 from django.db.models.options import Options
 from django.forms import ModelForm, inlineformset_factory
 from django.utils.text import get_text_list
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django_filters.filterset import filterset_factory
 
 DELETION_FIELD_NAME = "DELETE"

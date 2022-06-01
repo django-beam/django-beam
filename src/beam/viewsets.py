@@ -9,7 +9,7 @@ from django.db.models import Model, QuerySet
 from django.forms import Form, ModelForm
 from django.urls import path
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 
 from .actions import Action
