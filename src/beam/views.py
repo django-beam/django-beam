@@ -42,7 +42,7 @@ class ComponentMixin(ContextMixin):
         return self.component.queryset
 
     def get_form_class(self):
-        if self.component.form_class:
+        if getattr(self.component, "form_class", None):
             return self.component.form_class
         return super().get_form_class()
 

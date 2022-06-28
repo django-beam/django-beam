@@ -5,6 +5,7 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import PermissionDenied
+from django.http.response import HttpResponse
 from django.test import RequestFactory, TestCase
 from reversion import is_registered, set_comment
 from reversion.models import Version
@@ -12,6 +13,11 @@ from test_views import user_with_perms
 from testapp.models import Dragonfly, Petaluridae, Sighting
 
 registry: RegistryType = {}
+
+
+class GetResponse:
+    def __call__(self):
+        return HttpResponse()
 
 
 class SightingInline(RelatedInline):
@@ -65,7 +71,7 @@ class ReversionViewTest(TestCase):
         )
         request.user = user
 
-        middleware = SessionMiddleware()
+        middleware = SessionMiddleware(get_response=GetResponse())
         middleware.process_request(request)
         messages = FallbackStorage(request)
         setattr(request, "_messages", messages)
@@ -108,7 +114,7 @@ class ReversionViewTest(TestCase):
             },
         )
         request.user = user
-        middleware = SessionMiddleware()
+        middleware = SessionMiddleware(get_response=GetResponse())
         middleware.process_request(request)
         messages = FallbackStorage(request)
         setattr(request, "_messages", messages)
@@ -239,8 +245,8 @@ class ReversionViewTest(TestCase):
 
         request = RequestFactory().post("/", {})
         request.user = user_with_perms(["testapp.change_dragonfly"])
-        SessionMiddleware().process_request(request)
-        MessageMiddleware().process_request(request)
+        SessionMiddleware(get_response=GetResponse()).process_request(request)
+        MessageMiddleware(get_response=GetResponse()).process_request(request)
 
         with VersionedDragonflyViewSet().create_revision(request):
             alpha.save()

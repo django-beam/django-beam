@@ -6,7 +6,7 @@ from beam.views import ComponentMixin
 from beam.viewsets import BaseViewSet
 from dal import autocomplete
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class BaseAutocomplete(ComponentMixin, autocomplete.Select2QuerySetView):

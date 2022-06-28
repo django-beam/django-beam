@@ -4,8 +4,8 @@ from django.db import connection, transaction
 from django.http import HttpResponseRedirect
 from django.views import View
 from django.shortcuts import get_object_or_404
-from django.utils.encoding import force_text
-from django.utils.translation import ugettext as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext as _
 from django.views import generic
 from reversion import set_comment, RevertError
 from reversion.models import Version
@@ -43,7 +43,7 @@ class VersionRestoreView(ComponentMixin, View):
                         self.viewset.links["detail"].reverse(self.version.object)
                     )
         except RevertError as ex:
-            messages.error(request, force_text(ex))
+            messages.error(request, force_str(ex))
             return HttpResponseRedirect(
                 self.viewset.links["detail"].reverse(self.version.object)
             )
@@ -76,7 +76,7 @@ class VersionDetailView(DetailView):
                     response
                 )  # Raise exception to undo the transaction and revision.
         except RevertError as ex:
-            messages.error(request, force_text(ex))
+            messages.error(request, force_str(ex))
             return HttpResponseRedirect(
                 self.viewset.links["detail"].reverse(self.version.object)
             )
