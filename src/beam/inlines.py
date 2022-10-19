@@ -1,6 +1,5 @@
 from typing import List, Optional, Type
 
-from beam.actions import Action
 from django.contrib.admin.utils import NestedObjects
 from django.core.exceptions import ValidationError
 from django.core.paginator import Page, Paginator
@@ -11,6 +10,8 @@ from django.forms import ModelForm, inlineformset_factory
 from django.utils.text import get_text_list
 from django.utils.translation import gettext as _
 from django_filters.filterset import filterset_factory
+
+from beam.actions import Action
 
 DELETION_FIELD_NAME = "DELETE"
 
@@ -157,7 +158,7 @@ class BaseRelatedInline(object):
         return qs
 
     def _get_queryset_from_parent_instance(self):
-        if self.parent_instance is None:
+        if self.parent_instance is None or self.parent_instance.pk is None:
             return self.model.objects.none()
         related_name = self.model_options.get_field(
             self.foreign_key_field
