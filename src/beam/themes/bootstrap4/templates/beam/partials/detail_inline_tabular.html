@@ -62,11 +62,11 @@
                     <tr>
                         {% if actions %}<td></td>{% endif %}
                         {% if inline.filterset.is_bound %}
-                            <td colspan="inline.fields|length">
+                            <td colspan="{{ inline.fields|length }}">
                                 {% block empty_filters %}{{ block.super }}{% endblock %}
                             </td>
                         {% else %}
-                            <td colspan="inline.fields|length">
+                            <td colspan="{{ inline.fields|length }}">
                                 {% block empty %}{{ block.super }}{% endblock %}
                             </td>
                         {% endif %}
