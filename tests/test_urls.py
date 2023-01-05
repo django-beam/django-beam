@@ -1,8 +1,27 @@
-from beam.templatetags.beam_tags import get_link_url, get_url_for_related
-from django.test import TestCase
-from testapp.models import Dragonfly
-from testapp.views import DragonflyViewSet
+from unittest import mock
 
+from django.test import TestCase
+from django.test.utils import override_settings
+from django.urls import NoReverseMatch, include, path, reverse
+from testapp.models import Dragonfly
+from testapp.views import DragonflyViewSet, SightingViewSet
+
+from beam.templatetags.beam_tags import get_link_url, get_url_for_related
+
+urlpatterns = [
+    path(
+        "dragonfly/",
+        include(
+            (DragonflyViewSet().get_urls(), "my_app_name"), namespace="my_namespace"
+        ),
+    ),
+    path(
+        "sighting/",
+        include(
+            (SightingViewSet().get_urls(), "my_app_name"), namespace="my_namespace"
+        ),
+    ),
+]
 
 class UrlTest(TestCase):
     def test_get_urls_produces_urls(self):
@@ -83,3 +102,22 @@ class UrlTest(TestCase):
         instance = Dragonfly(pk=123)
         url = get_url_for_related({}, instance, "extra")
         self.assertIsNone(url)
+
+    @override_settings(ROOT_URLCONF=__name__)
+    @mock.patch.object(DragonflyViewSet, "url_namespace", "my_namespace")
+    def test_namespace_urls(self):
+        links = DragonflyViewSet().links
+        instance = Dragonfly(pk=123)
+        self.assertEqual(
+            get_link_url(None, links["detail"], instance), "/dragonfly/123/"
+        )
+        self.assertEqual(
+            get_link_url(None, links["update"], instance), "/dragonfly/123/update/"
+        )
+        self.assertEqual(
+            get_link_url(None, links["delete"], instance), "/dragonfly/123/delete/"
+        )
+        self.assertEqual(get_link_url(None, links["list"]), "/dragonfly/")
+        self.assertEqual(get_link_url(None, links["create"]), "/dragonfly/create/")
+
+        self.assertEqual(reverse("my_namespace:testapp_dragonfly_list"), "/dragonfly/")
