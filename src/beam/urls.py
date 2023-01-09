@@ -17,7 +17,8 @@ LayoutType = List[List[List[str]]]
 
 UrlKwargGetter = Callable[[Optional[Model], Optional[HttpRequest]], Optional[str]]
 """
-A callable that takes an instance and a request and may return a string.
+A callable that takes an instance and a request and may return a string
+as the value for a url kwarg.
 """
 
 

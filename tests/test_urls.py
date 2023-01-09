@@ -23,6 +23,7 @@ urlpatterns = [
     ),
 ]
 
+
 class UrlTest(TestCase):
     def test_get_urls_produces_urls(self):
         self.assertEqual(len(DragonflyViewSet().get_urls()), 6)
@@ -72,11 +73,14 @@ class UrlTest(TestCase):
             get_link_url(None, links["delete"], instance), "/dragonfly/123/delete/"
         )
 
-    def test_links_that_require_an_instance_return_none_if_missing(self):
+    def test_links_that_require_an_instance_raise_if_missing(self):
         links = DragonflyViewSet().links
-        self.assertEqual(get_link_url(None, links["detail"], None), None)
-        self.assertEqual(get_link_url(None, links["update"], None), None)
-        self.assertEqual(get_link_url(None, links["delete"], None), None)
+        with self.assertRaises(NoReverseMatch):
+            self.assertEqual(get_link_url(None, links["detail"], None), None)
+        with self.assertRaises(NoReverseMatch):
+            self.assertEqual(get_link_url(None, links["update"], None), None)
+        with self.assertRaises(NoReverseMatch):
+            self.assertEqual(get_link_url(None, links["delete"], None), None)
 
     def test_component_url_with_extra_context(self):
         instance = Dragonfly(pk=123)
@@ -98,10 +102,10 @@ class UrlTest(TestCase):
             "/dragonfly/extra/123/from_request/",
         )
 
-    def test_get_url_for_related_returns_none_instead_of_raising(self):
+    def test_get_url_for_related_raises_if_missing_params(self):
         instance = Dragonfly(pk=123)
-        url = get_url_for_related({}, instance, "extra")
-        self.assertIsNone(url)
+        with self.assertRaises(NoReverseMatch):
+            get_url_for_related({}, instance, "extra")
 
     @override_settings(ROOT_URLCONF=__name__)
     @mock.patch.object(DragonflyViewSet, "url_namespace", "my_namespace")

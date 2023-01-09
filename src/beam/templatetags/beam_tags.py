@@ -1,10 +1,6 @@
 from typing import Dict, List, Sequence, Tuple
 from urllib.parse import ParseResult, parse_qsl, urlparse
 
-from beam.components import BaseComponent
-from beam.layouts import layout_links
-from beam.registry import default_registry, get_viewset_for_model
-from beam.utils import navigation_component_entry
 from django import template
 from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
@@ -15,6 +11,11 @@ from django.template import RequestContext
 from django.template.loader import get_template
 from django.urls import NoReverseMatch
 from django.utils.http import urlencode
+
+from beam.components import BaseComponent
+from beam.layouts import layout_links
+from beam.registry import default_registry, get_viewset_for_model
+from beam.utils import navigation_component_entry
 
 register = template.Library()
 
@@ -30,8 +31,10 @@ def get_link_url(
         return component.reverse(
             obj=obj, request=request, override_kwargs=override_kwargs
         )
-    except NoReverseMatch:
-        return None
+    except NoReverseMatch as e:
+        raise NoReverseMatch(
+            f"Unable to reverse link to component {component}: {e}"
+        ) from e
 
 
 @register.simple_tag
@@ -99,8 +102,10 @@ def get_url_for_related(context, instance, component_name, **override_kwargs):
 
     try:
         return component.reverse(instance, request, override_kwargs)
-    except NoReverseMatch:
-        return None
+    except NoReverseMatch as e:
+        raise NoReverseMatch(
+            f"Unable to reverse link to component {component}: {e}"
+        ) from e
 
 
 @register.filter
@@ -279,7 +284,7 @@ def get_visible_links(
     links: Dict[str, BaseComponent],
     link_layout: List[str],
     obj: Model = None,
-    **override_kwargs
+    **override_kwargs,
 ) -> List[Tuple[BaseComponent, str]]:
 
     get_params = {}
@@ -296,10 +301,13 @@ def get_visible_links(
             user, obj=obj, request=request, override_kwargs=override_kwargs
         ):
             continue
+
         try:
             url = link.reverse(obj, request=request, override_kwargs=override_kwargs)
-        except NoReverseMatch:
-            url = None
+        except NoReverseMatch as e:
+            raise NoReverseMatch(
+                f"Unable to reverse link to component {link}: {e}"
+            ) from e
 
         if url and get_params:
             url = _add_params_to_url_if_new(url, get_params)

@@ -145,6 +145,7 @@ class ListMixin(BaseViewSet):
     list_filterset_fields: List[str] = []
     list_filterset_class: Optional[Type[django_filters.FilterSet]] = None
     list_action_classes: List[Type[Action]] = []
+    list_link_layout = ["create"]
 
 
 class CreateMixin(BaseViewSet):
@@ -161,7 +162,7 @@ class CreateMixin(BaseViewSet):
     create_queryset: QuerySet
     create_inline_classes: List[RelatedInline]
     create_form_class: ModelForm
-    create_link_layout = ["!create", "!update", "..."]
+    create_link_layout = ["list"]
     create_permission = "{app_label}.add_{model_name}"
 
 
