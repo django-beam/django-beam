@@ -1,16 +1,19 @@
-from beam import RelatedInline
-from beam.contrib.reversion.viewsets import VersionViewSet
-from beam.registry import RegistryType
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import PermissionDenied
 from django.http.response import HttpResponse
 from django.test import RequestFactory, TestCase
+from django.test.utils import override_settings
+from django.urls import include, path
 from reversion import is_registered, set_comment
 from reversion.models import Version
 from test_views import user_with_perms
 from testapp.models import Dragonfly, Petaluridae, Sighting
+
+from beam import RelatedInline
+from beam.contrib.reversion.viewsets import VersionViewSet
+from beam.registry import RegistryType
 
 registry: RegistryType = {}
 
@@ -36,6 +39,10 @@ class VersionedDragonflyViewSet(VersionViewSet):
     fields = ["name", "age"]
 
 
+urlpatterns = [
+    path("dragonfly/", include(VersionedDragonflyViewSet().get_urls())),
+]
+
 VersionedDragonflyViewSet()
 
 
@@ -51,6 +58,7 @@ class RegistrationTest(TestCase):
 
 
 class ReversionViewTest(TestCase):
+    # FIXME: this should probably be a regular webtest with the urlconf above
     def test_using_create_view_creates_a_revision(self):
         user = user_with_perms(["testapp.add_dragonfly"])
         create_view = VersionedDragonflyViewSet()._get_view(
@@ -132,6 +140,7 @@ class ReversionViewTest(TestCase):
         self.assertEqual(fly_version.revision.user, user)
         self.assertEqual(fly_version.revision.comment, "update")
 
+    @override_settings(ROOT_URLCONF=__name__)
     def test_revision_is_visible_in_list(self):
         alpha = Dragonfly.objects.create(name="alpha", age=47)
 
@@ -181,6 +190,7 @@ class ReversionViewTest(TestCase):
         with self.assertRaises(PermissionDenied):
             view(request, pk=alpha.pk)
 
+    @override_settings(ROOT_URLCONF=__name__)
     def test_show_detail_from_previous_version(self):
         alpha = Dragonfly.objects.create(name="alpha", age=47)
         sighting = Sighting.objects.create(name="Berlin", dragonfly=alpha)

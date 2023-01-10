@@ -4,13 +4,14 @@ from logging import getLogger
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Type
 
 import django_filters
-from beam.registry import ViewsetMetaClass, default_registry
 from django.db.models import Model, QuerySet
 from django.forms import Form, ModelForm
 from django.urls import path
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views import View
+
+from beam.registry import ViewsetMetaClass, default_registry
 
 from .actions import Action
 from .components import BaseComponent, Component, FormComponent, ListComponent
@@ -39,6 +40,7 @@ class BaseViewSet(metaclass=ViewsetMetaClass):
     inline_classes: List[Type[RelatedInline]] = []
     form_class: Form
     link_layout: List[str]
+    url_namespace: str = ""
 
     # we default to change_ because it is a safe default
     permission = "{app_label}.change_{model_name}"
@@ -143,6 +145,7 @@ class ListMixin(BaseViewSet):
     list_filterset_fields: List[str] = []
     list_filterset_class: Optional[Type[django_filters.FilterSet]] = None
     list_action_classes: List[Type[Action]] = []
+    list_link_layout = ["create"]
 
 
 class CreateMixin(BaseViewSet):
@@ -159,7 +162,7 @@ class CreateMixin(BaseViewSet):
     create_queryset: QuerySet
     create_inline_classes: List[RelatedInline]
     create_form_class: ModelForm
-    create_link_layout = ["!create", "!update", "..."]
+    create_link_layout = ["list"]
     create_permission = "{app_label}.add_{model_name}"
 
 

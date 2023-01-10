@@ -1,9 +1,6 @@
 from contextlib import contextmanager
 from typing import Iterable, List
 
-from beam import RelatedInline, ViewSet
-from beam.urls import UrlKwargDict
-from beam.viewsets import BaseViewSet, Component
 from django.utils.translation import gettext_lazy as _
 from reversion import (
     create_revision,
@@ -13,6 +10,10 @@ from reversion import (
     set_comment,
     set_user,
 )
+
+from beam import RelatedInline, ViewSet
+from beam.urls import UrlKwargDict
+from beam.viewsets import BaseViewSet, Component, DetailMixin
 
 from .views import VersionDetailView, VersionListView, VersionRestoreView
 
@@ -38,6 +39,8 @@ class VersionDetailMixin(BaseViewSet):
     version_detail_url_name = None
     version_detail_link_layout = ["version_list"]
     version_detail_permission = "{app_label}.view_{model_name}"
+
+    detail_link_layout = DetailMixin.detail_link_layout + ["!version_detail"]
 
     def get_component_classes(self):
         return super().get_component_classes() + [("version_detail", Component)]

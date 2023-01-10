@@ -17,6 +17,7 @@ class BaseComponent:
         verbose_name=None,
         url_name=None,
         url_kwargs=None,
+        url_namespace=None,
         permission=None,
         resolve_url=None,
         **kwargs
@@ -29,6 +30,7 @@ class BaseComponent:
         self.url_name = url_name
         self.url_kwargs = url_kwargs or {}
         self.resolve_url = resolve_url or reverse
+        self.url_namespace = url_namespace
 
         if isinstance(permission, str):
             context = {"component": self}
@@ -78,7 +80,11 @@ class BaseComponent:
         :return: A url
         """
         kwargs = self.resolve_url_kwargs(obj, request, override_kwargs)
-        return self.resolve_url(self.url_name, kwargs=kwargs)
+        url_name = self.url_name
+        if self.url_namespace:
+            url_name = self.url_namespace + ":" + url_name
+
+        return self.resolve_url(url_name, kwargs=kwargs)
 
     def resolve_url_kwargs(self, obj=None, request=None, override_kwargs=None):
         """
@@ -118,6 +124,7 @@ class Component(BaseComponent):
         link_layout=None,
         name=None,
         url_name=None,
+        url_namespace=None,
         **kwargs
     ):
         self.url = url
@@ -154,7 +161,9 @@ class Component(BaseComponent):
         self.link_layout = (
             link_layout if link_layout is not None else ["!{}".format(name), "..."]
         )
-        super().__init__(name=name, url_name=url_name, **kwargs)
+        super().__init__(
+            name=name, url_name=url_name, url_namespace=url_namespace, **kwargs
+        )
 
 
 class FormComponent(Component):
