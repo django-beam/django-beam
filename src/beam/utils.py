@@ -38,3 +38,17 @@ def navigation_component_entry(
         label = component.verbose_name
 
     return label, url
+
+
+def reverse_component(component, obj, request, override_kwargs):
+    """
+    Reverse a component and raise helpful error messages if reversing fails.
+    """
+    try:
+        return component.reverse(
+            obj=obj, request=request, override_kwargs=override_kwargs
+        )
+    except NoReverseMatch as e:
+        raise NoReverseMatch(f"Unable to reverse url to {component}: {e}") from e
+    except BaseException as e:
+        raise Exception(f"Unable to reverse url to {component}: {e}") from e

@@ -13,6 +13,7 @@ class BaseComponent:
 
     def __init__(
         self,
+        viewset=None,
         name=None,
         verbose_name=None,
         url_name=None,
@@ -25,6 +26,7 @@ class BaseComponent:
         if not name:
             raise ValueError("Components need a name")
 
+        self.viewset = viewset
         self.name = name
         self.verbose_name = verbose_name or self.name
         self.url_name = url_name
@@ -41,6 +43,16 @@ class BaseComponent:
             self.permission = permission.format(**context)
         else:
             self.permission = permission
+
+    def __repr__(self):
+        if self.viewset:
+            return "<{} {}.{} {}>".format(
+                self.__class__.__name__,
+                self.viewset.__module__,
+                self.viewset.__class__.__name__,
+                repr(self.name),
+            )
+        return "<{} {}>".format(self.__class__.__name__, repr(self.name))
 
     @classmethod
     def get_arguments(cls) -> Set[str]:
