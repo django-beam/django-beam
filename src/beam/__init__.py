@@ -1,8 +1,4 @@
-from .viewsets import ViewSet
 from .inlines import RelatedInline
+from .viewsets import ViewSet
 
-
-VERSION = 0.2
-
-
-__all__ = ["VERSION", "ViewSet", "RelatedInline"]
+__all__ = ["ViewSet", "RelatedInline"]
