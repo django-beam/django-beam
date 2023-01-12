@@ -12,6 +12,7 @@ from django.utils.translation import gettext as _
 from django_filters.filterset import filterset_factory
 
 from beam.actions import Action
+from beam.types import LayoutType
 
 DELETION_FIELD_NAME = "DELETE"
 
@@ -20,7 +21,7 @@ class BaseRelatedInline(object):
     model: Model
     title: str = ""
     foreign_key_field: str
-    layout = None
+    layout: Optional[LayoutType] = None
     fields: List[str] = []
     extra = None
     can_delete = True
