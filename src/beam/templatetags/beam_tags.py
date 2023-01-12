@@ -1,3 +1,4 @@
+import decimal
 from typing import Dict, List, Sequence, Tuple
 from urllib.parse import ParseResult, parse_qsl, urlparse
 
@@ -104,18 +105,33 @@ def get_url_for_related(context, instance, component_name, **override_kwargs):
 
 
 @register.filter
-def is_image(model_field):
-    return isinstance(model_field, ImageFieldFile)
+def is_image(value):
+    return isinstance(value, ImageFieldFile)
 
 
 @register.filter
-def is_file(model_field):
-    return isinstance(model_field, FieldFile)
+def is_file(value):
+    return isinstance(value, FieldFile)
 
 
 @register.filter
-def is_bool(model_field):
-    return isinstance(model_field, bool)
+def is_bool(value):
+    return isinstance(value, bool)
+
+
+@register.filter
+def is_int(value):
+    return isinstance(value, int)
+
+
+@register.filter
+def is_float(value):
+    return isinstance(value, float)
+
+
+@register.filter
+def is_decimal(value):
+    return isinstance(value, decimal.Decimal)
 
 
 @register.simple_tag
