@@ -54,6 +54,24 @@
             {{ value|yesno }}
         {% endblock %}
 
+    {% elif value|is_int %}
+
+        {% block int %}
+            {{ value }}
+        {% endblock %}
+
+    {% elif value|is_float %}
+
+        {% block float %}
+            {{ value }}
+        {% endblock %}
+
+    {% elif value|is_decimal %}
+
+        {% block decimal %}
+            {{ value }}
+        {% endblock %}
+
     {% else %}
 
         {% block else %}
