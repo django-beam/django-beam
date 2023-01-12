@@ -1,0 +1,28 @@
+{% extends "beam/base.html" %}
+
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block header %}
+    <h1>{% trans "Login" %}</h1>
+{% endblock %}
+
+{% block content %}
+    {% if next %}
+        {% if user.is_authenticated %}
+            <p class="alert alert-warning">{% trans "Your account doesn't have access to this page. To proceed, please log in with an account that has access." %}</p>
+        {% else %}
+            <p class="alert alert-info">{% trans "Please log in to see this page." %}</p>
+        {% endif %}
+    {% endif %}
+
+    <form method="post" action="{{ request.get_full_path }}">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" value="{% trans "Log in" %}" class="btn btn-primary">
+        <input type="hidden" name="next" value="{{ next }}">
+    </form>
+
+    {# Assumes you setup the password_reset view in your URLconf #}
+    <p><a href="{% url 'password_reset' %}">{% trans "Forgotten your password or username?" %}</a></p>
+{% endblock %}
