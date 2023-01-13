@@ -88,6 +88,7 @@ class UserViewSet(ViewSet):
         "last_name",
         "is_staff",
     ]
+    list_sort_fields = list_fields
     list_search_fields = ["username", "email", "first_name", "last_name"]
     list_filterset_fields = ["is_active", "is_staff", "is_superuser", "groups"]
 
@@ -135,6 +136,8 @@ class GroupViewSet(ViewSet):
     model = Group
     list_fields = ["name"]
     fields = ["name", "permissions"]
+    list_search_fields = ["name"]
+    list_sort_fields = ["name"]
     detail_inline_classes = [GroupPermissionInline, UserInline]
     detail_fields = [
         "name",
