@@ -12,24 +12,33 @@
             <div class="container">
                 <h2>{{ entry.app_config.verbose_name|capfirst }}</h2>
                 <div class="card-columns">
-                {% for viewset in entry.viewsets %}
+                {% for viewset, links in entry.viewsets %}
                     <div class="card">
                         <div class="card-header">
                             {% get_options viewset.model as options %}
                             <h3 class="card-title">{{ options.verbose_name_plural|capfirst }}</h3>
                         </div>
                         <div class="card-body">
-                            {% if viewset.links.list.reverse %}
-                            <a class="btn btn-primary" href="{{ viewset.links.list.reverse }}">{% trans "List" %}</a>
-                            {% endif %}
-                            {% if viewset.links.create.reverse %}
-                            <a class="btn btn-secondary" href="{{ viewset.links.create.reverse }}">{% trans "Create" %}</a>
-                            {% endif %}
+                            {% for link in links %}
+                                <a class="btn btn-{% if link.name == 'list' %}primary{% else %}secondary{% endif %}" href="{{ link.reverse }}">
+                                    {{ link.verbose_name|capfirst }}
+                                </a>
+                            {% endfor %}
                         </div>
                     </div>
                 {% endfor %}
                 </div>
             </div>
         </section>
+        {% empty %}
+        {% if not request.user.is_authenticated %}
+            <p>
+            {% trans "You don't have permission to view anything, try logging in."  %}
+            </p>
+            {% url 'login' as login_url %}
+            {% if login_url %}
+                <a href="{{ login_url }}">{% trans "Log in" %}</a>
+            {% endif %}
+        {% endif %}
     {% endfor %}
 {% endblock %}

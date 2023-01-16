@@ -17,9 +17,15 @@ def user_with_perms(perms, username="foo", password="bar", user_model=None):
     user = user_model.objects.create_user(username=username, password=password)
     for perm in perms:
         app_label, codename = perm.split(".")
-        user.user_permissions.add(
-            Permission.objects.get(content_type__app_label=app_label, codename=codename)
-        )
+        try:
+            permission = Permission.objects.get(
+                content_type__app_label=app_label, codename=codename
+            )
+        except Permission.DoesNotExist as e:
+            raise Permission.DoesNotExist(
+                f"Could not find permission {app_label}.{codename}"
+            ) from e
+        user.user_permissions.add(permission)
     return user
 
 
@@ -693,3 +699,74 @@ class InlinePaginationTest(WebTest):
                 "sighting-at-5",
             },
         )
+
+    def test_dashboard_no_permissions(self):
+        user_no_perms = user_with_perms([], username="user-no-perms")
+
+        dashboard_no_perms = self.app.get(
+            reverse("dashboard"),
+            user=user_no_perms,
+        )
+
+        self.assertNotContains(
+            dashboard_no_perms, Dragonfly._meta.verbose_name_plural.capitalize()
+        )
+        self.assertNotContains(dashboard_no_perms, 'href="/dragonfly/"')
+        self.assertNotContains(dashboard_no_perms, 'href="/dragonfly/create/"')
+
+        self.assertNotContains(
+            dashboard_no_perms, Sighting._meta.verbose_name_plural.capitalize()
+        )
+        self.assertNotContains(dashboard_no_perms, 'href="/sighting/"')
+        self.assertNotContains(dashboard_no_perms, 'href="/sighting/create/"')
+
+    def test_dashboard_one_app_only(self):
+        user_dragonfly_only = user_with_perms(
+            [
+                "testapp.view_dragonfly",
+                "testapp.add_dragonfly",
+            ],
+            username="user-dragonfly",
+        )
+
+        dashboard_dragonfly_only = self.app.get(
+            reverse("dashboard"),
+            user=user_dragonfly_only,
+        )
+
+        self.assertContains(
+            dashboard_dragonfly_only, Dragonfly._meta.verbose_name_plural.capitalize()
+        )
+        self.assertContains(dashboard_dragonfly_only, 'href="/dragonfly/"')
+        self.assertContains(dashboard_dragonfly_only, 'href="/dragonfly/create/"')
+
+        self.assertNotContains(
+            dashboard_dragonfly_only, Sighting._meta.verbose_name_plural.capitalize()
+        )
+        self.assertNotContains(dashboard_dragonfly_only, 'href="/sighting/"')
+        self.assertNotContains(dashboard_dragonfly_only, 'href="/sighting/create/"')
+
+    def test_dashboard_view_all_permissions(self):
+        user_view_all = user_with_perms(
+            [
+                "testapp.view_dragonfly",
+                "testapp.view_sighting",
+            ],
+            username="user-view-all",
+        )
+
+        dashboard_view_all = self.app.get(
+            reverse("dashboard"),
+            user=user_view_all,
+        )
+        self.assertContains(
+            dashboard_view_all, Dragonfly._meta.verbose_name_plural.capitalize()
+        )
+        self.assertContains(dashboard_view_all, 'href="/dragonfly/"')
+        self.assertNotContains(dashboard_view_all, 'href="/dragonfly/create/"')
+
+        self.assertContains(
+            dashboard_view_all, Sighting._meta.verbose_name_plural.capitalize()
+        )
+        self.assertContains(dashboard_view_all, 'href="/sighting/"')
+        self.assertNotContains(dashboard_view_all, 'href="/sighting/create/"')

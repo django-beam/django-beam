@@ -1,6 +1,5 @@
 from typing import List, Optional, Type
 
-from beam.registry import default_registry, register
 from django.apps import apps
 from django.contrib import messages
 from django.contrib.admin.utils import NestedObjects
@@ -15,6 +14,8 @@ from django.views import generic
 from django.views.generic.base import ContextMixin, TemplateView
 from django_filters.filterset import filterset_factory
 from extra_views import SearchableListMixin
+
+from beam.registry import default_registry, register
 
 from .actions import Action
 from .components import Component, ListComponent
@@ -612,10 +613,26 @@ class DashboardView(TemplateView):
 
         grouped = []
         for app_label, viewsets_dict in self.get_registry().items():
+            viewsets = []
+            for viewset in viewsets_dict.values():
+                links = []
+                for name in "list", "create":
+                    link = viewset().links.get(name)
+                    if link and link.has_perm(
+                        user=self.request.user, obj=None, request=self.request
+                    ):
+                        links.append(link)
+
+                if links:
+                    viewsets.append((viewset, links))
+
+            if not viewsets:
+                continue
+
             group = {
                 "app_label": app_label,
                 "app_config": apps.get_app_config(app_label),
-                "viewsets": viewsets_dict.values(),
+                "viewsets": viewsets,
             }
             grouped.append(group)
         context["grouped_by_app"] = grouped
