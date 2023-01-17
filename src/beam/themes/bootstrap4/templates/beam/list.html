@@ -75,7 +75,7 @@
             {% endif %}
 
             {% block table %}
-                <table class="table table-striped">
+                <table class="table table-striped beam-list-table">
                     {% block table_head %}
                     <thead>
                     <tr>
@@ -86,7 +86,7 @@
                         </th>
                         {% endif %}
                         {% for field in component.fields %}
-                            <th scope="col">
+                            <th scope="col" class="beam-list-field-label beam-field-label-{{ field }}">
                                 {% with field_name=field|stringformat:"s" %}{# cast to string to support virtual fields #}
                                     {% if field_name in sortable_fields %}
                                         {# fixme text-nowrap only if there is a chance to fit this?  #}
@@ -112,13 +112,13 @@
                     {% for object in object_list %}
                         <tr>
                             {% if actions %}
-                            <td>
+                            <td class="beam-list-action-checkbox">
                                 <input type="checkbox" class="beam-action__select-item" name="_action_select[]"
                                        value="{{ object.pk }}">
                             </td>
                             {% endif %}
                             {% for field in component.fields %}
-                                <td>
+                                <td class="beam-list-field beam-field-{{ field }}">
                                     {% include "beam/partials/detail_field.html" with object=object field=field %}
                                 </td>
                             {% endfor %}
