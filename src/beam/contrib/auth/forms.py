@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 
-from .widgets import BootstrapSelectMultiple
+from beam.themes.bootstrap4.widgets import BootstrapSelectMultiple
 
 
 class UserUpdateForm(forms.ModelForm):

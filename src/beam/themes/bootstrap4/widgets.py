@@ -18,7 +18,7 @@ class BootstrapSelectMultiple(SelectMultiple):
         super().__init__(attrs, choices)
 
     class Media:
-        js = ["beam_contrib_auth/js/bootstrap-select.min.js"]
+        js = ["beam/js/bootstrap-select.min.js"]
         css = {
-            "all": ["beam_contrib_auth/css/bootstrap-select.min.css"],
+            "all": ["beam/css/bootstrap-select.min.css"],
         }
