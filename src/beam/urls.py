@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import Callable, Dict, List, Optional, Union
+from typing import Callable, Dict, Optional, Union
 
 from django.db.models import Model
 from django.http import HttpRequest
@@ -10,9 +10,6 @@ logger = getLogger(__name__)
 undefined = (
     object()
 )  # sentinel value for attributes not defined or overwritten on the viewset
-
-
-LayoutType = List[List[List[str]]]
 
 
 UrlKwargGetter = Callable[[Optional[Model], Optional[HttpRequest]], Optional[str]]

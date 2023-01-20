@@ -16,6 +16,7 @@ from beam.registry import ViewsetMetaClass, default_registry
 from .actions import Action
 from .components import BaseComponent, Component, FormComponent, ListComponent
 from .inlines import RelatedInline
+from .types import LayoutType
 from .urls import UrlKwargDict
 from .views import CreateView, DeleteView, DetailView, ListView, UpdateView
 
@@ -25,9 +26,6 @@ logger = getLogger(__name__)
 undefined = (
     object()
 )  # sentinel value for attributes not defined or overwritten on the viewset
-
-
-LayoutType = List[List[List[str]]]
 
 
 class BaseViewSet(metaclass=ViewsetMetaClass):
@@ -139,7 +137,7 @@ class ListMixin(BaseViewSet):
     list_fields: List[str]
     list_layout: LayoutType
     list_queryset: QuerySet
-    list_inline_classes: List[RelatedInline]
+    list_inline_classes: List[Type[RelatedInline]]
     list_form_class: ModelForm
     list_permission = "{app_label}.view_{model_name}"
     list_filterset_fields: List[str] = []
@@ -160,7 +158,7 @@ class CreateMixin(BaseViewSet):
     create_fields: List[str]
     create_layout: LayoutType
     create_queryset: QuerySet
-    create_inline_classes: List[RelatedInline]
+    create_inline_classes: List[Type[RelatedInline]]
     create_form_class: ModelForm
     create_link_layout = ["list"]
     create_permission = "{app_label}.add_{model_name}"
@@ -178,7 +176,7 @@ class UpdateMixin(BaseViewSet):
     update_fields: List[str]
     update_layout: LayoutType
     update_queryset: QuerySet
-    update_inline_classes: List[RelatedInline]
+    update_inline_classes: List[Type[RelatedInline]]
     update_form_class: ModelForm
     update_link_layout = ["!create", "!update", "list", "...", "detail"]
     update_permission = "{app_label}.change_{model_name}"
@@ -196,7 +194,7 @@ class DetailMixin(BaseViewSet):
     detail_fields: List[str]
     detail_layout: LayoutType
     detail_queryset: QuerySet
-    detail_inline_classes: List[RelatedInline]
+    detail_inline_classes: List[Type[RelatedInline]]
     detail_link_layout = ["!detail", "...", "update"]
     detail_permission = "{app_label}.view_{model_name}"
 
@@ -213,7 +211,7 @@ class DeleteMixin(BaseViewSet):
     delete_fields: List[str]
     delete_layout: LayoutType
     delete_queryset: QuerySet
-    delete_inline_classes: List[RelatedInline]
+    delete_inline_classes: List[Type[RelatedInline]]
     delete_link_layout = ["!delete", "..."]
     delete_permission = "{app_label}.delete_{model_name}"
 
