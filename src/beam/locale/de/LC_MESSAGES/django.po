@@ -45,8 +45,8 @@ msgid "Logged out"
 msgstr "Abmelden"
 
 #: contrib/auth/templates/registration/logged_out.html:6
-msgid "You logged out successfully"
-msgstr ""
+msgid "You logged out successfully."
+msgstr "Die Abmeldung war erfolgreich."
 
 #: contrib/auth/templates/registration/logged_out.html:7
 msgid "Log in again"
@@ -383,12 +383,8 @@ msgid "download"
 msgstr "runterladen"
 
 #: themes/bootstrap4/templates/beam/partials/detail_inline.html:71
-#, fuzzy
-#| msgid ""
-#| "There\n"
-#| "                            aren't any that match the current filters."
 msgid "There aren't any that match the current filters."
-msgstr "Nichts für aktuelle Filter gefunden"
+msgstr "Nichts für aktuelle Filter gefunden."
 
 #: themes/bootstrap4/templates/beam/partials/detail_inline.html:79
 msgid "There aren't any."

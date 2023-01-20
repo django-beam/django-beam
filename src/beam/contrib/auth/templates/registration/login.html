@@ -3,11 +3,10 @@
 {% load crispy_forms_tags %}
 {% load i18n %}
 
-{% block header %}
-    <h1>{% trans "Login" %}</h1>
-{% endblock %}
+{% block title %}{% trans "Log in" %} | {{ block.super }}{% endblock %}
 
 {% block content %}
+    <h1>{% block heading %}{% trans "Log in" %}{% endblock %}</h1>
     {% if next %}
         {% if user.is_authenticated %}
             <p class="alert alert-warning">{% trans "Your account doesn't have access to this page. To proceed, please log in with an account that has access." %}</p>
@@ -24,5 +23,8 @@
     </form>
 
     {# Assumes you setup the password_reset view in your URLconf #}
-    <p><a href="{% url 'password_reset' %}">{% trans "Forgotten your password or username?" %}</a></p>
+    {% url 'password_reset' as reset_url %}
+    {% if reset_url %}
+    <p><a href="{{ reset_url }}">{% trans "Forgotten your password or username?" %}</a></p>
+    {% endif %}
 {% endblock %}

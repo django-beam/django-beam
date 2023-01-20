@@ -1,8 +1,10 @@
 {% extends "beam/base.html" %}
 {% load i18n %}
 
+{% block title %}{{ title }} | {{ block.super }}{% endblock %}
+
 {% block content %}
-    <h1>{% trans "Logged out" %}</h1>
-    <p>{% trans "You logged out successfully" %}</p>
+    <h1>{{ title }}</h1>
+    <p>{% trans "You logged out successfully." %}</p>
     <p><a href="{% url "login" %}">{% trans "Log in again" %}</a></p>
 {% endblock %}
