@@ -113,9 +113,17 @@ class BaseViewSet(metaclass=ViewsetMetaClass):
 
     def get_urls(self):
         urlpatterns = []
-        # FIXME maybe move patterns that contain wildcards to the end?
-        for component in self.components.values():
-            urlpatterns.append(self._get_url_pattern(component))
+        components = list(self.components.values())
+
+        # move patterns without kwargs to the front
+        for component in components:
+            if not getattr(component, "url_kwargs", None):
+                urlpatterns.append(self._get_url_pattern(component))
+
+        for component in components:
+            if getattr(component, "url_kwargs", None):
+                urlpatterns.append(self._get_url_pattern(component))
+
         return urlpatterns
 
 
