@@ -163,7 +163,7 @@ class Component(BaseComponent):
             model = queryset.model
 
         self.model = model
-        self.queryset = queryset.all()  # ensure we don't keep stale copies of querysets
+        self.queryset = queryset
 
         if not url_name:
             url_name = "{}_{}_{}".format(
@@ -176,6 +176,15 @@ class Component(BaseComponent):
         super().__init__(
             name=name, url_name=url_name, url_namespace=url_namespace, **kwargs
         )
+
+    @property
+    def queryset(self):
+        # ensure we don't keep stale copies of querysets
+        return self._queryset.all()
+
+    @queryset.setter
+    def queryset(self, queryset):
+        self._queryset = queryset
 
 
 class FormComponent(Component):
