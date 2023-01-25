@@ -6,9 +6,9 @@
                 {% if is_paginated %}
                     {% blocktrans with total=page_obj.paginator.count start=page_obj.start_index end=page_obj.end_index name=options.verbose_name_plural %}Showing {{ start }} to {{ end }} of {{ total }} {{ name }}{% endblocktrans %}
                 {% elif page_obj.paginator.count == 1 %}
-                    {% blocktrans with total=page_obj.paginator.count start=page_obj.start_index end=page_obj.end_index name_singular=options.verbose_name %}Showing {{ total }} {{ name_singular }}{% endblocktrans %}
+                    {% blocktrans with total=page_obj.paginator.count name_singular=options.verbose_name %}Showing {{ total }} {{ name_singular }}{% endblocktrans %}
                 {% else %}
-                    {% blocktrans with total=page_obj.paginator.count start=page_obj.start_index end=page_obj.end_index name_plural=options.verbose_name_plural %}Showing {{ total }} {{ name_plural }}{% endblocktrans %}
+                    {% blocktrans with total=object_list.count name_plural=options.verbose_name_plural %}Showing {{ total }} {{ name_plural }}{% endblocktrans %}
                 {% endif %}
             {% endif %}
         </p>
