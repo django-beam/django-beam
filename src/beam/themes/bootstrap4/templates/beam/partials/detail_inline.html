@@ -49,7 +49,7 @@
                 {% block inline_items %}
                 {% for object in page.object_list %}
                     {% block inline_item_container %}
-                    <li class="list-group-item bg-light">
+                    <li id="{{ inline.prefix }}-{{ forloop.counter0 }}" class="list-group-item bg-light">
                         {% block inline_item %}
                             {% if actions %}
                                 {% block select_item %}
