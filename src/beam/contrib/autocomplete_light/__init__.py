@@ -36,14 +36,16 @@ class BaseAutocomplete(ComponentMixin, autocomplete.Select2QuerySetView):
     def filter_words(self, q, qs):
         assert self.search_fields
 
-        if self.lookup_type not in ("contains", "icontains"):
-            return qs
-
         if not q:
             return qs
 
+        if self.lookup_type in ("contains", "icontains"):
+            words = self.q.split(" ")
+        else:
+            words = [self.q]
+
         qs_filter = Q()
-        for word in self.q.split(" "):
+        for word in words:
             word = word.strip()
             if not word:
                 continue
