@@ -499,7 +499,7 @@ msgstr "bearbeiten"
 
 #: viewsets.py:193
 msgid "detail"
-msgstr "Detail-Ansicht"
+msgstr "Details"
 
 #~ msgid ""
 #~ "There\n"
