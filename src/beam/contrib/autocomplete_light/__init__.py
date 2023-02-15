@@ -1,12 +1,13 @@
 from typing import List
 
+from dal import autocomplete
+from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
+
 from beam.components import Component
 from beam.urls import UrlKwargDict
 from beam.views import ComponentMixin
 from beam.viewsets import BaseViewSet
-from dal import autocomplete
-from django.db.models import Q
-from django.utils.translation import gettext_lazy as _
 
 
 class BaseAutocomplete(ComponentMixin, autocomplete.Select2QuerySetView):
@@ -34,6 +35,9 @@ class BaseAutocomplete(ComponentMixin, autocomplete.Select2QuerySetView):
 
     def filter_words(self, q, qs):
         assert self.search_fields
+
+        if self.lookup_type not in ("contains", "icontains"):
+            return qs
 
         if not q:
             return qs
