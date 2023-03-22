@@ -230,3 +230,52 @@ class PersonForm(forms.ModelForm):
             ),
         }
 ```
+
+### beam.contrib.auth
+
+Provides viewsets for editing users and groups as well as (optional) templates for use with the
+default django registration views.
+
+#### Usage
+
+If you just want the ability to edit users and groups, add the following to a `urls.py` in your
+project.
+
+```
+urlpatterns = [
+    path("auth/", include("beam.contrib.auth.urls")),
+    ...
+]
+```
+
+If you want to make use of the default templates for login, logout and password reset you'll need to
+do a bit more.
+
+Add `beam.contrib.auth` to your installed apps **before** `django.contrib.admin` so the templates
+will be picked up.
+
+In your settings.py:
+
+```
+INSTALLED_APPS = [
+    "beam.contrib.auth",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    # ...
+]
+
+# redirect to something other than the default /accounts/profile/
+LOGIN_REDIRECT_URL = "/"
+```
+
+Add the default django registration views to your urls.py
+
+```
+urlpatterns = [
+   path("accounts/", include("django.contrib.auth.urls")),
+   # ...
+]
+```
+
+Now you should be able to use e.g. `/accounts/login/` to login, reset your password via the forgot
+password link and so on.
