@@ -8,6 +8,8 @@
 
 # -- Path setup --------------------------------------------------------------
 
+from typing import List
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -17,17 +19,10 @@
 # sys.path.insert(0, os.path.abspath('.'))
 import sphinx_rtd_theme
 
-
-# -- Use Markdown for documentation ------------------------------------------
-from recommonmark.parser import CommonMarkParser
-
-source_parsers = {".md": CommonMarkParser}
-
-
 # -- Project information -----------------------------------------------------
 
 project = "django-beam"
-copyright = "2018, Django Beam Team"
+copyright = "2023, Django Beam Team"
 author = "Django Beam Team"
 
 # The short X.Y version
@@ -54,7 +49,7 @@ templates_path = ["_templates"]
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = ".md"
+source_suffix = ".rst"
 
 # The master toctree document.
 master_doc = "index"
@@ -64,7 +59,7 @@ master_doc = "index"
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -95,7 +90,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
+html_static_path: List[str] = []
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
