@@ -45,6 +45,21 @@ class VersionDetailMixin(BaseViewSet):
     def get_component_classes(self):
         return super().get_component_classes() + [("version_detail", Component)]
 
+    # mirror the detail fields and layout
+    @property
+    def version_detail_fields(self):
+        return getattr(self, "detail_fields", getattr(self, "fields", []))
+
+    @property
+    def version_detail_layout(self):
+        return getattr(self, "detail_layout", getattr(self, "layout", []))
+
+    @property
+    def version_detail_inline_classes(self):
+        return getattr(
+            self, "detail_inline_classes", getattr(self, "inline_classes", [])
+        )
+
 
 class VersionListMixin(BaseViewSet):
     version_list_view_class = VersionListView
