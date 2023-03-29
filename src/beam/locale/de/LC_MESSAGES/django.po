@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-12 11:39+0100\n"
+"POT-Creation-Date: 2023-03-29 14:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,238 +17,217 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: actions.py:80 themes/bootstrap4/templates/beam/partials/form_inline.html:78
-#: themes/bootstrap4/templates/beam/partials/form_inline.html:109
-#: themes/bootstrap4/templates/beam/partials/form_inline_tabular_row.html:59
-#: viewsets.py:210
+#: beam/actions.py:80
+#: beam/themes/bootstrap4/templates/beam/partials/form_inline.html:78
+#: beam/themes/bootstrap4/templates/beam/partials/form_inline.html:109
+#: beam/themes/bootstrap4/templates/beam/partials/form_inline_tabular_row.html:59
+#: beam/viewsets.py:216
 msgid "delete"
 msgstr "löschen"
 
-#: actions.py:100
+#: beam/actions.py:100
 #, python-brace-format
 msgid "Deleted {count} {name}"
 msgstr "Es wurden {count} {name} gelöscht"
 
-#: actions.py:108
+#: beam/actions.py:108
 msgid "update selected"
 msgstr "Auswahl bearbeiten"
 
-#: actions.py:149
+#: beam/actions.py:149
 #, python-brace-format
 msgid "Updated {count} {name}"
 msgstr "Es wurden {count} {name} aktualisiert"
 
-#: contrib/auth/templates/registration/logged_out.html:5
-#, fuzzy
-#| msgid "Log out"
-msgid "Logged out"
-msgstr "Abmelden"
-
-#: contrib/auth/templates/registration/logged_out.html:6
+#: beam/contrib/auth/templates/registration/logged_out.html:8
 msgid "You logged out successfully."
 msgstr "Die Abmeldung war erfolgreich."
 
-#: contrib/auth/templates/registration/logged_out.html:7
+#: beam/contrib/auth/templates/registration/logged_out.html:9
 msgid "Log in again"
 msgstr ""
 
-#: contrib/auth/templates/registration/login.html:7
-msgid "Login"
-msgstr ""
-
-#: contrib/auth/templates/registration/login.html:13
-msgid ""
-"Your account doesn't have access to this page. To proceed, please log in "
-"with an account that has access."
-msgstr ""
-
-#: contrib/auth/templates/registration/login.html:15
-msgid "Please log in to see this page."
-msgstr ""
-
-#: contrib/auth/templates/registration/login.html:22
-#: contrib/auth/templates/registration/password_reset_complete.html:11
+#: beam/contrib/auth/templates/registration/login.html:6
+#: beam/contrib/auth/templates/registration/login.html:9
+#: beam/contrib/auth/templates/registration/login.html:21
+#: beam/contrib/auth/templates/registration/password_reset_complete.html:11
+#: beam/themes/bootstrap4/templates/beam/dashboard.html:40
 #, fuzzy
 #| msgid "Log out"
 msgid "Log in"
 msgstr "Abmelden"
 
-#: contrib/auth/templates/registration/login.html:27
-#, fuzzy
-#| msgid "Change password"
-msgid "Lost password?"
-msgstr "Passwort ändern"
+#: beam/contrib/auth/templates/registration/login.html:12
+msgid ""
+"Your account doesn't have access to this page. To proceed, please log in "
+"with an account that has access."
+msgstr ""
 
-#: contrib/auth/templates/registration/password_change_done.html:6
+#: beam/contrib/auth/templates/registration/login.html:14
+msgid "Please log in to see this page."
+msgstr ""
+
+#: beam/contrib/auth/templates/registration/login.html:28
+#: beam/contrib/auth/templates/registration/password_reset_confirm.html:19
+msgid "Forgotten your password or username?"
+msgstr ""
+
+#: beam/contrib/auth/templates/registration/password_change_done.html:8
 msgid "Your password was changed."
 msgstr ""
 
-#: contrib/auth/templates/registration/password_change_form.html:11
+#: beam/contrib/auth/templates/registration/password_change_form.html:11
 msgid "Please correct the error below."
 msgstr ""
 
-#: contrib/auth/templates/registration/password_change_form.html:11
+#: beam/contrib/auth/templates/registration/password_change_form.html:11
 #, fuzzy
 #| msgid "Search the list below"
 msgid "Please correct the errors below."
 msgstr "Die Liste durchsuchen"
 
-#: contrib/auth/templates/registration/password_change_form.html:15
+#: beam/contrib/auth/templates/registration/password_change_form.html:15
 msgid ""
 "Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 
-#: contrib/auth/templates/registration/password_change_form.html:20
-#: contrib/auth/templates/registration/password_reset_confirm.html:13
+#: beam/contrib/auth/templates/registration/password_change_form.html:20
+#: beam/contrib/auth/templates/registration/password_reset_confirm.html:13
 #, fuzzy
 #| msgid "Change password"
 msgid "Change my password"
 msgstr "Passwort ändern"
 
-#: contrib/auth/templates/registration/password_reset_complete.html:7
-msgid "Password reset"
-msgstr ""
-
-#: contrib/auth/templates/registration/password_reset_complete.html:9
+#: beam/contrib/auth/templates/registration/password_reset_complete.html:9
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr ""
 
-#: contrib/auth/templates/registration/password_reset_confirm.html:9
+#: beam/contrib/auth/templates/registration/password_reset_confirm.html:9
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
 
-#: contrib/auth/templates/registration/password_reset_confirm.html:18
+#: beam/contrib/auth/templates/registration/password_reset_confirm.html:16
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
 
-#: contrib/auth/templates/registration/password_reset_done.html:9
+#: beam/contrib/auth/templates/registration/password_reset_done.html:9
 msgid ""
 "We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 
-#: contrib/auth/templates/registration/password_reset_done.html:11
+#: beam/contrib/auth/templates/registration/password_reset_done.html:11
 msgid ""
 "If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 
-#: contrib/auth/templates/registration/password_reset_email.html:2
+#: beam/contrib/auth/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
 
-#: contrib/auth/templates/registration/password_reset_email.html:4
+#: beam/contrib/auth/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr ""
 
-#: contrib/auth/templates/registration/password_reset_email.html:8
+#: beam/contrib/auth/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you’ve forgotten:"
 msgstr ""
 
-#: contrib/auth/templates/registration/password_reset_email.html:10
+#: beam/contrib/auth/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr ""
 
-#: contrib/auth/templates/registration/password_reset_email.html:12
+#: beam/contrib/auth/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr ""
 
-#: contrib/auth/templates/registration/password_reset_form.html:8
+#: beam/contrib/auth/templates/registration/password_reset_form.html:8
 msgid ""
 "Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
 
-#: contrib/auth/templates/registration/password_reset_form.html:13
+#: beam/contrib/auth/templates/registration/password_reset_form.html:13
 #, fuzzy
 #| msgid "Change password"
 msgid "Reset my password"
 msgstr "Passwort ändern"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
+#: beam/contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr ""
 
-#: contrib/auth/views.py:69
+#: beam/contrib/auth/views.py:68
 msgid "Important dates"
 msgstr ""
 
-#: contrib/auth/widgets.py:14
-msgid "Deselect all"
-msgstr "Alle abwählen"
-
-#: contrib/auth/widgets.py:15 themes/bootstrap4/templates/beam/list.html:85
-#: themes/bootstrap4/templates/beam/partials/detail_inline.html:43
-msgid "Select all"
-msgstr "Alle auswählen"
-
-#: contrib/auth/widgets.py:16
-#, python-brace-format
-msgid "{0} selected"
-msgstr "{0} ausgewählt"
-
-#: contrib/auth/widgets.py:17
-msgid "None selected"
-msgstr "Keine ausgewählt"
-
-#: contrib/autocomplete_light/__init__.py:85
+#: beam/contrib/autocomplete_light/__init__.py:91
 msgid "autocomplete"
 msgstr "Auto-Vervollständigung"
 
-#: contrib/reversion/templates/beam_reversion/version_detail.html:11
-#: contrib/reversion/templates/beam_reversion/version_detail.html:22
+#: beam/contrib/reversion/templates/beam_reversion/version_detail.html:11
+#: beam/contrib/reversion/templates/beam_reversion/version_detail.html:22
 #, python-format
 msgid "Version as of %(date)s"
 msgstr "Version von %(date)s"
 
-#: contrib/reversion/templates/beam_reversion/version_detail.html:32
+#: beam/contrib/reversion/templates/beam_reversion/version_detail.html:32
 msgid "Revert to this version"
 msgstr "Auf diese Version zurücksetzen"
 
-#: contrib/reversion/templates/beam_reversion/version_list.html:11
-#: contrib/reversion/templates/beam_reversion/version_list.html:22
-#: contrib/reversion/viewsets.py:53
+#: beam/contrib/reversion/templates/beam_reversion/version_list.html:11
+#: beam/contrib/reversion/templates/beam_reversion/version_list.html:22
+#: beam/contrib/reversion/viewsets.py:52
 msgid "history"
 msgstr "Verlauf"
 
-#: contrib/reversion/templates/beam_reversion/version_list.html:31
+#: beam/contrib/reversion/templates/beam_reversion/version_list.html:31
 msgid "date"
 msgstr "Datum"
 
-#: contrib/reversion/templates/beam_reversion/version_list.html:32
+#: beam/contrib/reversion/templates/beam_reversion/version_list.html:32
 msgid "user"
 msgstr "Benutzer"
 
-#: contrib/reversion/templates/beam_reversion/version_list.html:33
+#: beam/contrib/reversion/templates/beam_reversion/version_list.html:33
 msgid "action"
 msgstr "Aktion"
 
-#: contrib/reversion/views.py:39
+#: beam/contrib/reversion/templates/beam_reversion/version_list.html:59
+msgid ""
+"This object doesn’t have a change history. It probably wasn’t added via this "
+"interface."
+msgstr ""
+"Dieses Objekt hat keinen Verlauf. Wahrscheinlich wurde es nicht über dieses "
+"Benutzer-Interface angelegt."
+
+#: beam/contrib/reversion/views.py:39
 msgid "revert to version {}"
 msgstr "Zurücksetzen auf Version {}"
 
-#: contrib/reversion/viewsets.py:38
+#: beam/contrib/reversion/viewsets.py:37
 msgid "show version"
 msgstr "Version zeigen"
 
 #. Translators: Model verbose name and instance representation,
 #. suitable to be an item in a list.
-#: inlines.py:86
+#: beam/inlines.py:87
 #, python-brace-format
 msgid "{class_name} {instance}"
 msgstr "{class_name} {instance}"
 
-#: inlines.py:91
+#: beam/inlines.py:92
 #, python-brace-format
 msgid ""
 "Deleting {class_name} {instance} would require deleting the following "
@@ -257,29 +236,25 @@ msgstr ""
 "Das Löschen des {class_name}-Objekts „{instance}“ würde ein Löschen der "
 "folgenden geschützten verwandten Objekte erfordern: {related_objects}"
 
-#: inlines.py:97
+#: beam/inlines.py:98
 msgid "and"
 msgstr "und"
 
-#: themes/bootstrap4/templates/beam/dashboard.html:6
+#: beam/themes/bootstrap4/templates/beam/dashboard.html:6
 msgid "Dashboard"
 msgstr ""
 
-#: themes/bootstrap4/templates/beam/dashboard.html:23
-msgid "List"
-msgstr "Liste"
+#: beam/themes/bootstrap4/templates/beam/dashboard.html:36
+msgid "You don't have permission to view anything, try logging in."
+msgstr ""
 
-#: themes/bootstrap4/templates/beam/dashboard.html:26
-msgid "Create"
-msgstr "Anlegen"
-
-#: themes/bootstrap4/templates/beam/delete.html:14
-#: themes/bootstrap4/templates/beam/delete.html:31
+#: beam/themes/bootstrap4/templates/beam/delete.html:14
+#: beam/themes/bootstrap4/templates/beam/delete.html:31
 #, python-format
 msgid "Delete %(object)s"
 msgstr "Lösche %(object)s"
 
-#: themes/bootstrap4/templates/beam/delete.html:41
+#: beam/themes/bootstrap4/templates/beam/delete.html:41
 #, python-format
 msgid ""
 "You can't delete <em>%(object_name)s</em> because the following objects "
@@ -288,190 +263,209 @@ msgstr ""
 "<em>%(object_name)s</em> kann nicht gelöscht werden, da die folgenden "
 "Objekte davon abhängen:"
 
-#: themes/bootstrap4/templates/beam/delete.html:47
+#: beam/themes/bootstrap4/templates/beam/delete.html:47
 #, python-format
 msgid "Are you sure you want to delete <em>%(object_name)s</em>?"
 msgstr "Sind Sie sicher, dass sie <em>%(object_name)s</em> löschen wollen?"
 
-#: themes/bootstrap4/templates/beam/delete.html:50
+#: beam/themes/bootstrap4/templates/beam/delete.html:50
 msgid "The following objects will also be deleted:"
 msgstr "Die folgenden Objekte werden ebenfalls gelöscht:"
 
-#: themes/bootstrap4/templates/beam/delete.html:56
+#: beam/themes/bootstrap4/templates/beam/delete.html:56
 msgid "Yes, I'm sure"
 msgstr "Ja, ich bin sicher"
 
-#: themes/bootstrap4/templates/beam/delete.html:58
+#: beam/themes/bootstrap4/templates/beam/delete.html:58
 msgid "No, go back."
 msgstr "Nein, zurück gehen."
 
-#: themes/bootstrap4/templates/beam/form.html:15
-#: themes/bootstrap4/templates/beam/form.html:45
-#: themes/bootstrap4/templates/beam/partials/form_inline_tabular_row.html:39
-#: themes/bootstrap4/templates/beam/partials/form_layout.html:81
+#: beam/themes/bootstrap4/templates/beam/form.html:15
+#: beam/themes/bootstrap4/templates/beam/form.html:45
+#: beam/themes/bootstrap4/templates/beam/partials/form_inline_tabular_row.html:39
+#: beam/themes/bootstrap4/templates/beam/partials/form_layout.html:81
 #, python-format
 msgid "Create %(verbose_name)s"
 msgstr "%(verbose_name)s anlegen"
 
-#: themes/bootstrap4/templates/beam/form.html:55
-#: themes/bootstrap4/templates/beam/form.html:105
-#: themes/bootstrap4/templates/beam/update.html:34
-#: themes/bootstrap4/templates/beam/update.html:40
+#: beam/themes/bootstrap4/templates/beam/form.html:55
+#: beam/themes/bootstrap4/templates/beam/form.html:105
+#: beam/themes/bootstrap4/templates/beam/update.html:34
+#: beam/themes/bootstrap4/templates/beam/update.html:40
 msgid "Save"
 msgstr "Sichern"
 
-#: themes/bootstrap4/templates/beam/list.html:50
-#: themes/bootstrap4/templates/beam/list.html:51
+#: beam/themes/bootstrap4/templates/beam/list.html:50
+#: beam/themes/bootstrap4/templates/beam/list.html:51
 msgid "Search the list below"
 msgstr "Die Liste durchsuchen"
 
-#: themes/bootstrap4/templates/beam/list.html:57
+#: beam/themes/bootstrap4/templates/beam/list.html:57
 msgid "Clear"
 msgstr "Zurücksetzen"
 
-#: themes/bootstrap4/templates/beam/list.html:59
+#: beam/themes/bootstrap4/templates/beam/list.html:59
 msgid "Search"
 msgstr "Suchen"
 
-#: themes/bootstrap4/templates/beam/list.html:97
+#: beam/themes/bootstrap4/templates/beam/list.html:85
+#: beam/themes/bootstrap4/templates/beam/partials/detail_inline.html:43
+#: beam/themes/bootstrap4/widgets.py:15
+msgid "Select all"
+msgstr "Alle auswählen"
+
+#: beam/themes/bootstrap4/templates/beam/list.html:97
 msgid "reset sort"
 msgstr "Sortierung zurücksetzen"
 
-#: themes/bootstrap4/templates/beam/list.html:106
-#: themes/bootstrap4/templates/beam/partials/links.html:7
-#: themes/bootstrap4/templates/beam/partials/list_links.html:7
+#: beam/themes/bootstrap4/templates/beam/list.html:106
+#: beam/themes/bootstrap4/templates/beam/partials/links.html:7
+#: beam/themes/bootstrap4/templates/beam/partials/list_links.html:7
 msgid "Actions"
 msgstr "Aktionen"
 
-#: themes/bootstrap4/templates/beam/list.html:142
+#: beam/themes/bootstrap4/templates/beam/list.html:142
 #, python-format
 msgid "Could not find any %(name)s for query \"%(search_query)s\""
 msgstr "Keine %(name)s für Suche \"%(search_query)s\" gefunden"
 
-#: themes/bootstrap4/templates/beam/list.html:144
+#: beam/themes/bootstrap4/templates/beam/list.html:144
 #, python-format
 msgid "Could not find any %(name)s that match the current filters"
 msgstr "Keine %(name)s für aktuelle Filter gefunden"
 
-#: themes/bootstrap4/templates/beam/list.html:146
+#: beam/themes/bootstrap4/templates/beam/list.html:146
 #, python-format
 msgid "Could not find any %(name)s"
 msgstr "Keine %(name)s gefunden"
 
-#: themes/bootstrap4/templates/beam/partials/actions.html:5
+#: beam/themes/bootstrap4/templates/beam/partials/actions.html:5
 msgid "Action"
 msgstr "Aktion"
 
-#: themes/bootstrap4/templates/beam/partials/actions.html:13
+#: beam/themes/bootstrap4/templates/beam/partials/actions.html:13
 msgid "Apply"
 msgstr "Anwenden"
 
-#: themes/bootstrap4/templates/beam/partials/actions.html:14
+#: beam/themes/bootstrap4/templates/beam/partials/actions.html:14
 msgid "Selected COUNT of TOTAL."
 msgstr "Es sind COUNT von TOTAL ausgewählt."
 
-#: themes/bootstrap4/templates/beam/partials/actions.html:17
+#: beam/themes/bootstrap4/templates/beam/partials/actions.html:17
 msgid "Select all TOTAL."
 msgstr "Alle TOTAL auswählen."
 
-#: themes/bootstrap4/templates/beam/partials/actions.html:20
+#: beam/themes/bootstrap4/templates/beam/partials/actions.html:20
 msgid "Cancel selection"
 msgstr "Auswahl zurücksetzen"
 
-#: themes/bootstrap4/templates/beam/partials/detail_field.html:45
+#: beam/themes/bootstrap4/templates/beam/partials/detail_field.html:45
 msgid "download"
 msgstr "runterladen"
 
-#: themes/bootstrap4/templates/beam/partials/detail_inline.html:71
+#: beam/themes/bootstrap4/templates/beam/partials/detail_inline.html:71
 msgid "There aren't any that match the current filters."
 msgstr "Nichts für aktuelle Filter gefunden."
 
-#: themes/bootstrap4/templates/beam/partials/detail_inline.html:79
+#: beam/themes/bootstrap4/templates/beam/partials/detail_inline.html:79
 msgid "There aren't any."
 msgstr "Es gibt keine."
 
-#: themes/bootstrap4/templates/beam/partials/filters.html:9
+#: beam/themes/bootstrap4/templates/beam/partials/filters.html:9
 msgid "show/hide filters"
 msgstr "Filter ein-/ausblenden"
 
-#: themes/bootstrap4/templates/beam/partials/filters.html:19
+#: beam/themes/bootstrap4/templates/beam/partials/filters.html:19
 msgid "Clear filters"
 msgstr "Filter zurücksetzen"
 
-#: themes/bootstrap4/templates/beam/partials/filters.html:21
+#: beam/themes/bootstrap4/templates/beam/partials/filters.html:21
 msgid "Filter"
 msgstr "Filter"
 
-#: themes/bootstrap4/templates/beam/partials/form_inline.html:125
+#: beam/themes/bootstrap4/templates/beam/partials/form_inline.html:125
 #, python-format
 msgid "add %(name)s"
 msgstr "%(name)s hinzufügen"
 
-#: themes/bootstrap4/templates/beam/partials/messages.html:18
+#: beam/themes/bootstrap4/templates/beam/partials/messages.html:18
 msgid "Close"
 msgstr "Schließen"
 
-#: themes/bootstrap4/templates/beam/partials/navigation.html:12
+#: beam/themes/bootstrap4/templates/beam/partials/navigation.html:12
 msgid "Home"
 msgstr "Home"
 
-#: themes/bootstrap4/templates/beam/partials/navigation.html:71
+#: beam/themes/bootstrap4/templates/beam/partials/navigation.html:71
 msgid "Change password"
 msgstr "Passwort ändern"
 
-#: themes/bootstrap4/templates/beam/partials/navigation.html:79
+#: beam/themes/bootstrap4/templates/beam/partials/navigation.html:79
 msgid "Log out"
 msgstr "Abmelden"
 
-#: themes/bootstrap4/templates/beam/partials/pagination.html:7
+#: beam/themes/bootstrap4/templates/beam/partials/pagination.html:7
 #, python-format
 msgid "Showing %(start)s to %(end)s of %(total)s %(name)s"
 msgstr "%(name)s %(start)s bis %(end)s von %(total)s"
 
-#: themes/bootstrap4/templates/beam/partials/pagination.html:9
+#: beam/themes/bootstrap4/templates/beam/partials/pagination.html:9
 #, python-format
 msgid "Showing %(total)s %(name_singular)s"
 msgstr "%(total)s %(name_singular)s"
 
-#: themes/bootstrap4/templates/beam/partials/pagination.html:11
+#: beam/themes/bootstrap4/templates/beam/partials/pagination.html:11
 #, python-format
 msgid "Showing %(total)s %(name_plural)s"
 msgstr "%(total)s %(name_plural)s"
 
-#: themes/bootstrap4/templates/beam/partials/pagination.html:18
+#: beam/themes/bootstrap4/templates/beam/partials/pagination.html:18
 msgid "pagination"
 msgstr "Seiten-Nummerierung"
 
-#: themes/bootstrap4/templates/beam/partials/pagination.html:24
+#: beam/themes/bootstrap4/templates/beam/partials/pagination.html:24
 msgid "Previous"
 msgstr "Zurück"
 
-#: themes/bootstrap4/templates/beam/partials/pagination.html:79
+#: beam/themes/bootstrap4/templates/beam/partials/pagination.html:79
 msgid "Next"
 msgstr "Weiter"
 
-#: themes/bootstrap4/templates/beam/update.html:14
-#: themes/bootstrap4/templates/beam/update.html:26
+#: beam/themes/bootstrap4/templates/beam/update.html:14
+#: beam/themes/bootstrap4/templates/beam/update.html:26
 #, python-format
 msgid "Update %(object)s"
 msgstr "%(object)s bearbeiten"
 
-#: themes/bootstrap4/templates/beam/update.html:33
-#: themes/bootstrap4/templates/beam/update.html:39
+#: beam/themes/bootstrap4/templates/beam/update.html:33
+#: beam/themes/bootstrap4/templates/beam/update.html:39
 msgid "Save and continue editing"
 msgstr "Sichern und weiter bearbeiten"
 
-#: views.py:170
+#: beam/themes/bootstrap4/widgets.py:14
+msgid "Deselect all"
+msgstr "Alle abwählen"
+
+#: beam/themes/bootstrap4/widgets.py:16
+#, python-brace-format
+msgid "{0} selected"
+msgstr "{0} ausgewählt"
+
+#: beam/themes/bootstrap4/widgets.py:17
+msgid "None selected"
+msgstr "Keine ausgewählt"
+
+#: beam/views.py:171
 #, python-brace-format
 msgid "The {model} \"{name}\" was added successfully."
 msgstr "{model} \"{name}\" wurde erfolgreich hinzugefügt."
 
-#: views.py:205
+#: beam/views.py:206
 #, python-brace-format
 msgid "The {model} \"{name}\" was changed successfully."
 msgstr "{model} \"{name}\" wurde erfolgreich geändert."
 
-#: views.py:379 views.py:443
+#: beam/views.py:380 beam/views.py:444
 msgid ""
 "There was an error finding the objects you selected. This could be caused by "
 "another user changing them concurrently. Please try again."
@@ -480,26 +474,42 @@ msgstr ""
 "Dies kann auftreten, wenn andere Nutzer diese gleichzeitig bearbeiten. Bitte "
 "versuchen Sie es erneut."
 
-#: views.py:547
+#: beam/views.py:548
 #, python-brace-format
 msgid "The {model} \"{name}\" was deleted successfully."
 msgstr "{model} \"{name}\" wurde erfolgreich gelöscht."
 
-#: viewsets.py:130
+#: beam/viewsets.py:136
 msgid "list"
 msgstr "alle zeigen"
 
-#: viewsets.py:157
+#: beam/viewsets.py:163
 msgid "create"
 msgstr "anlegen"
 
-#: viewsets.py:175
+#: beam/viewsets.py:181
 msgid "update"
 msgstr "bearbeiten"
 
-#: viewsets.py:193
+#: beam/viewsets.py:199
 msgid "detail"
 msgstr "Details"
+
+#, fuzzy
+#~| msgid "Log out"
+#~ msgid "Logged out"
+#~ msgstr "Abmelden"
+
+#, fuzzy
+#~| msgid "Change password"
+#~ msgid "Lost password?"
+#~ msgstr "Passwort ändern"
+
+#~ msgid "List"
+#~ msgstr "Liste"
+
+#~ msgid "Create"
+#~ msgstr "Anlegen"
 
 #~ msgid ""
 #~ "There\n"
