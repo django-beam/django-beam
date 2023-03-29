@@ -60,7 +60,7 @@ class VersionListMixin(BaseViewSet):
 
 
 class VersionViewSetMixin(VersionDetailMixin, VersionRestoreMixin, VersionListMixin):
-    versioned_component_names = ["create", "update"]
+    versioned_component_names = ["create", "update", "delete"]
 
     def __init__(self) -> None:
         super().__init__()
