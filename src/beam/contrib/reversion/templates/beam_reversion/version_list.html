@@ -52,3 +52,11 @@
         {% endfor %}
     </table>
 {% endblock %}
+
+{% block no_results %}
+    {% if not versions %}
+        <p class="alert alert-info" role="alert">
+            {% translate 'This object doesn’t have a change history. It probably wasn’t added via this interface.' %}
+        </p>
+    {% endif %}
+{% endblock %}
