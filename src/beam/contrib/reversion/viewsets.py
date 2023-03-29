@@ -76,6 +76,7 @@ class VersionViewSetMixin(VersionDetailMixin, VersionRestoreMixin, VersionListMi
             inline_class
             for component in self.components.values()
             for inline_class in component.inline_classes
+            if component.name in self.versioned_component_names
         }
 
     def _register_model_with_parents(self, model, follow=()):
