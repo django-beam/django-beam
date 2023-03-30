@@ -227,7 +227,11 @@ it will be used for the respective view. For example, if you have a
 model ``customers.Customer`` and create a template ``customers/customer_detail.html``
 it will be used for the detail view of the ``CustomerViewSet``.
 
-Beam also provides a default template for each view.
+Beam also adds a template name based on the component name. For example, if you
+have a component ``call_component`` and create a template ``customers/customer_call.html``
+it will be used for the call view.
+
+Beam also provides default templates for all base view.
 
 ``beam/create.html``, ``beam/update.html``, ``beam/detail.html``, ``beam/delete.html``, ``beam/list.html``
 
