@@ -13,7 +13,7 @@ from reversion import (
 
 from beam import RelatedInline, ViewSet
 from beam.urls import UrlKwargDict
-from beam.viewsets import BaseViewSet, Component, DetailMixin
+from beam.viewsets import BaseViewSet, Component, DeleteMixin, DetailMixin, UpdateMixin
 
 from .views import VersionDetailView, VersionListView, VersionRestoreView
 
@@ -76,6 +76,14 @@ class VersionListMixin(BaseViewSet):
 
 class VersionViewSetMixin(VersionDetailMixin, VersionRestoreMixin, VersionListMixin):
     versioned_component_names = ["create", "update", "delete"]
+    update_link_layout = UpdateMixin.update_link_layout + [
+        "!version_restore",
+        "!version_detail",
+    ]
+    delete_link_layout = DeleteMixin.delete_link_layout + [
+        "!version_restore",
+        "!version_detail",
+    ]
 
     def __init__(self) -> None:
         super().__init__()
