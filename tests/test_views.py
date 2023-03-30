@@ -1,3 +1,5 @@
+from unittest import TestCase, mock
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.urls import reverse
@@ -9,7 +11,9 @@ from testapp.models import (
     Sighting,
     SightingReference,
 )
-from testapp.views import DragonflyViewSet, SightingViewSet
+from testapp.views import DragonflyViewSet, ExtraView, SightingViewSet
+
+from beam.views import CreateView, DetailView, ListView, UpdateView
 
 
 def user_with_perms(perms, username="foo", password="bar", user_model=None):
@@ -27,6 +31,80 @@ def user_with_perms(perms, username="foo", password="bar", user_model=None):
             ) from e
         user.user_permissions.add(permission)
     return user
+
+
+class TemplateNameTest(TestCase):
+    def test_detail_templates(self):
+        view = DetailView(
+            component=DragonflyViewSet().components["detail"], object=Dragonfly(pk=123)
+        )
+        self.assertEqual(
+            view.get_template_names(),
+            ["testapp/dragonfly_detail.html", "beam/detail.html"],
+        )
+
+    def test_list_templates(self):
+        view = ListView(
+            component=DragonflyViewSet().components["list"],
+            object_list=Dragonfly.objects.none(),
+        )
+        self.assertEqual(
+            view.get_template_names(), ["testapp/dragonfly_list.html", "beam/list.html"]
+        )
+
+    def test_update_templates(self):
+        view = UpdateView(
+            component=DragonflyViewSet().components["update"], object=Dragonfly(pk=123)
+        )
+        self.assertEqual(
+            view.get_template_names(),
+            [
+                "testapp/dragonfly_update.html",
+                "testapp/dragonfly_form.html",
+                "beam/update.html",
+            ],
+        )
+
+    def test_create_templates(self):
+        view = CreateView(
+            component=DragonflyViewSet().components["create"], object=Dragonfly(pk=123)
+        )
+        self.assertEqual(
+            view.get_template_names(),
+            [
+                "testapp/dragonfly_create.html",
+                "testapp/dragonfly_form.html",
+                "beam/create.html",
+            ],
+        )
+
+    def test_extra_templates(self):
+        view = ExtraView(
+            component=DragonflyViewSet().components["extra"], object=Dragonfly(pk=123)
+        )
+        self.assertEqual(
+            view.get_template_names(),
+            [
+                "testapp/dragonfly_extra.html",
+                "testapp/dragonfly_detail.html",
+                "beam/detail.html",
+            ],
+        )
+
+    def test_explicit_template_takes_precedence(self):
+        with mock.patch.object(ExtraView, "template_name", "explicit.html"):
+            view = ExtraView(
+                component=DragonflyViewSet().components["extra"],
+                object=Dragonfly(pk=123),
+            )
+            self.assertEqual(
+                view.get_template_names(),
+                [
+                    "explicit.html",
+                    "testapp/dragonfly_extra.html",
+                    "beam/detail.html",
+                ],
+            )
 
 
 class ViewTest(WebTest):

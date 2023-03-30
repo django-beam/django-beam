@@ -26,6 +26,32 @@ class ComponentMixin(ContextMixin):
     component: Optional[Component] = None
     viewset = None
 
+    def get_template_names(self):
+        template_names = super().get_template_names()
+        opts = self.model._meta
+        component_template_name = (
+            f"{opts.app_label}/{opts.model_name}_{self.component.name}.html"
+        )
+        insert_index = len(template_names)
+
+        # we check if a generic template via template_name_suffix is contained in the
+        # template names, if so we want to insert the component template before that
+        # so that e.g. foo/bar_create.html takes precedence over foo/bar_form.html
+        template_name_suffix = getattr(self, "template_name_suffix", None)
+        if template_name_suffix:
+            suffix_template_name = (
+                f"{opts.app_label}/{opts.model_name}{template_name_suffix}.html"
+            )
+            try:
+                insert_index = template_names.index(suffix_template_name)
+            except ValueError:
+                pass
+
+        if component_template_name not in template_names:
+            template_names.insert(insert_index, component_template_name)
+
+        return template_names
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
