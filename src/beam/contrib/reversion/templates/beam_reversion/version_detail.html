@@ -27,11 +27,13 @@
 {% block below_inlines %}
     <section class="border-top">
         <div class="container">
-            <form method="post">
+            {% get_url_for_related object "version_restore" version_id=version.pk as restore_url %}
+            {% if restore_url %}
+            <form method="post" action="{{ restore_url }}">
                 {% csrf_token %}
                 <input class="btn btn-danger float-right" type="submit" value="{% trans "Revert to this version" %}">
             </form>
+            {% endif %}
         </div>
     </section>
 {% endblock %}
-
