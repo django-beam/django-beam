@@ -2,12 +2,10 @@ from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, transaction
 from django.http import HttpResponseRedirect
-from django.views import View
-from django.shortcuts import get_object_or_404
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
-from django.views import generic
-from reversion import set_comment, RevertError
+from django.views import View, generic
+from reversion import RevertError, set_comment
 from reversion.models import Version
 
 from beam.views import ComponentMixin, DetailView
@@ -40,12 +38,16 @@ class VersionRestoreView(ComponentMixin, View):
                     self.version.revision.revert(delete=True)
                     messages.success(request, "Reverted")
                     return HttpResponseRedirect(
-                        self.viewset.links["detail"].reverse(self.version.object)
+                        self.viewset.links["detail"].reverse(
+                            obj=self.version.object, request=request
+                        )
                     )
         except RevertError as ex:
             messages.error(request, force_str(ex))
             return HttpResponseRedirect(
-                self.viewset.links["detail"].reverse(self.version.object)
+                self.viewset.links["detail"].reverse(
+                    obj=self.version.object, request=request
+                )
             )
 
 
