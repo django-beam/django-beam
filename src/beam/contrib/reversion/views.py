@@ -8,7 +8,7 @@ from django.views import View, generic
 from reversion import RevertError, set_comment
 from reversion.models import Version
 
-from beam.views import ComponentMixin, DetailView
+from beam.views import ComponentMixin, InlinesMixin
 
 
 class _RollBackRevisionView(Exception):
@@ -51,7 +51,12 @@ class VersionRestoreView(ComponentMixin, View):
             )
 
 
-class VersionDetailView(DetailView):
+class VersionDetailView(ComponentMixin, InlinesMixin, generic.DetailView):
+    # we don't inherit from DetailView as that would add the ActionMixin
+    # we explicitly don't want the ActionMixin in here as that would
+    # allow the user to perform the regular actions using an old version
+    # as input with rather unpredictable results
+
     def get_context_data(self, **kwargs):
         kwargs["version"] = self.version
         return super().get_context_data(**kwargs)
