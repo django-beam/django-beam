@@ -51,7 +51,11 @@
     {% elif value|is_bool %}
 
         {% block bool %}
-            {{ value|yesno }}
+            {% if value %}
+                <i class="fa fa-check text-success" title="{% trans "yes"|capfirst %}"></i>
+            {% else %}
+                <i class="fa fa-times" title="{% trans "no"|capfirst %}"></i>
+            {% endif %}
         {% endblock %}
 
     {% elif value|is_int %}
