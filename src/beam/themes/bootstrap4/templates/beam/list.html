@@ -82,7 +82,7 @@
                         {% if actions %}
                         <th>
                             <input class="beam-action__select-across" name="_action_select_across" type="hidden" value="">
-                            <input title={% trans "Select all" %} class="beam-action__select-all" type="checkbox">
+                            <input title="{% trans "Select all" %}" class="beam-action__select-all" type="checkbox">
                         </th>
                         {% endif %}
                         {% for field in component.fields %}
@@ -124,7 +124,7 @@
                             {% endfor %}
                             {% block list_item_links %}
                                 {% if component.list_item_link_layout %}
-                                <td class="pt-2">
+                                <td class="beam-list-item-links">
                                     {% include "beam/partials/list_links.html" with links=viewset.links link_layout=component.list_item_link_layout object=object %}
                                 </td>
                                 {% endif %}
