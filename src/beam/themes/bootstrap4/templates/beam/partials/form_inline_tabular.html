@@ -14,13 +14,17 @@
                     {% if inline.can_order %}<th scope="col"></th>{% endif %}
 
                     {% for field in inline.fields %}
+                        {% if inline.can_order and inline.order_field == field %}
+                            {# skip order field #}
+                        {% else %}
                         {% block label_container %}
-                        <th scope="col">
-                            {% block label %}
-                                {{ inline.model|field_verbose_name:field|capfirst }}
-                            {% endblock %}
-                        </th>
+                            <th scope="col">
+                                {% block label %}
+                                    {{ inline.model|field_verbose_name:field|capfirst }}
+                                {% endblock %}
+                            </th>
                         {% endblock %}
+                        {% endif %}
                     {% endfor %}
 
                     {% if inline.formset.can_delete %}<th scope="col"></th>{% endif %}
