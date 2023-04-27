@@ -75,7 +75,7 @@
                             {% if inline.formset.can_delete %}
                                 {% block delete %}
                                 <button class="btn btn-outline-danger related-inline-item-remove d-none float-right">
-                                    {% trans "delete" %}
+                                    {% trans "delete"|capfirst %}
                                 </button>
                                 {% endblock %}
                             {% endif %}
@@ -106,7 +106,8 @@
                     {% endif %}
                     {% if inline.formset.can_delete %}
                         <button class="btn btn-outline-danger related-inline-item-remove float-right d-none">
-                            {% trans "delete" %}</button>
+                            {% trans "delete"|capfirst %}
+                        </button>
                     {% endif %}
                     {% include "beam/partials/form_layout.html" with form=inline.formset.empty_form fields=inline.fields layout=inline.layout %}
                 </li>
