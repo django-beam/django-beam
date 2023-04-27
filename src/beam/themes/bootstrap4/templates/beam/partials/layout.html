@@ -23,7 +23,7 @@
                     {% if field.is_html %}
 
                         {% block html_field_container %}
-                        <div class="beam-field beam-html-field beam-field-{{ field.name|default:"html" }}">
+                        <div class="beam-field mb-3 beam-html-field beam-field-{{ field.name|default:"html" }}">
                             {% block html_field %}
                                 {{ field.content|safe }}
                             {% endblock %}
@@ -33,7 +33,7 @@
                     {% else %}
 
                         {% block detail_field_container %}
-                        <div class="row">
+                        <div class="row field-group mb-3">
                             <div class="col-sm-4 text-md-right font-weight-bold beam-field-label beam-detail-field-label beam-field-label-{{ field }}">
 
                                 {% block detail_field_label %}

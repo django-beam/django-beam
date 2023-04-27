@@ -27,7 +27,7 @@
                     {% if field.is_html %}
 
                         {% block html_field_container %}
-                        <div class="beam-field beam-html-field beam-field-{{ field.name|default:"html" }}">
+                        <div class="beam-field mb-3 beam-html-field beam-field-{{ field.name|default:"html" }}">
                             {% block html_field %}
                                 {{ field.content|safe }}
                             {% endblock %}
@@ -40,7 +40,7 @@
                         {% if form_field is None %}
 
                             {% block detail_field_container %}
-                            <div class="row">
+                            <div class="row field-group mb-3">
                                 <div class="col-sm-4 text-md-right beam-field-label beam-detail-field-label beam-field-label-{{ field }} ">
 
                                     {% block detail_field_label %}
@@ -66,7 +66,7 @@
                             {% get_options form_field.field.queryset.model as related_options %}
 
                             {% block form_field_container %}
-                            <div class="row field-group">
+                            <div class="row field-group mb-3">
                                 <div class="col-sm-4 text-md-right beam-field-label beam-form-field-label beam-field-label-{{ field }}">
 
                                     {% block form_field_label %}
