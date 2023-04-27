@@ -1,14 +1,16 @@
 {% load crispy_forms_tags crispy_forms_field %}
+
+
 {# work around because we don't render the label using crispy #}
 {% if form_field|is_checkbox %}
     <div class="form-group form-check pt-1">
-    {% if field.errors %}
-        {% crispy_field form_field 'class' 'form-check-input is-invalid' %}
-    {% else %}
-        {% crispy_field form_field 'class' 'form-check-input' %}
-    {% endif %}
+        {% if field.errors %}
+            {% crispy_field form_field 'class' 'form-check-input is-invalid' %}
+        {% else %}
+            {% crispy_field form_field 'class' 'form-check-input' %}
+        {% endif %}
     </div>
 {% else %}
-{# fall back to crispy forms default tempalte #}
-{% include "bootstrap4/field.html" with field=form_field form_show_errors=True %}
+    {# fall back to crispy forms default tempalte #}
+    {% include "bootstrap4/field.html" with field=form_field form_show_errors=True %}
 {% endif %}
