@@ -133,7 +133,7 @@ class ReversionViewTest(TestCase):
 
         fly_version = Version.objects.get_for_object_reference(
             Dragonfly, alpha.pk
-        ).latest("revision__created_date")
+        ).latest("revision__date_created")
 
         self.assertEqual(fly_version.object.name, "beta")
         self.assertEqual(fly_version.field_dict["name"], "beta")
@@ -202,7 +202,7 @@ class ReversionViewTest(TestCase):
             alpha.save()
 
         version = Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
-            "revision__created_date"
+            "revision__date_created"
         )
 
         alpha.name = "beta"
@@ -241,7 +241,7 @@ class ReversionViewTest(TestCase):
             alpha.save()
 
         Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
-            "revision__created_date"
+            "revision__date_created"
         )
         detail_view = VersionedDragonflyViewSet()._get_view(
             VersionedDragonflyViewSet().components["detail"]
@@ -262,7 +262,7 @@ class ReversionViewTest(TestCase):
             alpha.save()
 
         version = Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
-            "revision__created_date"
+            "revision__date_created"
         )
 
         alpha.name = "beta"
@@ -295,7 +295,7 @@ class ReversionViewTest(TestCase):
             alpha.save()
 
         version = Version.objects.get_for_object_reference(Dragonfly, alpha.pk).latest(
-            "revision__created_date"
+            "revision__date_created"
         )
 
         version_view = VersionedDragonflyViewSet()._get_view(
