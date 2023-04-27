@@ -3,6 +3,7 @@
 
 
 {% if fields and not layout %}
+    {# FIXME: shouldn't this use fields instead of form.fields? #}
     {% fields_to_layout form.fields as layout %}
 {% elif not fields and not layout %}
     {% fields_to_layout form.fields as layout %}

@@ -21,10 +21,13 @@
 
         {% block inline_layout %}
         {% for field in form.fields %}
+            {# FIXME field can't be html as we iterate over form.fields not inline.fields or inline.layout #}
             {% if field.is_html %}
                 <td class="beam-field-{{ field }}">
                     {{ field.content|safe }}
                 </td>
+            {% elif inline.can_order and inline.order_field == field %}
+                {# skip order field #}
             {% else %}
                 {% get_form_field form field as form_field %}
                 {% if form_field is None %}
