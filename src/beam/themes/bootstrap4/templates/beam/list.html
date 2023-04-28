@@ -148,9 +148,17 @@
             {% endif %}
         {% endblock %}
 
-        {% block pagination %}
-            {% include "beam/partials/pagination.html" with page_param=view.page_kwarg %}
+        {% block pagination_container %}
+            <div class="row mb-4">
+                <div class="col-sm-9">
+                    {% block pagination %}
+                        {% include "beam/partials/pagination.html" with page_param=view.page_kwarg %}
+                    {% endblock %}
+                </div>
+            </div>
         {% endblock %}
+
+
 
         {% if actions %}
         </form>

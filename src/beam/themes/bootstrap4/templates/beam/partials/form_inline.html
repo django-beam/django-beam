@@ -36,7 +36,7 @@
         {% endblock %}
 
         {% block inline_group_container %}
-        <div class="card mb-4">
+        <div class="card mb-3">
             <ul class="related-inline-group list-group list-group-flush mb-0">
 
                 {% block inline_group %}
@@ -116,23 +116,26 @@
         </div>
         {% endblock %}
 
-        {% block add_form %}
-            <div class="container-fluid mb-2">
-                <div class="row">
-                    <div class="btn-group ml-auto">
-                        {% block inline_add_button %}
-                            {% get_options inline.formset.model as inline_options %}
-                            <button class="btn btn-outline-primary related-inline-item-add d-none">
-                                {% blocktrans with name=inline_options.verbose_name %}add {{ name }}{% endblocktrans %}
-                            </button>
-                        {% endblock %}
-                    </div>
+        {% block pagination_and_add_form_container %}
+            <div class="row align-items-center mb-4">
+                <div class="col-sm-9">
+                    {% block pagination %}
+                        {% include "beam/partials/pagination.html" with page_param=inline.page_param paginator=page.paginator is_paginated=page.has_other_pages page_obj=page page_number=page.number object_list=page.object_list options=inline.model_options %}
+                    {% endblock %}
+                </div>
+                <div class="col-sm-3">
+                    {% block add_form %}
+                        <div class="btn-group float-right">
+                            {% block inline_add_button %}
+                                {% get_options inline.formset.model as inline_options %}
+                                <button class="btn btn-outline-primary related-inline-item-add d-none">
+                                    {% blocktrans with name=inline_options.verbose_name %}add {{ name }}{% endblocktrans %}
+                                </button>
+                            {% endblock %}
+                        </div>
+                    {% endblock %}
                 </div>
             </div>
-        {% endblock %}
-
-        {% block pagination %}
-            {% include "beam/partials/pagination.html" with page_param=inline.page_param paginator=page.paginator is_paginated=page.has_other_pages page_obj=page page_number=page.number object_list=page.object_list options=inline.model_options %}
         {% endblock %}
 
     {% endblock %}
