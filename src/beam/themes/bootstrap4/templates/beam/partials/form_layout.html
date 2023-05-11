@@ -70,8 +70,10 @@
                                 <div class="col-sm-4 text-md-right beam-field-label beam-form-field-label beam-field-label-{{ field }}">
 
                                     {% block form_field_label %}
-                                        <label class="col-form-label" for="{{ form_field.auto_id }}">
-                                            {{ form_field.label }}<span class="text-muted small">{% if form_field.field.required %}*{% else %}&nbsp;{% endif %}</span>
+                                        <label class="col-form-label {% if form_field.field.required %}required-field{% endif %}"
+                                               for="{{ form_field.auto_id }}"
+                                               {% if form_field.field.required %}title="{% trans "This field is required." %}"{% endif %}>
+                                            {{ form_field.label }}{% if form_field.field.required %}<span class="asterisk-field">*</span>{% else %}&nbsp;{% endif %}
                                         </label>
                                     {% endblock %}
 
