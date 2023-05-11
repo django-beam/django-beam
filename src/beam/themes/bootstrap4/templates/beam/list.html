@@ -74,7 +74,8 @@
         {% endif %}
 
         {% block table %}
-            <table class="table table-striped beam-list-table">
+            <div class="table-responsive">
+            <table class="table table-striped border-bottom beam-list-table">
                 {% block table_head %}
                 <thead>
                 <tr>
@@ -132,6 +133,7 @@
                 {% endfor %}
                 </tbody>
             </table>
+            </div>
         {% endblock %}
 
         {% block no_results %}
