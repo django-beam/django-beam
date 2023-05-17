@@ -2,6 +2,7 @@
 {% load beam_tags %}
 
 {% block navigation_container %}
+{% get_apps_for_navigation as apps %}
 <nav class="navbar navbar-expand-md navbar-light shadow-sm border-bottom bg-light mb-3">
     <div class="container">
     {% block navigation %}
