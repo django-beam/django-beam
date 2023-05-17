@@ -183,11 +183,11 @@ def any_filter(iterable):
 
 
 @register.simple_tag(takes_context=True)
-def render_navigation(context):
+def get_apps_for_navigation(context):
     request = context.get("request", None)
     user = request.user if request else None
 
-    grouped = []
+    apps_with_entries = []
     for app_label, viewsets_dict in default_registry.items():
         entries = []
         for viewset in viewsets_dict.values():
@@ -205,10 +205,21 @@ def render_navigation(context):
             "app_config": apps.get_app_config(app_label),
             "entries": entries,
         }
-        grouped.append(group)
-    navigation_template = get_template("beam/partials/navigation.html")
+        apps_with_entries.append(group)
+    return apps_with_entries
+
+
+@register.simple_tag(takes_context=True)
+def render_navigation(context):
+    """
+    Render the navigation template with the apps.
+
+    Deprecated: use get_apps_for_navigation instead.
+    """
+    apps = get_apps_for_navigation(context)
     request = context.get("request", None)
-    return navigation_template.render({"apps": grouped, "request": request})
+    navigation_template = get_template("beam/partials/navigation.html")
+    return navigation_template.render({"apps": apps, "request": request})
 
 
 @register.simple_tag()

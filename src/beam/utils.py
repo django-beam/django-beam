@@ -18,7 +18,7 @@ def navigation_component_entry(
     component=None, user=None, request=None
 ) -> Optional[Tuple[str, str]]:
     """
-    Get an optional tuple (label, url) for a given compoment to use in render_navigation
+    Get an optional tuple (label, url) for a given component to use in render_navigation
     """
     if not component:
         return None

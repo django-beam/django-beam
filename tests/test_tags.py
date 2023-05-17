@@ -1,3 +1,4 @@
+from django.template import RequestContext
 from django.test import RequestFactory, TestCase
 from django.urls import NoReverseMatch
 from test_views import user_with_perms
@@ -6,6 +7,7 @@ from testapp.views import DragonflyViewSet
 
 from beam.templatetags.beam_tags import (
     _add_params_to_url_if_new,
+    get_apps_for_navigation,
     get_visible_links,
     preserve_query_string,
 )
@@ -63,3 +65,24 @@ class TagsTest(TestCase):
         self.assertEqual(
             {component.name for component, url in links}, {"create", "detail"}
         )
+
+    def test_apps_for_navigation(self):
+        request = RequestFactory().get("/")
+        request.user = user_with_perms(
+            ["testapp.view_dragonfly", "testapp.view_sighting"]
+        )
+        context = RequestContext(request, {"request": request})
+        apps = get_apps_for_navigation(context=context)
+        self.assertEqual(len(apps), 1)
+        self.assertEqual(apps[0]["app_label"], "testapp")
+        self.assertEqual(
+            apps[0]["entries"],
+            [("dragonflys", "/dragonfly/"), ("sightings", "/sighting/")],
+        )
+
+    def test_apps_for_navigation_require_permission(self):
+        request = RequestFactory().get("/")
+        request.user = user_with_perms([])
+        context = RequestContext(request, {"request": request})
+        apps = get_apps_for_navigation(context=context)
+        self.assertEqual(apps, [])
