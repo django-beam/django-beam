@@ -1,7 +1,10 @@
-{% load i18n beam_tags %}
-<div class="row" data-object-count="{% if is_paginated %}{{ page_obj.paginator.count }}{% else %}{{ object_list.count }}{% endif %}">
-    <div class="col-sm-6">
-        <p class="pt-2">
+{% load i18n %}
+{% load beam_tags %}
+
+
+<div class="row align-items-center" data-object-count="{% if is_paginated %}{{ page_obj.paginator.count }}{% else %}{{ object_list.count }}{% endif %}">
+    <div class="{% if is_paginated %}col-sm-4{% else %}col-12{% endif %}">
+        <div class="object-count">
             {% if object_list %}
                 {% if is_paginated %}
                     {% blocktrans with total=page_obj.paginator.count start=page_obj.start_index end=page_obj.end_index name=options.verbose_name_plural %}Showing {{ start }} to {{ end }} of {{ total }} {{ name }}{% endblocktrans %}
@@ -11,12 +14,12 @@
                     {% blocktrans with total=object_list.count name_plural=options.verbose_name_plural %}Showing {{ total }} {{ name_plural }}{% endblocktrans %}
                 {% endif %}
             {% endif %}
-        </p>
+        </div>
     </div>
 
     {% if is_paginated %}
-        <nav class="col-sm-6" aria-label="{% trans 'pagination' %}">
-            <ul class="pagination justify-content-end">
+        <nav class="col-sm-8" aria-label="{% trans 'pagination' %}">
+            <ul class="pagination justify-content-center mb-0">
                 {% if page_obj.has_previous %}
                     <li class="page-item">
                         <a class="page-link" href="{% page_link page_param page_obj.previous_page_number  %}" aria-label="Previous">

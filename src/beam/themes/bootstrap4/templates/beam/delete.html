@@ -20,43 +20,41 @@
 
 {% block content %}
     <section class="beam-main">
-        <div class="container">
-            {% block heading_container %}
-                <h1>
-                    {% block heading %}
-                        {% if heading %}
-                            {{ heading }}
-                        {% else %}
-                            {% get_options component.model as options %}
-                            {% blocktrans %}Delete {{ object }}{% endblocktrans %}
-                            <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
-                        {% endif %}
-                    {% endblock %}
-                </h1>
-            {% endblock %}
+        {% block heading_container %}
+            <h1>
+                {% block heading %}
+                    {% if heading %}
+                        {{ heading }}
+                    {% else %}
+                        {% get_options component.model as options %}
+                        {% blocktrans %}Delete {{ object }}{% endblocktrans %}
+                        <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
+                    {% endif %}
+                {% endblock %}
+            </h1>
+        {% endblock %}
 
-            {% if protected_objects %}
+        {% if protected_objects %}
 
-                <p>
-                    {% blocktrans with object_name=object_name %}You can't delete <em>{{ object_name }}</em> because the following objects depend on it:{% endblocktrans %}
-                </p>
-                <ul>{{ protected_objects|unordered_list }}</ul>
+            <p>
+                {% blocktrans with object_name=object_name %}You can't delete <em>{{ object_name }}</em> because the following objects depend on it:{% endblocktrans %}
+            </p>
+            <ul>{{ protected_objects|unordered_list }}</ul>
 
-            {% else %}
-                <p>
-                    {% blocktrans with object_name=object_name %}Are you sure you want to delete <em>{{ object_name }}</em>?{% endblocktrans %}
-                </p>
-                {% if nested_objects|length > 1 %}
-                <p>{%trans "The following objects will also be deleted:" %}</p>
-                <ul>{{ nested_objects|unordered_list }}</ul>
-                {% endif %}
-                <form method="post">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit" class="btn btn-danger float-left">{% trans "Yes, I'm sure" %}</button>
-                </form>
-                <button class="btn btn-default float-left" onclick="window.history.back()">{% trans "No, go back." %}</button>
+        {% else %}
+            <p>
+                {% blocktrans with object_name=object_name %}Are you sure you want to delete <em>{{ object_name }}</em>?{% endblocktrans %}
+            </p>
+            {% if nested_objects|length > 1 %}
+            <p>{%trans "The following objects will also be deleted:" %}</p>
+            <ul>{{ nested_objects|unordered_list }}</ul>
             {% endif %}
-        </div>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-danger float-left">{% trans "Yes, I'm sure" %}</button>
+            </form>
+            <button class="btn btn-default float-left" onclick="window.history.back()">{% trans "No, go back." %}</button>
+        {% endif %}
     </section>
 {% endblock %}

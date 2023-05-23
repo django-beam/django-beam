@@ -22,140 +22,148 @@
 {% block content %}
     {% get_options component.model as options %}
     <section class="beam-main">
-        <div class="container">
-            {% block links_container %}
-                <div class="float-right beam-links">
-                    {% block links %}
-                        {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
-                    {% endblock %}
-                </div>
-            {% endblock %}
-            {% block heading_container %}
-                <h1>
-                    {% block heading %}
-                        {% if heading %}
-                            {{ heading }}
-                        {% else %}
-                            {{ options.verbose_name_plural|capfirst }}
-                        {% endif %}
-                    {% endblock %}
-                </h1>
-            {% endblock %}
-
-            {% block search %}
-                {% if view.search_fields %}
-                    <form method="get" id="search-form">
-                        <div class="input-group">
-                            <input name="q" type="text" value="{{ search_query }}" class="form-control"
-                                   placeholder="{% trans 'Search the list below' %}"
-                                   aria-label="{% trans 'Search the list below' %}"
-                                   aria-describedby="search-form-input">
-                            <div class="input-group-append">
-
-                                {% if search_query %}
-                                    <a href="{{ request.path }}"
-                                       class="btn btn-outline-secondary">{% trans "Clear" %}</a>
-                                {% endif %}
-                                <input type="submit" class="btn btn-outline-primary" value="{% trans 'Search' %}"/>
-                            </div>
-                        </div>
-                    </form>
-                {% endif %}
-            {% endblock %}
-            {% block filters %}
-                {% include "beam/partials/filters.html" %}
-            {% endblock %}
-
-            {% if actions %}
-            <form method="post" id="list-action-form" novalidate>
-                {% csrf_token %}
-                {% block actions %}
-                    {% include "beam/partials/actions.html" %}
+        {% block links_container %}
+            <div class="float-right beam-links">
+                {% block links %}
+                    {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
                 {% endblock %}
-            {% endif %}
+            </div>
+        {% endblock %}
+        {% block heading_container %}
+            <h1>
+                {% block heading %}
+                    {% if heading %}
+                        {{ heading }}
+                    {% else %}
+                        {{ options.verbose_name_plural|capfirst }}
+                    {% endif %}
+                {% endblock %}
+            </h1>
+        {% endblock %}
 
-            {% block table %}
-                <table class="table table-striped beam-list-table">
-                    {% block table_head %}
-                    <thead>
+        {% block search %}
+            {% if view.search_fields %}
+                <form method="get" id="search-form">
+                    <div class="input-group">
+                        <input name="q" type="text" value="{{ search_query }}" class="form-control"
+                               placeholder="{% trans 'Search the list below' %}"
+                               aria-label="{% trans 'Search the list below' %}"
+                               aria-describedby="search-form-input">
+                        <div class="input-group-append">
+
+                            {% if search_query %}
+                                <a href="{{ request.path }}"
+                                   class="btn btn-outline-secondary">{% trans "Clear" %}</a>
+                            {% endif %}
+                            <input type="submit" class="btn btn-outline-primary" value="{% trans 'Search' %}"/>
+                        </div>
+                    </div>
+                </form>
+            {% endif %}
+        {% endblock %}
+        {% block filters %}
+            {% include "beam/partials/filters.html" %}
+        {% endblock %}
+
+        {% if actions %}
+        <form method="post" id="list-action-form" novalidate>
+            {% csrf_token %}
+            {% block actions %}
+                {% include "beam/partials/actions.html" %}
+            {% endblock %}
+        {% endif %}
+
+        {% block table %}
+            <div class="table-responsive">
+            <table class="table table-striped border-bottom beam-list-table">
+                {% block table_head %}
+                <thead>
+                <tr>
+                    {% if actions %}
+                    <th>
+                        <input class="beam-action__select-across" name="_action_select_across" type="hidden" value="">
+                        <input title="{% trans "Select all" %}" class="beam-action__select-all" type="checkbox">
+                    </th>
+                    {% endif %}
+                    {% for field in component.fields %}
+                        <th scope="col" class="beam-list-field-label beam-field-label-{{ field }}">
+                            {% with field_name=field|stringformat:"s" %}{# cast to string to support virtual fields #}
+                                {% if field_name in sortable_fields %}
+                                    {# fixme text-nowrap only if there is a chance to fit this?  #}
+                                    <a class="text-nowrap" href="{% sort_link field_name sorted_fields %}">
+                                        {{ component.model|field_verbose_name:field|capfirst }}&nbsp;{% if field_name in sorted_fields %}<i class="fa fa-caret-up"></i>{% elif "-"|add:field_name in sorted_fields %}<i class="fa fa-caret-down"></i>{% endif %}
+                                    </a>
+                                    {% if field_name in sorted_fields or "-"|add:field_name in sorted_fields %}
+                                        <a title="{% trans "reset sort" %}" href="{% sort_link "" "" %}"><i class="fa fa-remove"></i></a>
+                                    {% endif %}
+                                {% else %}
+                                    {{ component.model|field_verbose_name:field|capfirst }}
+                                {% endif %}
+                            {% endwith %}
+                        </th>
+                    {% endfor %}
+                    {% if component.list_item_link_layout %}
+                    <th>{% trans "Actions" %}</th>
+                    {% endif %}
+                </tr>
+                </thead>
+                    {% endblock %}
+                <tbody>
+                {% for object in object_list %}
                     <tr>
                         {% if actions %}
-                        <th>
-                            <input class="beam-action__select-across" name="_action_select_across" type="hidden" value="">
-                            <input title={% trans "Select all" %} class="beam-action__select-all" type="checkbox">
-                        </th>
+                        <td class="beam-list-action-checkbox">
+                            <input type="checkbox" class="beam-action__select-item" name="_action_select[]"
+                                   value="{{ object.pk }}">
+                        </td>
                         {% endif %}
                         {% for field in component.fields %}
-                            <th scope="col" class="beam-list-field-label beam-field-label-{{ field }}">
-                                {% with field_name=field|stringformat:"s" %}{# cast to string to support virtual fields #}
-                                    {% if field_name in sortable_fields %}
-                                        {# fixme text-nowrap only if there is a chance to fit this?  #}
-                                        <a class="text-nowrap" href="{% sort_link field_name sorted_fields %}">
-                                            {{ component.model|field_verbose_name:field|capfirst }}&nbsp;{% if field_name in sorted_fields %}<i class="fa fa-caret-up"></i>{% elif "-"|add:field_name in sorted_fields %}<i class="fa fa-caret-down"></i>{% endif %}
-                                        </a>
-                                        {% if field_name in sorted_fields or "-"|add:field_name in sorted_fields %}
-                                            <a title="{% trans "reset sort" %}" href="{% sort_link "" "" %}"><i class="fa fa-remove"></i></a>
-                                        {% endif %}
-                                    {% else %}
-                                        {{ component.model|field_verbose_name:field|capfirst }}
-                                    {% endif %}
-                                {% endwith %}
-                            </th>
+                            <td class="beam-list-field beam-field-{{ field }}">
+                                {% include "beam/partials/detail_field.html" with object=object field=field %}
+                            </td>
                         {% endfor %}
-                        {% if component.list_item_link_layout %}
-                        <th>{% trans "Actions" %}</th>
-                        {% endif %}
-                    </tr>
-                    </thead>
-                        {% endblock %}
-                    <tbody>
-                    {% for object in object_list %}
-                        <tr>
-                            {% if actions %}
-                            <td class="beam-list-action-checkbox">
-                                <input type="checkbox" class="beam-action__select-item" name="_action_select[]"
-                                       value="{{ object.pk }}">
+                        {% block list_item_links %}
+                            {% if component.list_item_link_layout %}
+                            <td class="beam-list-item-links">
+                                {% include "beam/partials/list_links.html" with links=viewset.links link_layout=component.list_item_link_layout object=object %}
                             </td>
                             {% endif %}
-                            {% for field in component.fields %}
-                                <td class="beam-list-field beam-field-{{ field }}">
-                                    {% include "beam/partials/detail_field.html" with object=object field=field %}
-                                </td>
-                            {% endfor %}
-                            {% block list_item_links %}
-                                {% if component.list_item_link_layout %}
-                                <td class="pt-2">
-                                    {% include "beam/partials/list_links.html" with links=viewset.links link_layout=component.list_item_link_layout object=object %}
-                                </td>
-                                {% endif %}
-                            {% endblock %}
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            {% endblock %}
+                        {% endblock %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        {% endblock %}
 
-            {% block no_results %}
-                {% if not object_list %}
-                    <p class="alert alert-info" role="alert">
-                        {% if search_query %}
-                            {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }} for query "{{ search_query }}"{% endblocktrans %}.
-                        {% elif filterset and filterset.is_bound and filterset.is_valid %}
-                            {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }} that match the current filters{% endblocktrans %}.
-                        {% else %}
-                            {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }}{% endblocktrans %}.
-                        {% endif %}
-                    </p>
-                {% endif %}
-            {% endblock %}
-
-            {% block pagination %}
-                {% include "beam/partials/pagination.html" with page_param=view.page_kwarg %}
-            {% endblock %}
-
-            {% if actions %}
-            </form>
+        {% block no_results %}
+            {% if not object_list %}
+                <p class="alert alert-info" role="alert">
+                    {% if search_query %}
+                        {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }} for query "{{ search_query }}"{% endblocktrans %}.
+                    {% elif filterset and filterset.is_bound and filterset.is_valid %}
+                        {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }} that match the current filters{% endblocktrans %}.
+                    {% else %}
+                        {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }}{% endblocktrans %}.
+                    {% endif %}
+                </p>
             {% endif %}
-        </div>
+        {% endblock %}
+
+        {% block pagination_container %}
+            <div class="row mb-4">
+                <div class="col-sm-9">
+                    {% block pagination %}
+                        {% include "beam/partials/pagination.html" with page_param=view.page_kwarg %}
+                    {% endblock %}
+                </div>
+            </div>
+        {% endblock %}
+
+
+
+        {% if actions %}
+        </form>
+        {% endif %}
     </section>
 {% endblock %}

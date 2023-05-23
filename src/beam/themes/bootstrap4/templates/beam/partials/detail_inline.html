@@ -31,7 +31,7 @@
         {% endblock %}
 
         {% block inline_group_container %}
-        <div class="card mb-4">
+        <div class="card mb-3">
             <ul class="list-group list-group-flush mb-0">
             {% block inline_group %}
 
@@ -91,8 +91,14 @@
         </div>
         {% endblock %}
 
-        {% block pagination %}
-            {% include "beam/partials/pagination.html" with page_param=inline.page_param paginator=page.paginator is_paginated=page.has_other_pages page_obj=page page_number=page.number object_list=page.object_list options=inline.model_options %}
+        {% block pagination_container %}
+            <div class="row mb-4">
+                <div class="col-sm-9">
+                    {% block pagination %}
+                        {% include "beam/partials/pagination.html" with page_param=inline.page_param paginator=page.paginator is_paginated=page.has_other_pages page_obj=page page_number=page.number object_list=page.object_list options=inline.model_options %}
+                    {% endblock %}
+                </div>
+            </div>
         {% endblock %}
 
         {% block actions_container_end %}
