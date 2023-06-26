@@ -8,9 +8,12 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db.models import Manager, Model, QuerySet
 from django.db.models.fields.files import FieldFile, ImageFieldFile
 from django.db.models.fields.reverse_related import ForeignObjectRel
+from django.forms import Form
 from django.template import RequestContext
 from django.template.loader import get_template
+from django.utils.html import escape
 from django.utils.http import urlencode
+from django.utils.safestring import mark_safe
 
 from beam.components import BaseComponent
 from beam.layouts import layout_links
@@ -228,7 +231,7 @@ def fields_to_layout(fields):
 
 
 @register.simple_tag(takes_context=True)
-def sort_link(context, field: str, sorted_fields: Sequence[str]):
+def sort_link(context, field: str, sorted_fields: Sequence[str], page_param=None):
     sort_param = context["view"].sort_param
     sort_separator = context["view"].sort_separator
 
@@ -245,32 +248,88 @@ def sort_link(context, field: str, sorted_fields: Sequence[str]):
         sorted_fields.append(field)
 
     return preserve_query_string(
-        context, **{"page": "", sort_param: sort_separator.join(sorted_fields)}
+        context, ignore_params=page_param, **{sort_param: sort_separator.join(sorted_fields)}
     )
 
 
 @register.simple_tag(takes_context=True)
-def page_link(context, page_query_string, page_number):
-    return preserve_query_string(context, **{page_query_string: page_number})
+def page_link(context, page_param, page_number):
+    return preserve_query_string(context, **{page_param: page_number})
 
 
 @register.simple_tag(takes_context=True)
-def preserve_query_string(context, **kwargs):
+def preserve_query_string(context, ignore_params=None, **kwargs):
+    get = preserve_get_params(context, ignore_params=ignore_params, **kwargs)
+    return "?{}".format(get.urlencode())
+
+
+@register.simple_tag(takes_context=True)
+def preserve_get_params_as_hidden_inputs(context, ignore_params=None, **kwargs):
+    get = preserve_get_params(context, ignore_params=ignore_params, **kwargs)
+    inputs = [
+        f'<input type="hidden" name="{escape(k)}" value="{escape(v)}">' for k, v in get.items()
+    ]
+    return mark_safe("".join(inputs))
+
+
+@register.simple_tag(takes_context=True)
+def preserve_get_params(context, ignore_params=None, **kwargs):
+    """Preserve GET parameters from the current URL, whilst overwriting parameters
+    given by optional kwargs. Optional ignore_params will be removed from the parameters.
+
+    :param context: a Django template context
+    :param ignore_params: if provided, the ignore_params will be removed from the get parameters
+    :param kwargs: further kwargs will overwrite parameters with the given values
+    :return: a dict with all preserved get parameters
+    """
     if "request" not in context:
         raise Exception(
-            "The query_string tag requires django.core.context_processors.request"
+            "The preserve_get_params tag requires django.core.context_processors.request"
         )
-    request = context["request"]
 
+    request = context["request"]
     get = request.GET.copy()
 
-    for item, value in kwargs.items():
-        if value == "":
-            get.pop(item, None)
-        else:
-            get[item] = value
+    # ignore_params may be a string
+    if isinstance(ignore_params, str):
+        get.pop(ignore_params, None)
 
-    return "?{}".format(get.urlencode())
+    # or a list of strings
+    elif isinstance(ignore_params, list):
+        for param in ignore_params:
+            get.pop(param, None)
+
+    # kwargs overwrite the parameters
+    for key, value in kwargs.items():
+        if value == "":
+            get.pop(key, None)
+        else:
+            get[key] = value
+
+    return get
+
+
+@register.simple_tag
+def build_ignore_params(*args):
+    """
+    Builds a list of parameter names which should be ignored when preserving GET params.
+
+    :param args: each arg may be a name of a parameter to ignore
+        or a form, whose fields should be ignored
+    :return: a list of parameter names to ignore
+    """
+    ignore_params = []
+    for arg in args:
+        if isinstance(arg, Form):
+            for field in arg:
+                key = field.name
+                if arg.prefix:
+                    key = arg.prefix + "-" + key
+                ignore_params.append(key)
+        elif isinstance(arg, str):
+            ignore_params.append(arg)
+
+    return ignore_params
 
 
 def _add_params_to_url_if_new(url, default_params):
