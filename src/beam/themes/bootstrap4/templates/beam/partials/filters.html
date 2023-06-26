@@ -1,4 +1,7 @@
 {% load i18n %}
+{% load beam_tags %}
+
+
 {% if filterset %}
     <div class="beam-filterset mt-3 mb-3">
         <div class="input-group">
@@ -11,16 +14,24 @@
         </div>
         <div class="beam-filterset__collapse collapse {% if filterset.form.has_changed %}show{% endif %} mt-3"
              id="filter-form-container">
+
             <form method="get" id="{{ filterset.form.prefix }}-form" class="beam-filterset__form">
+
                 {% include "beam/partials/form_layout.html" with form=filterset.form %}
-                <input type="hidden" name="_has_beam_filter" value="1">
+
+                {% build_ignore_params filterset.form page_param as ignore_params %}
+
+                {% preserve_get_params_as_hidden_inputs ignore_params=ignore_params _has_beam_filter="1" %}
+
                 <div class="input-group">
-                    <a href="{{ request.path }}"
+                    <a href="{{ request.path }}{% preserve_query_string ignore_params=ignore_params _has_beam_filter="0" %}"
                        class="btn btn-outline-secondary">{% trans "Clear filters" %}</a>
                     <input type="submit" class="btn btn-outline-primary ml-auto"
                            value="{% trans 'Filter' %}"/>
                 </div>
+
             </form>
+
         </div>
     </div>
 {% endif %}

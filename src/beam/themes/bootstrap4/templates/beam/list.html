@@ -44,6 +44,9 @@
         {% block search %}
             {% if view.search_fields %}
                 <form method="get" id="search-form">
+
+                    {% preserve_get_params_as_hidden_inputs ignore_params=view.page_kwarg q="" %}
+
                     <div class="input-group">
                         <input name="q" type="text" value="{{ search_query }}" class="form-control"
                                placeholder="{% trans 'Search the list below' %}"
@@ -52,7 +55,7 @@
                         <div class="input-group-append">
 
                             {% if search_query %}
-                                <a href="{{ request.path }}"
+                                <a href="{{ request.path }}{% preserve_query_string ignore_params=view.page_kwarg q="" %}"
                                    class="btn btn-outline-secondary">{% trans "Clear" %}</a>
                             {% endif %}
                             <input type="submit" class="btn btn-outline-primary" value="{% trans 'Search' %}"/>
@@ -62,7 +65,7 @@
             {% endif %}
         {% endblock %}
         {% block filters %}
-            {% include "beam/partials/filters.html" %}
+            {% include "beam/partials/filters.html" with page_param=view.page_kwarg %}
         {% endblock %}
 
         {% if actions %}
@@ -90,11 +93,11 @@
                             {% with field_name=field|stringformat:"s" %}{# cast to string to support virtual fields #}
                                 {% if field_name in sortable_fields %}
                                     {# fixme text-nowrap only if there is a chance to fit this?  #}
-                                    <a class="text-nowrap" href="{% sort_link field_name sorted_fields %}">
+                                    <a class="text-nowrap" href="{% sort_link field_name sorted_fields page_param=view.page_kwarg %}">
                                         {{ component.model|field_verbose_name:field|capfirst }}&nbsp;{% if field_name in sorted_fields %}<i class="fa fa-caret-up"></i>{% elif "-"|add:field_name in sorted_fields %}<i class="fa fa-caret-down"></i>{% endif %}
                                     </a>
                                     {% if field_name in sorted_fields or "-"|add:field_name in sorted_fields %}
-                                        <a title="{% trans "reset sort" %}" href="{% sort_link "" "" %}"><i class="fa fa-remove"></i></a>
+                                        <a title="{% trans "reset sort" %}" href="{% sort_link "" "" page_param=view.page_kwarg %}"><i class="fa fa-remove"></i></a>
                                     {% endif %}
                                 {% else %}
                                     {{ component.model|field_verbose_name:field|capfirst }}
