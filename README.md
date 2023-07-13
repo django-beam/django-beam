@@ -80,6 +80,26 @@ The `beam.contrib` package provides integration with several third-party Django 
 
 Refer to the documentation for usage instructions on each of the contrib packages.
 
+## Testing
+
+You can use the [tox](https://tox.readthedocs.io/en/latest/) testing tool to run the tests:
+
+```bash
+tox -e py38-djangolatest
+```
+
+Run the tests of a specific test file only:
+
+```bash
+tox -e py38-djangolatest -- test_tags
+```
+
+Run against all supported versions of Python and Django:
+
+```bash
+tox
+```
+
 ## Support
 
 If you encounter any issues or have questions, please refer to the [django-beam documentation](https://django-beam.readthedocs.io/en/latest/) or raise an issue on the [GitHub repository](https://github.com/yourgithubuser/django-beam/issues).
