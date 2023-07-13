@@ -3,12 +3,15 @@
 
 {# work around because we don't render the label using crispy #}
 {% if form_field|is_checkbox %}
-    <div class="form-group form-check pt-1">
-        {% if field.errors %}
-            {% crispy_field form_field 'class' 'form-check-input is-invalid' %}
-        {% else %}
-            {% crispy_field form_field 'class' 'form-check-input' %}
-        {% endif %}
+    <div class="form-group mb-0">
+        <div class="form-check mt-2 pl-0">
+            {% if form_field.errors %}
+                {% crispy_field form_field 'class' 'form-check-input is-invalid ml-0 position-relative' %}
+            {% else %}
+                {% crispy_field form_field 'class' 'form-check-input ml-0 position-relative' %}
+            {% endif %}
+            {% include 'bootstrap4/layout/help_text_and_errors.html' with field=form_field form_show_errors=True only %}
+        </div>
     </div>
 {% else %}
     {# fall back to crispy forms default tempalte #}
