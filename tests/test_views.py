@@ -213,6 +213,45 @@ class ViewTest(WebTest):
         self.assertContains(response, "alpha")
         self.assertNotContains(response, "omega")
 
+    def test_list_clear_search(self):
+        Dragonfly.objects.create(name="alpha", age=12)
+        Dragonfly.objects.create(name="omega", age=99)
+        result_page = self.app.get(
+            DragonflyViewSet().links["list"].reverse() + "?q=alpha",
+            user=user_with_perms(["testapp.view_dragonfly"]),
+        )
+        response = result_page.click(_("Clear"), index=0)
+
+        self.assertContains(response, "alpha")
+        self.assertContains(response, "omega")
+
+    def test_list_search_and_pagination(self):
+        for i in range(DragonflyViewSet.list_paginate_by * 5):
+            Dragonfly.objects.create(name="dragonfly-{:02}".format(i), age=100)
+
+        first_page = self.app.get(
+            DragonflyViewSet().links["list"].reverse() + "?q=dragonfly-1",
+            user=user_with_perms(["testapp.view_dragonfly"]),
+        )
+        self.assertContains(first_page, "dragonfly-10")
+        self.assertContains(first_page, "dragonfly-11")
+        self.assertContains(first_page, "dragonfly-12")
+        self.assertContains(first_page, "dragonfly-13")
+        self.assertContains(first_page, "dragonfly-14")
+        self.assertNotContains(first_page, "dragonfly-15")
+
+        second_page = first_page.click("2")
+        self.assertNotContains(second_page, "dragonfly-14")
+        self.assertContains(second_page, "dragonfly-15")
+        self.assertContains(second_page, "dragonfly-16")
+        self.assertContains(second_page, "dragonfly-17")
+        self.assertContains(second_page, "dragonfly-18")
+        self.assertContains(second_page, "dragonfly-19")
+        self.assertNotContains(second_page, "dragonfly-20")
+
+        search_form = second_page.forms["search-form"]
+        self.assertEqual(search_form["q"].value, "dragonfly-1")
+
     def test_list_filter_with_class(self):
         Dragonfly.objects.create(name="alpha", age=12)
         Dragonfly.objects.create(name="omega", age=99)
@@ -256,6 +295,19 @@ class ViewTest(WebTest):
         self.assertNotContains(tokyo_response, "alpha")
         self.assertContains(tokyo_response, "omega")
 
+    def test_list_filter_empty(self):
+        alpha = Dragonfly.objects.create(name="alpha", age=12)
+        omega = Dragonfly.objects.create(name="omega", age=99)
+        Sighting.objects.create(name="Berlin", dragonfly=alpha)
+        Sighting.objects.create(name="Tokyo", dragonfly=omega)
+
+        response = self.app.get(
+            SightingViewSet().links["list"].reverse(),
+            user=user_with_perms(["testapp.view_sighting"]),
+        )
+
+        filter_form = response.forms["filter-form"]
+
         filter_form["filter-name"] = "nothing"
         empty_response = filter_form.submit()
         self.assertNotContains(empty_response, "alpha")
@@ -264,6 +316,80 @@ class ViewTest(WebTest):
             empty_response,
             "Could not find any sightings that match the current filters",
         )
+
+    def test_list_clear_filter(self):
+        Dragonfly.objects.create(name="alpha", age=12)
+        response = self.app.get(
+            DragonflyViewSet().links["list"].reverse(),
+            user=user_with_perms(["testapp.view_dragonfly"]),
+        )
+
+        filter_form = response.forms["filter-form"]
+
+        filter_form["filter-max_age"] = "0"
+        max_0 = filter_form.submit()
+        self.assertNotContains(max_0, "alpha")
+
+        cleared = max_0.click(_("Clear filters"))
+        self.assertContains(cleared, "alpha")
+
+    def test_list_search_and_filter(self):
+        Dragonfly.objects.create(name="alpha", age=12)
+        Dragonfly.objects.create(name="beta", age=23)
+        Dragonfly.objects.create(name="alvin", age=52)
+        Dragonfly.objects.create(name="omega", age=99)
+        searched = self.app.get(
+            DragonflyViewSet().links["list"].reverse() + "?q=al",
+            user=user_with_perms(["testapp.view_dragonfly"]),
+        )
+        self.assertContains(searched, "alpha")
+        self.assertNotContains(searched, "beta")
+        self.assertContains(searched, "alvin")
+        self.assertNotContains(searched, "omega")
+
+        filter_form = searched.forms["filter-form"]
+
+        filter_form["filter-max_age"] = "50"
+        max_50_and_searched = filter_form.submit()
+        self.assertContains(max_50_and_searched, "alpha")
+        self.assertNotContains(max_50_and_searched, "beta")
+        self.assertNotContains(max_50_and_searched, "alvin")
+        self.assertNotContains(max_50_and_searched, "omega")
+
+        max_50 = max_50_and_searched.click(_("Clear"), index=0)
+        self.assertContains(max_50, "alpha")
+        self.assertContains(max_50, "beta")
+        self.assertNotContains(max_50, "alvin")
+        self.assertNotContains(max_50, "omega")
+
+    def test_list_filter_and_search(self):
+        Dragonfly.objects.create(name="alpha", age=12)
+        Dragonfly.objects.create(name="beta", age=23)
+        Dragonfly.objects.create(name="alvin", age=52)
+        Dragonfly.objects.create(name="omega", age=99)
+
+        max_50 = self.app.get(
+            DragonflyViewSet().links["list"].reverse() + "?filter-max_age=50",
+            user=user_with_perms(["testapp.view_dragonfly"]),
+        )
+        self.assertContains(max_50, "alpha")
+        self.assertContains(max_50, "beta")
+        self.assertNotContains(max_50, "alvin")
+        self.assertNotContains(max_50, "omega")
+
+        search_form = max_50.forms["search-form"]
+        search_form["q"] = "al"
+        max_50_and_searched = search_form.submit()
+        self.assertContains(max_50_and_searched, "alpha")
+        self.assertNotContains(max_50_and_searched, "beta")
+        self.assertNotContains(max_50_and_searched, "alvin")
+        self.assertNotContains(max_50_and_searched, "omega")
+
+        searched = max_50_and_searched.click(_("Clear filters"))
+        self.assertContains(searched, "alpha")
+        self.assertNotContains(searched, "beta")
+        self.assertContains(searched, "alvin")
+        self.assertNotContains(searched, "omega")
 
     def test_list_sort(self):
         user = user_with_perms(["testapp.view_dragonfly"])
