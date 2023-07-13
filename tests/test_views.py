@@ -3,6 +3,7 @@ from unittest import TestCase, mock
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from django_webtest import WebTest
 from testapp.models import (
     CascadingSighting,
@@ -162,6 +163,27 @@ class ViewTest(WebTest):
         self.assertNotContains(response, "page=8")
         self.assertContains(response, "page=9")
         self.assertContains(response, "page=10")
+
+    def test_list_pagination_show_all(self):
+        for i in range(DragonflyViewSet.list_paginate_by * 2):
+            Dragonfly.objects.create(name="dragonfly-{:02}".format(i), age=100)
+
+        first_page = self.app.get(
+            DragonflyViewSet().links["list"].reverse(),
+            user=user_with_perms(["testapp.view_dragonfly"]),
+        )
+
+        show_all_page = first_page.click(_("Show all"))
+        self.assertContains(show_all_page, "dragonfly-00")
+        self.assertContains(show_all_page, "dragonfly-01")
+        self.assertContains(show_all_page, "dragonfly-02")
+        self.assertContains(show_all_page, "dragonfly-03")
+        self.assertContains(show_all_page, "dragonfly-04")
+        self.assertContains(show_all_page, "dragonfly-05")
+        self.assertContains(show_all_page, "dragonfly-06")
+        self.assertContains(show_all_page, "dragonfly-07")
+        self.assertContains(show_all_page, "dragonfly-08")
+        self.assertContains(show_all_page, "dragonfly-09")
 
     def test_list_requires_permission(self):
         Dragonfly.objects.create(name="alpha", age=12)

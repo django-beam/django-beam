@@ -536,12 +536,22 @@ class ListView(
     ComponentMixin,
     generic.ListView,
 ):
+    paginate_max_show_all = 250
+
     @property
     def search_fields(self):
         return self.component.list_search_fields
 
     def get_paginate_by(self, queryset):
-        return self.component.list_paginate_by
+        paginate_by = self.paginate_by or self.component.list_paginate_by
+
+        show_all = self.request.GET.get("show_all", False)
+
+        if show_all and queryset.count() <= self.paginate_max_show_all:
+            # ensure the queryset will not be paginated
+            return None
+
+        return paginate_by
 
     def get_search_query(self):
         if not self.search_fields:
@@ -555,6 +565,7 @@ class ListView(
         context = super().get_context_data(**kwargs)
         context["search_query"] = self.get_search_query()
         context["list_item_link_layout"] = self.component.list_item_link_layout
+        context["paginate_max_show_all"] = self.paginate_max_show_all
         return context
 
 

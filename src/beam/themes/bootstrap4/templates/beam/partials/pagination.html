@@ -8,6 +8,12 @@
             {% if object_list %}
                 {% if is_paginated %}
                     {% blocktrans with total=page_obj.paginator.count start=page_obj.start_index end=page_obj.end_index name=options.verbose_name_plural %}Showing {{ start }} to {{ end }} of {{ total }} {{ name }}{% endblocktrans %}
+                    {% if page_obj.paginator.count <= paginate_max_show_all %}
+                        <a class="ml-2"
+                           href="{% preserve_query_string ignore_params=page_param show_all=1 %}">
+                            {% trans "Show all"|capfirst %}
+                        </a>
+                    {% endif %}
                 {% elif page_obj.paginator.count == 1 %}
                     {% blocktrans with total=page_obj.paginator.count name_singular=options.verbose_name %}Showing {{ total }} {{ name_singular }}{% endblocktrans %}
                 {% else %}
