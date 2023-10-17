@@ -33,7 +33,7 @@
             <tbody>
                 {% for object in page.object_list %}
                     {% block inline_item_container %}
-                    <tr id="{{ inline.prefix }}-{{ forloop.counter0 }}">
+                    <tr id="{{ inline.prefix }}-{{ forloop.counter0 }}" data-item-id="{{ object.id }}">
                         {% if actions %}
                             <td>
                                 {% block select_item %}{{ block.super }}{% endblock %}

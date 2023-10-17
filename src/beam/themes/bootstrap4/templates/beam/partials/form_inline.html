@@ -43,7 +43,7 @@
                 {% for form in inline.formset %}
 
                     {% block inline_item_container %}
-                    <li data-inline-id="{{ forloop.counter0 }}" id="{{ inline.prefix }}-{{ forloop.counter0 }}"
+                    <li data-inline-id="{{ forloop.counter0 }}" id="{{ inline.prefix }}-{{ forloop.counter0 }}" data-item-id="{{ object.id }}"
                         class="related-inline-item list-group-item bg-light pt-4">
 
                         {% block inline_item %}
