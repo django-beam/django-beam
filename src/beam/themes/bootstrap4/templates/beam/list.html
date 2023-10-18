@@ -113,7 +113,7 @@
                     {% endblock %}
                 <tbody>
                 {% for object in object_list %}
-                    <tr>
+                    <tr data-pk="{{ object.pk }}">
                         {% if actions %}
                         <td class="beam-list-action-checkbox">
                             <input type="checkbox" class="beam-action__select-item" name="_action_select[]"
