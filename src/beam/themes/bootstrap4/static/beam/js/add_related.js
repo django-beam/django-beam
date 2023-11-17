@@ -7,6 +7,7 @@ function add_create_related_button(elem, text, url) {
 
   jQuery("<a><i class='fa fa-plus-circle' title='" + text + "'></a>")
     .appendTo(elem)
+    .attr("class", "beam-create-related")
     .attr("rel", "opener")
     .attr("href", url)
     .attr("target", "_blank")
