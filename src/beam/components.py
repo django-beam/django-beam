@@ -222,6 +222,22 @@ class ListComponent(Component):
 class Link(BaseComponent):
     """
     A component class that can be added to ViewSet.links to add links to external views.
+
+    Example usage:
+
+        class SomeViewSet(beam.ViewSet):
+            @property
+            def links(self) -> Dict[str, BaseComponent]:
+                links = super().links
+                links["frontend"] = Link(
+                    viewset=self,
+                    name="frontend",
+                    verbose_name=_("frontend"),
+                    url_name="uploads_upload_frontend",
+                    url_kwargs={"public_id": "public_id"},
+                    permission="uploads.view_frontend",
+                )
+                return links
     """
 
     pass
