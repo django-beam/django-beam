@@ -21,7 +21,7 @@ function add_create_related_button(elem, text, url) {
 function change_input_value(elem, value, text) {
   if (elem.tagName === "SELECT") {
     let option = new Option(text, value, true, true);
-    elem.appendChild(option);
+    elem.prepend(option);
   } else {
     elem.val(value);
   }
