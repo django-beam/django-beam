@@ -15,5 +15,5 @@
     </div>
 {% else %}
     {# fall back to crispy forms default tempalte #}
-    {% include "bootstrap4/field.html" with field=form_field form_show_errors=True wrapper_class="mb-0" %}
+    {% include "bootstrap4/field.html" with field=form_field form_show_errors=True wrapper_class="mb-0" tag=None %}
 {% endif %}

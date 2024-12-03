@@ -42,7 +42,7 @@
                          data-create-text="{% blocktrans with verbose_name=related_options.verbose_name|capfirst %}Create {{ verbose_name }}{% endblocktrans %}"
                          data-create-url="{{ create_url }}?_popup={{ form_field.auto_id }}"
                     {% endif %}>
-                        {% include "bootstrap4/field.html" with field=form_field form_show_errors=True wrapper_class="mb-0" %}
+                        {% include "bootstrap4/field.html" with field=form_field form_show_errors=True wrapper_class="mb-0" tag=None %}
                     </td>
 
                 {% endif %}
