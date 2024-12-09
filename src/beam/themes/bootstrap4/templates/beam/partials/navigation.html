@@ -76,9 +76,10 @@
 
                                         {% block logout_item %}
                                             {% if logout_url %}
-                                                <a class="dropdown-item" href="{{ logout_url }}">
-                                                    {% trans "Log out" %}
-                                                </a>
+                                                <form id="logout-form" method="post" action="{{ logout_url }}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="dropdown-item">{% translate "Log out" %}</button>
+                                                </form>
                                             {% endif %}
                                         {% endblock %}
 
