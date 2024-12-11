@@ -19,7 +19,10 @@
 
 
 {% block content %}
-    <form method="post" class="beam-form" enctype="multipart/form-data" novalidate>
+    {% get_options component.model as options %}
+    <form method="post" class="beam-form"
+          id="{{ options.app_label }}-{{ options.model_name }}-form"
+          enctype="multipart/form-data" novalidate>
         {% block form %}
         {% csrf_token %}
 
