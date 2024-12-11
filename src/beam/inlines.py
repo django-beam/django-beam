@@ -131,6 +131,7 @@ class BaseRelatedInline(object):
     def get_formset_kwargs(self):
         return {
             "instance": self.parent_instance,
+            "queryset": self.get_queryset(),
             "data": self.request.POST if self.request and self.request.POST else None,
             "files": self.request.FILES
             if self.request and self.request.FILES
