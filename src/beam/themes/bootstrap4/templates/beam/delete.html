@@ -49,7 +49,7 @@
             <p>{%trans "The following objects will also be deleted:" %}</p>
             <ul>{{ nested_objects|unordered_list }}</ul>
             {% endif %}
-            <form method="post">
+            <form {% block form_attributes %}method="post" {% get_options component.model as options %} id="{{ options.app_label }}-{{ options.model_name }}-delete-form"{% endblock %}>
                 {% csrf_token %}
                 {{ form.as_p }}
                 <button type="submit" class="btn btn-danger float-left">{% trans "Yes, I'm sure" %}</button>

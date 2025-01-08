@@ -5,6 +5,8 @@
 
 {% block body_classes %}{{ block.super }} beam-update{% if component.model %}{% get_options component.model as options %} beam-update-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
 
+{% block form_attributes %}{{ block.super }} {% get_options component.model as options %} id="{{ options.app_label }}-{{ options.model_name }}-update-form"{% endblock %}
+
 
 {% block title %}
     {% if heading %}
