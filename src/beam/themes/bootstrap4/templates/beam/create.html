@@ -2,3 +2,5 @@
 {% load beam_tags %}
 
 {% block body_classes %}{{ block.super }} beam-create{% if component.model %}{% get_options component.model as options %} beam-create-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
+
+{% block form_attributes %}{{ block.super }} {% get_options component.model as options %} id="{{ options.app_label }}-{{ options.model_name }}-create-form"{% endblock %}
