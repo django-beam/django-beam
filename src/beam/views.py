@@ -1,3 +1,4 @@
+import warnings
 from typing import List, Optional, Type
 
 from django.apps import apps
@@ -6,12 +7,13 @@ from django.contrib.admin.utils import NestedObjects
 from django.core.exceptions import FieldDoesNotExist, PermissionDenied
 from django.db import router
 from django.forms import all_valid
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.html import escape
 from django.utils.translation import gettext as _
 from django.views import generic
 from django.views.generic.base import ContextMixin, TemplateView
+from django.views.generic.edit import DeletionMixin
 from django_filters.filterset import filterset_factory
 from extra_views import SearchableListMixin
 
@@ -586,20 +588,38 @@ class DeleteView(ComponentMixin, InlinesMixin, generic.DeleteView):
             model=self.model._meta.verbose_name, name=str(self.object)
         )
 
+    def form_valid(self, form):
+        success_url = self.get_success_url()
+        success_message = self.get_success_message()
+
+        if self.__class__.delete is not DeletionMixin.delete:
+            warnings.warn(
+                f"DeleteView uses FormMixin to handle POST requests. As a "
+                f"consequence, any custom deletion logic in "
+                f"{self.__class__.__name__}.delete() handler should be moved "
+                f"to form_valid().",
+            )
+            response = self.delete(self.request)
+        else:
+            self.object.delete()
+            response = HttpResponseRedirect(success_url)
+
+        if success_message:
+            messages.success(self.request, success_message)
+
+        return response
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         nested, protected = self.get_nested_objects(self.object)
         if protected:
             return HttpResponseForbidden()
 
-        success_message = self.get_success_message()
-
-        response = self.delete(request, *args, **kwargs)
-
-        if success_message:
-            messages.success(request, success_message)
-
-        return response
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
     @classmethod
     def get_nested_objects(cls, obj):
