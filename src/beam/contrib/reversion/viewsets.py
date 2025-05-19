@@ -152,12 +152,12 @@ class VersionViewSetMixin(VersionDetailMixin, VersionRestoreMixin, VersionListMi
             self._register_model_with_parents(inline_model)
 
             # if the remote field has an accessor name that
-            # we can follow from our model (not is_hidden())
+            # we can follow from our model (not hidden)
             # we want reversion to follow that accessor when
             # creating a revision for our model
             if not inline_model._meta.get_field(
                 inline_class.foreign_key_field
-            ).remote_field.is_hidden():
+            ).remote_field.hidden:
                 field = inline_model._meta.get_field(inline_class.foreign_key_field)
                 inline_fields.append(field.remote_field.get_accessor_name())
 
