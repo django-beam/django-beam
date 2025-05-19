@@ -28,6 +28,6 @@ repos:
       - id: check-json
       - id: check-added-large-files
   - repo: https://github.com/PyCQA/flake8
-    rev: 3.9.2
+    rev: 7.2.0
     hooks:
       - id: flake8
