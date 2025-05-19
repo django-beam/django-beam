@@ -1,32 +1,33 @@
 from typing import Dict
 from unittest.mock import Mock
 
-from beam.components import BaseComponent, Component
-from beam.viewsets import BaseViewSet, undefined
 from django.test import TestCase
+
+from beam.facets import BaseFacet, Facet
+from beam.viewsets import BaseViewSet, undefined
 
 
 class ViewsetTest(TestCase):
-    def test_get_components(self):
+    def test_get_facets(self):
         class ViewSet(BaseViewSet):
             model = Mock()
             view_class = Mock()
 
-            def get_component_classes(self):
-                return super().get_component_classes() + [("test", Component)]
+            def get_facet_classes(self):
+                return super().get_facet_classes() + [("test", Facet)]
 
-        self.assertEqual(len(ViewSet().components), 1)
+        self.assertEqual(len(ViewSet().facets), 1)
 
     def test_links(self):
         class ViewSet(BaseViewSet):
             model = Mock()
             view_class = Mock()
 
-            def get_component_classes(self):
-                return super().get_component_classes() + [("test", Component)]
+            def get_facet_classes(self):
+                return super().get_facet_classes() + [("test", Facet)]
 
             @property
-            def links(self) -> Dict[str, BaseComponent]:
+            def links(self) -> Dict[str, BaseFacet]:
                 super_links = super().links
                 super_links["extra"] = Mock()
                 return super_links
@@ -42,8 +43,8 @@ class ViewsetTest(TestCase):
             model = Mock()
             view_class = Mock()
 
-            def get_component_classes(self):
-                return super().get_component_classes() + [("test", Component)]
+            def get_facet_classes(self):
+                return super().get_facet_classes() + [("test", Facet)]
 
             url = "foo/<pk>"
 
@@ -57,55 +58,55 @@ class ViewsetTest(TestCase):
             model = Mock()
             view_class = Mock()
 
-            def get_component_classes(self):
-                return super().get_component_classes() + [("test", Component)]
+            def get_facet_classes(self):
+                return super().get_facet_classes() + [("test", Facet)]
 
             url = "foo/<pk>"
 
         viewset = ViewSet()
-        component = viewset.components["test"]
+        facet = viewset.facets["test"]
 
         self.assertEqual(
-            viewset._get_view(component).__wrapped__, ViewSet.view_class.as_view()
+            viewset._get_view(facet).__wrapped__, ViewSet.view_class.as_view()
         )
 
-    def test_resolve_component_kwargs(self):
+    def test_resolve_facet_kwargs(self):
         class ViewSet(BaseViewSet):
             model = Mock()
             view_class = Mock()
             arg = "value"
 
         self.assertEqual(
-            ViewSet()._resolve_component_kwargs("test", ["arg"])["arg"], "value"
+            ViewSet()._resolve_facet_kwargs("test", ["arg"])["arg"], "value"
         )
 
-    def test_resolve_component_kwargs_does_not_return_unspecified_value(self):
+    def test_resolve_facet_kwargs_does_not_return_unspecified_value(self):
         class ViewSet(BaseViewSet):
             model = Mock()
             view_class = Mock()
 
-        component = Mock()
-        component.get_arguments.return_value = ["arg"]
+        facet = Mock()
+        facet.get_arguments.return_value = ["arg"]
 
-        self.assertNotIn("arg", ViewSet()._resolve_component_kwargs("test", ["arg"]))
+        self.assertNotIn("arg", ViewSet()._resolve_facet_kwargs("test", ["arg"]))
 
-    def test_resolve_component_kwargs_does_not_return_sentinel_value(self):
+    def test_resolve_facet_kwargs_does_not_return_sentinel_value(self):
         class ViewSet(BaseViewSet):
             model = Mock()
             view_class = Mock()
             arg = undefined
 
-        self.assertNotIn("arg", ViewSet()._resolve_component_kwargs("test", ["arg"]))
+        self.assertNotIn("arg", ViewSet()._resolve_facet_kwargs("test", ["arg"]))
 
-    def test_resolve_component_kwargs_does_return_falsy_values(self):
+    def test_resolve_facet_kwargs_does_return_falsy_values(self):
         class ViewSet(BaseViewSet):
             model = Mock()
             view_class = Mock()
             arg = None
 
-        self.assertIsNone(ViewSet()._resolve_component_kwargs("test", ["arg"])["arg"])
+        self.assertIsNone(ViewSet()._resolve_facet_kwargs("test", ["arg"])["arg"])
 
-    def test_resolve_component_kwargs_prefers_specific(self):
+    def test_resolve_facet_kwargs_prefers_specific(self):
         class ViewSet(BaseViewSet):
             model = Mock()
             view_class = Mock()
@@ -113,11 +114,11 @@ class ViewsetTest(TestCase):
             test_arg = "specific_value"
 
         self.assertEqual(
-            ViewSet()._resolve_component_kwargs("test", ["arg"])["arg"],
+            ViewSet()._resolve_facet_kwargs("test", ["arg"])["arg"],
             "specific_value",
         )
 
-    def test_resolve_component_kwargs_does_not_return_specific_undefined(self):
+    def test_resolve_facet_kwargs_does_not_return_specific_undefined(self):
         class ViewSet(BaseViewSet):
             model = Mock()
             view_class = Mock()
@@ -125,14 +126,14 @@ class ViewsetTest(TestCase):
             test_arg = undefined
 
         self.assertEqual(
-            ViewSet()._resolve_component_kwargs("test", ["arg"])["arg"], "value"
+            ViewSet()._resolve_facet_kwargs("test", ["arg"])["arg"], "value"
         )
 
-    def test_resolve_component_kwargs_prefers_specific_falsy(self):
+    def test_resolve_facet_kwargs_prefers_specific_falsy(self):
         class ViewSet(BaseViewSet):
             model = Mock()
             view_class = Mock()
             arg = "value"
             test_arg = None
 
-        self.assertIsNone(ViewSet()._resolve_component_kwargs("test", ["arg"])["arg"])
+        self.assertIsNone(ViewSet()._resolve_facet_kwargs("test", ["arg"])["arg"])

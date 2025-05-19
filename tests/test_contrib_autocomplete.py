@@ -1,10 +1,11 @@
-from beam import ViewSet
-from beam.contrib.autocomplete_light import AutocompleteMixin
-from beam.registry import RegistryType
 from django.core.exceptions import PermissionDenied
 from django.test import RequestFactory, TestCase
 from test_views import user_with_perms
 from testapp.models import Dragonfly
+
+from beam import ViewSet
+from beam.contrib.autocomplete_light import AutocompleteMixin
+from beam.registry import RegistryType
 
 registry: RegistryType = {}
 
@@ -26,7 +27,7 @@ class AutocompleteTest(TestCase):
         Dragonfly.objects.create(name="omega", age=99)
 
         view = AutocompleteDragonflyViewSet()._get_view(
-            AutocompleteDragonflyViewSet().components["autocomplete"]
+            AutocompleteDragonflyViewSet().facets["autocomplete"]
         )
 
         response = view(request)
@@ -42,7 +43,7 @@ class AutocompleteTest(TestCase):
         Dragonfly.objects.create(name="omega", age=99)
 
         view = AutocompleteDragonflyViewSet()._get_view(
-            AutocompleteDragonflyViewSet().components["autocomplete"]
+            AutocompleteDragonflyViewSet().facets["autocomplete"]
         )
 
         response = view(request)
@@ -57,7 +58,7 @@ class AutocompleteTest(TestCase):
         request.user = user_with_perms([])
 
         view = AutocompleteDragonflyViewSet()._get_view(
-            AutocompleteDragonflyViewSet().components["autocomplete"]
+            AutocompleteDragonflyViewSet().facets["autocomplete"]
         )
 
         with self.assertRaises(PermissionDenied):

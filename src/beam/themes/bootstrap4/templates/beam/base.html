@@ -31,9 +31,9 @@
 
 
 <body class="beam {% if popup %}popup {% endif %}{% block body_classes %}{% endblock %}"
-      data-beam-component="{{ component.name }}"
-      {% if component.model %}
-          {% get_options component.model as options %}
+      data-beam-facet="{{ facet.name }}"
+      {% if facet.model %}
+          {% get_options facet.model as options %}
           data-model="{{ options.app_label }}.{{ options.model_name }}"
       {% endif %}
       {% if object %} data-pk="{{ object.pk }}" {% endif %}
