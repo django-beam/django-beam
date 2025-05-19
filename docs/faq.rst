@@ -13,7 +13,7 @@ Frequently asked questions
         class SomeViewSet(beam.ViewSet)
             # ...
             @property
-            def links(self) -> Dict[str, BaseComponent]:
+            def links(self) -> Dict[str, BaseFacet]:
                 links = super().links
                 links["frontend"] = Link(
                     viewset=self,

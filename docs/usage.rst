@@ -51,7 +51,7 @@ The most common attributes for the viewset mixins in the provided code are:
 - ``queryset``: The queryset used to fetch the data for the view.
 - ``inline_classes``: A list of related inline classes for the view, see the Inlines section below.
 - ``form_class``: The form class used for handling form submissions in the view.
-- ``link_layout``: A list of components that will be linked from within the user interface, see :ref:`Links between views`.
+- ``link_layout``: A list of facets that will be linked from within the user interface, see :ref:`Links between views`.
 
 For a complete list of attributes, see the documentation for the respective viewset mixins.
 
@@ -190,21 +190,21 @@ If you need to use different inlines for e.g. the detail and the update view, ju
 pass one of them to the ``detail_inline_classes`` and the other to the ``update_inline_classes`` attribute.
 
 
-Adding views: Components
+Adding views: Facets
 ------------------------
 
-Components are used to group and pass relevant attributes from the viewset to
-the individual views. A view is only passed data that it's component expects in
-`__init__`. The component provides methods like ``has_perm`` to check if the user
+Facets are used to group and pass relevant attributes from the viewset to
+the individual views. A view is only passed data that it's facet expects in
+`__init__`. The facet provides methods like ``has_perm`` to check if the user
 has the required permissions to access the relevant view or ``reverse`` to link
 to the view.
 
-You only need to care about components if you want to extend a viewset with
+You only need to care about facets if you want to extend a viewset with
 additional views as in the example below.
 
 .. code-block:: python
 
-    class CustomerCallView(beam.views.ComponentMixin, MyBaseView):
+    class CustomerCallView(beam.views.FacetMixin, MyBaseView):
         phone = None
         # your custom view code goes here ...
 
@@ -212,7 +212,7 @@ additional views as in the example below.
         model = Customer
         fields = ["first_name", "last_name", "email", "phone"]
 
-        call_component = Component
+        call_facet = Facet
         call_url = "call/{phone}/"
         call_url_kwargs = {"phone": "phone"}
         call_permission = "customers.view_customer"
@@ -227,8 +227,8 @@ it will be used for the respective view. For example, if you have a
 model ``customers.Customer`` and create a template ``customers/customer_detail.html``
 it will be used for the detail view of the ``CustomerViewSet``.
 
-Beam also adds a template name based on the component name. For example, if you
-have a component ``call_component`` and create a template ``customers/customer_call.html``
+Beam also adds a template name based on the facet name. For example, if you
+have a facet ``call_facet`` and create a template ``customers/customer_call.html``
 it will be used for the call view.
 
 Beam also provides default templates for all base view.

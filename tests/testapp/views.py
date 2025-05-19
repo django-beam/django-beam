@@ -1,17 +1,18 @@
 import csv
 from typing import Optional
 
-import beam.views
 import django_filters
+from django.db.models import QuerySet
+from django.http import HttpResponse
+
+import beam.views
 from beam import RelatedInline, ViewSet, actions
 from beam.actions import Action, DeleteAction, MassUpdateAction
-from beam.components import ListComponent
+from beam.facets import ListFacet
 from beam.inlines import TabularRelatedInline
 from beam.urls import request_kwarg
 from beam.views import DetailView
-from beam.viewsets import Component
-from django.db.models import QuerySet
-from django.http import HttpResponse
+from beam.viewsets import Facet
 
 from .models import CascadingSighting, Dragonfly, ProtectedSighting, Sighting
 
@@ -67,7 +68,7 @@ class ExtraView(DetailView):
     special_param = None
 
 
-class ExtraComponent(Component):
+class ExtraFacet(Facet):
     show_link = False
 
 
@@ -89,7 +90,7 @@ class DragonflyViewSet(ViewSet):
     list_action_classes = [DeleteAction, DragonFlyUpdateAction]
     list_paginate_by = 5
 
-    extra_component = ExtraComponent
+    extra_facet = ExtraFacet
     extra_view_class = ExtraView
     extra_url = "extra/<str:pk>/<str:special>/"
     extra_url_kwargs = {"pk": "id", "special": request_kwarg("special")}
@@ -101,7 +102,7 @@ class SightingViewSet(ViewSet):
     list_filterset_fields = ["name"]
     queryset = Sighting.objects.order_by("pk")
 
-    other_list_component = ListComponent
+    other_list_facet = ListFacet
     other_list_view_class = beam.views.ListView
     other_list_url = "other/"
     other_list_verbose_name = "Another list is possible"

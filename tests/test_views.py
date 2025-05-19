@@ -37,7 +37,7 @@ def user_with_perms(perms, username="foo", password="bar", user_model=None):
 class TemplateNameTest(TestCase):
     def test_detail_templates(self):
         view = DetailView(
-            component=DragonflyViewSet().components["detail"], object=Dragonfly(pk=123)
+            facet=DragonflyViewSet().facets["detail"], object=Dragonfly(pk=123)
         )
         self.assertEqual(
             view.get_template_names(),
@@ -46,7 +46,7 @@ class TemplateNameTest(TestCase):
 
     def test_list_templates(self):
         view = ListView(
-            component=DragonflyViewSet().components["list"],
+            facet=DragonflyViewSet().facets["list"],
             object_list=Dragonfly.objects.none(),
         )
         self.assertEqual(
@@ -55,7 +55,7 @@ class TemplateNameTest(TestCase):
 
     def test_update_templates(self):
         view = UpdateView(
-            component=DragonflyViewSet().components["update"], object=Dragonfly(pk=123)
+            facet=DragonflyViewSet().facets["update"], object=Dragonfly(pk=123)
         )
         self.assertEqual(
             view.get_template_names(),
@@ -68,7 +68,7 @@ class TemplateNameTest(TestCase):
 
     def test_create_templates(self):
         view = CreateView(
-            component=DragonflyViewSet().components["create"], object=Dragonfly(pk=123)
+            facet=DragonflyViewSet().facets["create"], object=Dragonfly(pk=123)
         )
         self.assertEqual(
             view.get_template_names(),
@@ -81,7 +81,7 @@ class TemplateNameTest(TestCase):
 
     def test_extra_templates(self):
         view = ExtraView(
-            component=DragonflyViewSet().components["extra"], object=Dragonfly(pk=123)
+            facet=DragonflyViewSet().facets["extra"], object=Dragonfly(pk=123)
         )
         self.assertEqual(
             view.get_template_names(),
@@ -95,7 +95,7 @@ class TemplateNameTest(TestCase):
     def test_explicit_template_takes_precedence(self):
         with mock.patch.object(ExtraView, "template_name", "explicit.html"):
             view = ExtraView(
-                component=DragonflyViewSet().components["extra"],
+                facet=DragonflyViewSet().facets["extra"],
                 object=Dragonfly(pk=123),
             )
             self.assertEqual(
@@ -527,7 +527,7 @@ class ViewTest(WebTest):
             status=403,
         )
 
-    def test_extra_component_requires_permission(self):
+    def test_extra_facet_requires_permission(self):
         alpha = Dragonfly.objects.create(name="alpha", age=47)
         self.app.get(
             (

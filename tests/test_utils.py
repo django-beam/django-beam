@@ -5,7 +5,7 @@ from django.urls import NoReverseMatch
 from test_views import user_with_perms
 from testapp.views import DragonflyViewSet, SightingViewSet
 
-from beam.utils import check_permission, navigation_component_entry, reverse_component
+from beam.utils import check_permission, navigation_facet_entry, reverse_facet
 
 
 class CheckPermissionsTest(TestCase):
@@ -35,47 +35,45 @@ class CheckPermissionsTest(TestCase):
         self.assertFalse(check_permission(lambda *args: True, user=None, obj=None))
 
     def test_navigation_entry_handles_empty(self):
-        self.assertEqual(navigation_component_entry(None), None)
+        self.assertEqual(navigation_facet_entry(None), None)
 
     def test_navigation_entry_uses_model_name_as_list_label(self):
         user = user_with_perms(["testapp.view_dragonfly"])
         self.assertEqual(
-            navigation_component_entry(DragonflyViewSet().links["list"], user=user),
+            navigation_facet_entry(DragonflyViewSet().links["list"], user=user),
             ("dragonflys", "/dragonfly/"),
         )
 
-    def test_navigation_entry_handles_other_components(self):
+    def test_navigation_entry_handles_other_facets(self):
         user = user_with_perms(["testapp.view_sighting"])
         self.assertEqual(
-            navigation_component_entry(
-                SightingViewSet().links["other_list"], user=user
-            ),
+            navigation_facet_entry(SightingViewSet().links["other_list"], user=user),
             ("Another list is possible", "/sighting/other/"),
         )
 
     def test_navigation_entry_respects_permissions(self):
         user = user_with_perms(["testapp.view_dragonfly"])
         self.assertEqual(
-            navigation_component_entry(DragonflyViewSet().links["list"], user=user),
+            navigation_facet_entry(DragonflyViewSet().links["list"], user=user),
             ("dragonflys", "/dragonfly/"),
         )
         self.assertEqual(
-            navigation_component_entry(SightingViewSet().links["list"], user=user), None
+            navigation_facet_entry(SightingViewSet().links["list"], user=user), None
         )
 
-    def test_reverse_component_returns_url(self):
-        url = reverse_component(
-            component=DragonflyViewSet().links["list"],
+    def test_reverse_facet_returns_url(self):
+        url = reverse_facet(
+            facet=DragonflyViewSet().links["list"],
             request=None,
             obj=None,
             override_kwargs=None,
         )
         self.assertEqual(url, "/dragonfly/")
 
-    def test_reverse_component_raises_no_reverse_match_if_no_reverse_match(self):
+    def test_reverse_facet_raises_no_reverse_match_if_no_reverse_match(self):
         with self.assertRaises(NoReverseMatch) as e:
-            reverse_component(
-                component=DragonflyViewSet().links["detail"],
+            reverse_facet(
+                facet=DragonflyViewSet().links["detail"],
                 request=None,
                 obj=None,
                 override_kwargs=None,
@@ -84,22 +82,18 @@ class CheckPermissionsTest(TestCase):
         self.assertTrue(
             str(e.exception).startswith(
                 "Unable to reverse url to "
-                "<Component testapp.views.DragonflyViewSet 'detail'>: "
+                "<Facet testapp.views.DragonflyViewSet 'detail'>: "
                 "Reverse"
             )
         )
 
-    def test_reverse_component_raises_on_all_exceptions(self):
-        component = DragonflyViewSet().links["detail"]
-        with mock.patch.object(
-            component, "resolve_url", side_effect=ValueError("FAIL")
-        ):
+    def test_reverse_facet_raises_on_all_exceptions(self):
+        facet = DragonflyViewSet().links["detail"]
+        with mock.patch.object(facet, "resolve_url", side_effect=ValueError("FAIL")):
             with self.assertRaises(Exception) as e:
-                reverse_component(
-                    component=component, request=None, obj=None, override_kwargs=None
-                )
+                reverse_facet(facet=facet, request=None, obj=None, override_kwargs=None)
         self.assertNotIsInstance(e.exception, NoReverseMatch)
         self.assertEqual(
             str(e.exception),
-            "Unable to reverse url to <Component testapp.views.DragonflyViewSet 'detail'>: FAIL",
+            "Unable to reverse url to <Facet testapp.views.DragonflyViewSet 'detail'>: FAIL",
         )

@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load beam_tags %}
 
-{% block body_classes %}{{ block.super }} beam-list{% if component.model %}{% get_options component.model as options %} beam-list-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
+{% block body_classes %}{{ block.super }} beam-list{% if facet.model %}{% get_options facet.model as options %} beam-list-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
 
 {% block extra_scripts %}{{ block.super }}{{ filterset.form.media.js }}{% for action in actions %}{{ action.get_form.media.js }}{% endfor %}{% endblock %}
 {% block extra_styles %}{{ block.super }}{{ filterset.form.media.css }}{% for action in actions %}{{ action.get_form.media.css }}{% endfor %}{% endblock %}
@@ -12,7 +12,7 @@
     {% if heading %}
         {{ heading }}
     {% else %}
-        {% get_options component.model as options %}
+        {% get_options facet.model as options %}
         {{ options.verbose_name_plural|capfirst }}
     {% endif %}
     | {{ block.super }}
@@ -20,12 +20,12 @@
 
 
 {% block content %}
-    {% get_options component.model as options %}
+    {% get_options facet.model as options %}
     <section class="beam-main">
         {% block links_container %}
             <div class="float-right beam-links">
                 {% block links %}
-                    {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
+                    {% include "beam/partials/links.html" with links=viewset.links link_layout=facet.link_layout %}
                 {% endblock %}
             </div>
         {% endblock %}
@@ -88,24 +88,24 @@
                         <input title="{% trans "Select all" %}" class="beam-action__select-all" type="checkbox">
                     </th>
                     {% endif %}
-                    {% for field in component.fields %}
+                    {% for field in facet.fields %}
                         <th scope="col" class="beam-list-field-label beam-field-label-{{ field }}">
                             {% with field_name=field|stringformat:"s" %}{# cast to string to support virtual fields #}
                                 {% if field_name in sortable_fields %}
                                     {# fixme text-nowrap only if there is a chance to fit this?  #}
                                     <a class="text-nowrap" href="{% sort_link field_name sorted_fields page_param=view.page_kwarg %}">
-                                        {{ component.model|field_verbose_name:field|capfirst }}&nbsp;{% if field_name in sorted_fields %}<i class="fa fa-caret-up"></i>{% elif "-"|add:field_name in sorted_fields %}<i class="fa fa-caret-down"></i>{% endif %}
+                                        {{ facet.model|field_verbose_name:field|capfirst }}&nbsp;{% if field_name in sorted_fields %}<i class="fa fa-caret-up"></i>{% elif "-"|add:field_name in sorted_fields %}<i class="fa fa-caret-down"></i>{% endif %}
                                     </a>
                                     {% if field_name in sorted_fields or "-"|add:field_name in sorted_fields %}
                                         <a title="{% trans "reset sort" %}" href="{% sort_link "" "" page_param=view.page_kwarg %}"><i class="fa fa-remove"></i></a>
                                     {% endif %}
                                 {% else %}
-                                    {{ component.model|field_verbose_name:field|capfirst }}
+                                    {{ facet.model|field_verbose_name:field|capfirst }}
                                 {% endif %}
                             {% endwith %}
                         </th>
                     {% endfor %}
-                    {% if component.list_item_link_layout %}
+                    {% if facet.list_item_link_layout %}
                     <th>{% trans "Actions" %}</th>
                     {% endif %}
                 </tr>
@@ -120,15 +120,15 @@
                                    value="{{ object.pk }}">
                         </td>
                         {% endif %}
-                        {% for field in component.fields %}
+                        {% for field in facet.fields %}
                             <td class="beam-list-field beam-field-{{ field }}">
                                 {% include "beam/partials/detail_field.html" with object=object field=field %}
                             </td>
                         {% endfor %}
                         {% block list_item_links %}
-                            {% if component.list_item_link_layout %}
+                            {% if facet.list_item_link_layout %}
                             <td class="beam-list-item-links">
-                                {% include "beam/partials/list_links.html" with links=viewset.links link_layout=component.list_item_link_layout object=object %}
+                                {% include "beam/partials/list_links.html" with links=viewset.links link_layout=facet.list_item_link_layout object=object %}
                             </td>
                             {% endif %}
                         {% endblock %}

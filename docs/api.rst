@@ -16,7 +16,7 @@ The most common attributes for the viewset mixins in the provided code are:
 - ``queryset``: The queryset used to fetch the data for the view.
 - ``inline_classes``: A list of related inline classes for the view, see the Inlines section below.
 - ``form_class``: The form class used for handling form submissions in the view.
-- ``link_layout``: A list of components that will be linked from within the user interface, see :ref:`Links between views`.
+- ``link_layout``: A list of facets that will be linked from within the user interface, see :ref:`Links between views`.
 
 
 

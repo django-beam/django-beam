@@ -56,29 +56,29 @@ def get_viewset_for_model(registry, model):
 
 class ViewsetMetaClass(type):
     def __new__(mcs, name, bases, attrs):
-        # Collect components from current class.
-        current_component_classes = []
+        # Collect facets from current class.
+        current_facet_classes = []
         for key, value in list(attrs.items()):
-            if key.endswith("_component"):
-                current_component_classes.append((key[: -len("_component")], value))
-        attrs["_declared_component_classes"] = OrderedDict(current_component_classes)
+            if key.endswith("_facet"):
+                current_facet_classes.append((key[: -len("_facet")], value))
+        attrs["_declared_facet_classes"] = OrderedDict(current_facet_classes)
 
         new_class: Type[BaseViewSet] = super().__new__(mcs, name, bases, attrs)
 
         # Walk through the MRO.
-        declared_component_classes = OrderedDict()
+        declared_facet_classes = OrderedDict()
         for base in reversed(new_class.__mro__):
             # Collect fields from base class.
-            if hasattr(base, "_declared_component_classes"):
-                declared_component_classes.update(base._declared_component_classes)
+            if hasattr(base, "_declared_facet_classes"):
+                declared_facet_classes.update(base._declared_facet_classes)
 
             # Field shadowing.
             for attr, value in base.__dict__.items():
-                if value is None and attr in declared_component_classes:
-                    declared_component_classes.pop(attr)
+                if value is None and attr in declared_facet_classes:
+                    declared_facet_classes.pop(attr)
 
-        new_class._component_classes = list(declared_component_classes.items())
-        new_class._declared_component_classes = declared_component_classes
+        new_class._facet_classes = list(declared_facet_classes.items())
+        new_class._declared_facet_classes = declared_facet_classes
 
         if (
             new_class.registry is not None

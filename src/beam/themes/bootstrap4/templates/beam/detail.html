@@ -3,7 +3,7 @@
 {% load beam_tags %}
 
 
-{% block body_classes %}{{ block.super }} beam-detail{% if component.model %}{% get_options component.model as options %} beam-detail-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
+{% block body_classes %}{{ block.super }} beam-detail{% if facet.model %}{% get_options facet.model as options %} beam-detail-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
 
 
 {% block extra_scripts %}{{ block.super }}{% for inline in inlines %}{{ inline.filterset.form.media.js }}{% for action in inline.actions %}{{ action.get_form.media.js }}{% endfor %}{% endfor %}{% endblock %}
@@ -14,7 +14,7 @@
     {% if heading %}
         {{ heading }}
     {% else %}
-        {% get_options component.model as options %}
+        {% get_options facet.model as options %}
         {{ object }}
         | {{ options.verbose_name|capfirst }}
     {% endif %}
@@ -30,7 +30,7 @@
             {% block links_container %}
                 <div class="float-right beam-links">
                     {% block links %}
-                        {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
+                        {% include "beam/partials/links.html" with links=viewset.links link_layout=facet.link_layout %}
                     {% endblock %}
                 </div>
             {% endblock %}
@@ -41,7 +41,7 @@
                         {% if heading %}
                             {{ heading }}
                         {% else %}
-                            {% get_options component.model as options %}
+                            {% get_options facet.model as options %}
                             {{ object }}
                             <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
                         {% endif %}
@@ -54,7 +54,7 @@
                     <div class="card-body">
                     <div class="card-text">
                         {% block details %}
-                            {% include "beam/partials/layout.html" with object=object layout=component.layout fields=component.fields %}
+                            {% include "beam/partials/layout.html" with object=object layout=facet.layout fields=facet.fields %}
                         {% endblock %}
                     </div>
                     </div>

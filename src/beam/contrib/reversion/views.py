@@ -8,7 +8,7 @@ from django.views import View, generic
 from reversion import RevertError, set_comment
 from reversion.models import Version
 
-from beam.views import ComponentMixin, InlinesMixin
+from beam.views import FacetMixin, InlinesMixin
 
 
 class _RollBackRevisionView(Exception):
@@ -17,7 +17,7 @@ class _RollBackRevisionView(Exception):
         self.response = response
 
 
-class VersionRestoreView(ComponentMixin, View):
+class VersionRestoreView(FacetMixin, View):
     def post(self, request, *args, **kwargs):
         self.version = Version.objects.get_for_object_reference(
             self.model, kwargs["pk"]
@@ -51,7 +51,7 @@ class VersionRestoreView(ComponentMixin, View):
             )
 
 
-class VersionDetailView(ComponentMixin, InlinesMixin, generic.DetailView):
+class VersionDetailView(FacetMixin, InlinesMixin, generic.DetailView):
     # we don't inherit from DetailView as that would add the ActionMixin
     # we explicitly don't want the ActionMixin in here as that would
     # allow the user to perform the regular actions using an old version
@@ -94,7 +94,7 @@ class VersionDetailView(ComponentMixin, InlinesMixin, generic.DetailView):
         return ["beam_reversion/version_detail.html"]
 
 
-class VersionListView(ComponentMixin, generic.DetailView):
+class VersionListView(FacetMixin, generic.DetailView):
     def get_template_names(self):
         return ["beam_reversion/version_list.html"]
 

@@ -4,33 +4,33 @@ from dal import autocomplete
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
-from beam.components import Component
+from beam.facets import Facet
 from beam.urls import UrlKwargDict
-from beam.views import ComponentMixin
+from beam.views import FacetMixin
 from beam.viewsets import BaseViewSet
 
 
-class BaseAutocomplete(ComponentMixin, autocomplete.Select2QuerySetView):
+class BaseAutocomplete(FacetMixin, autocomplete.Select2QuerySetView):
     @property
     def lookup_type(self):
-        return self.component.autocomplete_lookup_type
+        return self.facet.autocomplete_lookup_type
 
     @property
     def search_fields(self):
-        return self.component.autocomplete_search_fields
+        return self.facet.autocomplete_search_fields
 
     def get_result_label(self, item):
-        formatter = self.component.autocomplete_result_label
+        formatter = self.facet.autocomplete_result_label
         if formatter:
             return formatter(item)
         return super().get_result_label(item)
 
     @property
     def model(self):
-        return self.component.model
+        return self.facet.model
 
     def get_queryset(self):
-        qs = self.component.queryset
+        qs = self.facet.queryset
         return self.filter_words(self.q, qs)
 
     def filter_words(self, q, qs):
@@ -59,7 +59,7 @@ class BaseAutocomplete(ComponentMixin, autocomplete.Select2QuerySetView):
         return qs.filter(qs_filter)
 
 
-class AutocompleteComponent(Component):
+class AutocompleteFacet(Facet):
     def __init__(
         self,
         autocomplete_search_fields=None,
@@ -95,7 +95,5 @@ class AutocompleteMixin(BaseViewSet):
     autocomplete_result_label = None
     autocomplete_permission = "{app_label}.view_{model_name}"
 
-    def get_component_classes(self):
-        return [
-            ("autocomplete", AutocompleteComponent)
-        ] + super().get_component_classes()
+    def get_facet_classes(self):
+        return [("autocomplete", AutocompleteFacet)] + super().get_facet_classes()

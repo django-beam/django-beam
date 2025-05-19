@@ -3,16 +3,16 @@
 {% load beam_tags %}
 
 
-{% block body_classes %}{{ block.super }} beam-update{% if component.model %}{% get_options component.model as options %} beam-update-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
+{% block body_classes %}{{ block.super }} beam-update{% if facet.model %}{% get_options facet.model as options %} beam-update-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
 
-{% block form_attributes %}{{ block.super }} {% get_options component.model as options %} id="{{ options.app_label }}-{{ options.model_name }}-update-form"{% endblock %}
+{% block form_attributes %}{{ block.super }} {% get_options facet.model as options %} id="{{ options.app_label }}-{{ options.model_name }}-update-form"{% endblock %}
 
 
 {% block title %}
     {% if heading %}
         {{ heading }}
     {% else %}
-        {% get_options component.model as options %}
+        {% get_options facet.model as options %}
         {% blocktrans %}Update {{ object }}{% endblocktrans %}
         | {{ options.verbose_name|capfirst }}
     {% endif %}
@@ -24,7 +24,7 @@
     {% if heading %}
         {{ heading }}
     {% else %}
-        {% get_options component.model as options %}
+        {% get_options facet.model as options %}
         {% blocktrans %}Update {{ object }}{% endblocktrans %}
         <small class="text-muted">{{ options.verbose_name|capfirst }}</small>
     {% endif %}

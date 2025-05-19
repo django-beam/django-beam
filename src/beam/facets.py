@@ -8,7 +8,7 @@ from .actions import Action
 from .utils import check_permission
 
 
-class BaseComponent:
+class BaseFacet:
     show_link = True
 
     def __init__(
@@ -24,7 +24,7 @@ class BaseComponent:
         **kwargs
     ):
         if not name:
-            raise ValueError("Components need a name")
+            raise ValueError("Facets need a name")
 
         self.viewset = viewset
         self.name = name
@@ -35,7 +35,7 @@ class BaseComponent:
         self.url_namespace = url_namespace
 
         if isinstance(permission, str):
-            context = {"component": self}
+            context = {"facet": self}
             if getattr(self, "model", None) is not None:
                 opts = self.model._meta
                 context["model_name"] = opts.model_name
@@ -59,8 +59,8 @@ class BaseComponent:
         """
         Get a list of arguments that can be passed from the viewset.
 
-        These arguments will be used by ViewSet._get_components
-        when instantiating components.
+        These arguments will be used by ViewSet._get_facets
+        when instantiating facets.
         """
         arguments = set()
         for class_ in inspect.getmro(cls):
@@ -70,7 +70,7 @@ class BaseComponent:
 
     def has_perm(self, user, obj=None, request=None, override_kwargs=None) -> bool:
         """
-        Check whether a given user has access to this component.
+        Check whether a given user has access to this facet.
         The optional parameters mirror those for reverse so that
         every possible url can be checked as well.
 
@@ -78,13 +78,13 @@ class BaseComponent:
         :param request: An optional request
         :param override_kwargs: An optional dict overriding url kwargs
 
-        :return: A boolean, is the user allowed to interact with this component?
+        :return: A boolean, is the user allowed to interact with this facet?
         """
         return check_permission(permission=self.permission, user=user, obj=obj)
 
     def reverse(self, obj=None, request=None, override_kwargs=None):
         """
-        Get a url for this component.
+        Get a url for this facet.
 
         :param obj: An optional model instance
         :param request: An optional request
@@ -100,7 +100,7 @@ class BaseComponent:
 
     def resolve_url_kwargs(self, obj=None, request=None, override_kwargs=None):
         """
-        Used to build the url kwargs that Component.reverse passed to django's reverse.
+        Used to build the url kwargs that Facet.reverse passed to django's reverse.
 
         Keys with None values are dropped from the result so you can't have urls
         with None in them.
@@ -123,7 +123,7 @@ class BaseComponent:
         return {k: v for k, v in kwargs.items() if v is not None}
 
 
-class Component(BaseComponent):
+class Facet(BaseFacet):
     def __init__(
         self,
         view_class=None,
@@ -143,8 +143,8 @@ class Component(BaseComponent):
 
         if not view_class:
             raise ValueError(
-                "A component requires a view class, if you do "
-                "not want to serve a view use BaseComponent"
+                "A facet requires a view class, if you do "
+                "not want to serve a view use BaseFacet"
             )
         self.view_class = view_class
 
@@ -155,7 +155,7 @@ class Component(BaseComponent):
 
         if model is None and queryset is None:
             raise ValueError(
-                "Component {} needs at least one of model, queryset".format(name)
+                "Facet {} needs at least one of model, queryset".format(name)
             )
         elif model is not None and queryset is None:
             queryset = model._default_manager
@@ -187,13 +187,13 @@ class Component(BaseComponent):
         self._queryset = queryset
 
 
-class FormComponent(Component):
+class FormFacet(Facet):
     def __init__(self, form_class=None, **kwargs):
         self.form_class = form_class
         super().__init__(**kwargs)
 
 
-class ListComponent(Component):
+class ListFacet(Facet):
     def __init__(
         self,
         list_search_fields: Optional[List[str]] = None,
@@ -219,15 +219,15 @@ class ListComponent(Component):
         super().__init__(**kwargs)
 
 
-class Link(BaseComponent):
+class Link(BaseFacet):
     """
-    A component class that can be added to ViewSet.links to add links to external views.
+    A facet class that can be added to ViewSet.links to add links to external views.
 
     Example usage:
 
         class SomeViewSet(beam.ViewSet):
             @property
-            def links(self) -> Dict[str, BaseComponent]:
+            def links(self) -> Dict[str, BaseFacet]:
                 links = super().links
                 links["frontend"] = Link(
                     viewset=self,

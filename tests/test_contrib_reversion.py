@@ -62,7 +62,7 @@ class ReversionViewTest(TestCase):
     def test_using_create_view_creates_a_revision(self):
         user = user_with_perms(["testapp.add_dragonfly"])
         create_view = VersionedDragonflyViewSet()._get_view(
-            VersionedDragonflyViewSet().components["create"]
+            VersionedDragonflyViewSet().facets["create"]
         )
 
         request = RequestFactory().post(
@@ -107,7 +107,7 @@ class ReversionViewTest(TestCase):
         alpha = Dragonfly.objects.create(name="alpha", age=47)
 
         update_view = VersionedDragonflyViewSet()._get_view(
-            VersionedDragonflyViewSet().components["update"]
+            VersionedDragonflyViewSet().facets["update"]
         )
 
         request = RequestFactory().post(
@@ -164,7 +164,7 @@ class ReversionViewTest(TestCase):
         )
 
         view = VersionedDragonflyViewSet()._get_view(
-            VersionedDragonflyViewSet().components["version_list"]
+            VersionedDragonflyViewSet().facets["version_list"]
         )
 
         response = view(request, pk=alpha.pk)
@@ -184,7 +184,7 @@ class ReversionViewTest(TestCase):
             alpha.save()
 
         view = VersionedDragonflyViewSet()._get_view(
-            VersionedDragonflyViewSet().components["version_list"]
+            VersionedDragonflyViewSet().facets["version_list"]
         )
 
         with self.assertRaises(PermissionDenied):
@@ -212,7 +212,7 @@ class ReversionViewTest(TestCase):
         sighting.save()
 
         detail_view = VersionedDragonflyViewSet()._get_view(
-            VersionedDragonflyViewSet().components["detail"]
+            VersionedDragonflyViewSet().facets["detail"]
         )
         detail_page = detail_view(request, pk=alpha.pk)
 
@@ -220,7 +220,7 @@ class ReversionViewTest(TestCase):
         self.assertContains(detail_page, "Tokyo")
 
         version_view = VersionedDragonflyViewSet()._get_view(
-            VersionedDragonflyViewSet().components["version_detail"]
+            VersionedDragonflyViewSet().facets["version_detail"]
         )
         version_page = version_view(request, pk=alpha.pk, version_id=version.pk)
 
@@ -244,7 +244,7 @@ class ReversionViewTest(TestCase):
             "revision__date_created"
         )
         detail_view = VersionedDragonflyViewSet()._get_view(
-            VersionedDragonflyViewSet().components["detail"]
+            VersionedDragonflyViewSet().facets["detail"]
         )
         with self.assertRaises(PermissionDenied):
             detail_view(request, pk=alpha.pk)
@@ -272,7 +272,7 @@ class ReversionViewTest(TestCase):
         sighting.save()
 
         version_view = VersionedDragonflyViewSet()._get_view(
-            VersionedDragonflyViewSet().components["version_restore"]
+            VersionedDragonflyViewSet().facets["version_restore"]
         )
         response = version_view(request, pk=alpha.pk, version_id=version.pk)
 
@@ -299,7 +299,7 @@ class ReversionViewTest(TestCase):
         )
 
         version_view = VersionedDragonflyViewSet()._get_view(
-            VersionedDragonflyViewSet().components["version_restore"]
+            VersionedDragonflyViewSet().facets["version_restore"]
         )
         with self.assertRaises(PermissionDenied):
             version_view(request, pk=alpha.pk, version_id=version.pk)

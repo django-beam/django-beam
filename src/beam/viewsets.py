@@ -14,7 +14,7 @@ from django.views import View
 from beam.registry import ViewsetMetaClass, default_registry
 
 from .actions import Action
-from .components import BaseComponent, Component, FormComponent, ListComponent
+from .facets import BaseFacet, Facet, FormFacet, ListFacet
 from .inlines import RelatedInline
 from .types import LayoutType
 from .urls import UrlKwargDict
@@ -43,53 +43,53 @@ class BaseViewSet(metaclass=ViewsetMetaClass):
     # we default to change_ because it is a safe default
     permission = "{app_label}.change_{model_name}"
 
-    _component_classes: Sequence[Tuple[str, Type[Component]]] = []
+    _facet_classes: Sequence[Tuple[str, Type[Facet]]] = []
 
-    def get_component_classes(self) -> Sequence[Tuple[str, Type[Component]]]:
-        return self._component_classes
+    def get_facet_classes(self) -> Sequence[Tuple[str, Type[Facet]]]:
+        return self._facet_classes
 
-    def _get_components(self) -> Dict[str, Component]:
-        components: Dict[str, Component] = OrderedDict()
-        for name, component in self.get_component_classes():
-            kwargs = self._resolve_component_kwargs(name, component.get_arguments())
-            components[name] = component(**kwargs)
-        return components
+    def _get_facets(self) -> Dict[str, Facet]:
+        facets: Dict[str, Facet] = OrderedDict()
+        for name, facet in self.get_facet_classes():
+            kwargs = self._resolve_facet_kwargs(name, facet.get_arguments())
+            facets[name] = facet(**kwargs)
+        return facets
 
-    def _resolve_component_kwargs(self, component_name, arguments: Iterable[str]):
-        component_kwargs = {}
+    def _resolve_facet_kwargs(self, facet_name, arguments: Iterable[str]):
+        facet_kwargs = {}
 
-        specific_prefix = "{}_".format(component_name)
+        specific_prefix = "{}_".format(facet_name)
         for name in arguments:
             if name in ["name", "viewset"]:  # those are set below
                 continue
             specific_value = getattr(self, specific_prefix + name, undefined)
 
             if specific_value is not undefined:
-                component_kwargs[name] = specific_value
+                facet_kwargs[name] = specific_value
                 continue
 
             value = getattr(self, name, undefined)
             if value is not undefined:
-                component_kwargs[name] = value
+                facet_kwargs[name] = value
                 continue
 
-        component_kwargs["name"] = component_name
-        component_kwargs["viewset"] = self
+        facet_kwargs["name"] = facet_name
+        facet_kwargs["viewset"] = self
 
-        return component_kwargs
+        return facet_kwargs
 
     @cached_property
-    def components(self) -> Dict[str, Component]:
-        return self._get_components()
+    def facets(self) -> Dict[str, Facet]:
+        return self._get_facets()
 
     @property
-    def links(self) -> Dict[str, BaseComponent]:
-        """A list of components that can be linked from within the ui"""
-        return self.components
+    def links(self) -> Dict[str, BaseFacet]:
+        """A list of facets that can be linked from within the ui"""
+        return self.facets
 
-    def _get_view(self, component: Component):
+    def _get_view(self, facet: Facet):
         # FIXME handle function based views?
-        view_class = component.view_class
+        view_class = facet.view_class
         view_kwargs: Dict[str, Any] = {}
 
         view = view_class.as_view(**view_kwargs)
@@ -98,37 +98,37 @@ class BaseViewSet(metaclass=ViewsetMetaClass):
             @wraps(view)
             def wrapped_view(request, *args, **kwargs):
                 view.view_initkwargs["viewset"] = self
-                view.view_initkwargs["component"] = component
+                view.view_initkwargs["facet"] = facet
                 return view(request, *args, **kwargs)
 
             return wrapped_view
         else:
             return view
 
-    def _get_url_pattern(self, component):
-        view = self._get_view(component)
-        url = component.url
-        url_name = component.url_name
+    def _get_url_pattern(self, facet):
+        view = self._get_view(facet)
+        url = facet.url
+        url_name = facet.url_name
         return path(url, view, name=url_name)
 
     def get_urls(self):
         urlpatterns = []
-        components = list(self.components.values())
+        facets = list(self.facets.values())
 
         # move patterns without kwargs to the front
-        for component in components:
-            if not getattr(component, "url_kwargs", None):
-                urlpatterns.append(self._get_url_pattern(component))
+        for facet in facets:
+            if not getattr(facet, "url_kwargs", None):
+                urlpatterns.append(self._get_url_pattern(facet))
 
-        for component in components:
-            if getattr(component, "url_kwargs", None):
-                urlpatterns.append(self._get_url_pattern(component))
+        for facet in facets:
+            if getattr(facet, "url_kwargs", None):
+                urlpatterns.append(self._get_url_pattern(facet))
 
         return urlpatterns
 
 
 class ListMixin(BaseViewSet):
-    list_component = ListComponent
+    list_facet = ListFacet
     list_view_class = ListView
     list_url = ""
     list_url_name: str
@@ -155,7 +155,7 @@ class ListMixin(BaseViewSet):
 
 
 class CreateMixin(BaseViewSet):
-    create_component = FormComponent
+    create_facet = FormFacet
     create_view_class = CreateView
     create_url = "create/"
     create_url_kwargs: UrlKwargDict = {}
@@ -173,7 +173,7 @@ class CreateMixin(BaseViewSet):
 
 
 class UpdateMixin(BaseViewSet):
-    update_component = FormComponent
+    update_facet = FormFacet
     update_view_class = UpdateView
     update_url = "<str:pk>/update/"
     update_url_kwargs: UrlKwargDict = {"pk": "pk"}
@@ -191,7 +191,7 @@ class UpdateMixin(BaseViewSet):
 
 
 class DetailMixin(BaseViewSet):
-    detail_component = Component
+    detail_facet = Facet
     detail_view_class: View = DetailView
     detail_url: str = "<str:pk>/"
     detail_url_name: str
@@ -208,7 +208,7 @@ class DetailMixin(BaseViewSet):
 
 
 class DeleteMixin(BaseViewSet):
-    delete_component = Component
+    delete_facet = Facet
     delete_view_class = DeleteView
     delete_url = "<str:pk>/delete/"
     delete_url_name: str

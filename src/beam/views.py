@@ -18,24 +18,24 @@ from extra_views import SearchableListMixin
 from beam.registry import default_registry, register
 
 from .actions import Action
-from .components import Component, ListComponent
+from .facets import Facet, ListFacet
 from .inlines import RelatedInline
 
 
-class ComponentMixin(ContextMixin):
-    component: Optional[Component] = None
+class FacetMixin(ContextMixin):
+    facet: Optional[Facet] = None
     viewset = None
 
     def get_template_names(self):
         template_names = super().get_template_names()
         opts = self.model._meta
-        component_template_name = (
-            f"{opts.app_label}/{opts.model_name}_{self.component.name}.html"
+        facet_template_name = (
+            f"{opts.app_label}/{opts.model_name}_{self.facet.name}.html"
         )
         insert_index = len(template_names)
 
         # we check if a generic template via template_name_suffix is contained in the
-        # template names, if so we want to insert the component template before that
+        # template names, if so we want to insert the facet template before that
         # so that e.g. foo/bar_create.html takes precedence over foo/bar_form.html
         template_name_suffix = getattr(self, "template_name_suffix", None)
         if template_name_suffix:
@@ -47,8 +47,8 @@ class ComponentMixin(ContextMixin):
             except ValueError:
                 pass
 
-        if component_template_name not in template_names:
-            template_names.insert(insert_index, component_template_name)
+        if facet_template_name not in template_names:
+            template_names.insert(insert_index, facet_template_name)
 
         return template_names
 
@@ -56,38 +56,38 @@ class ComponentMixin(ContextMixin):
         context = super().get_context_data(**kwargs)
 
         context["viewset"] = self.viewset
-        context["component"] = self.component
+        context["facet"] = self.facet
         context["popup"] = self.request.GET.get("_popup")
 
         return context
 
     @property
     def model(self):
-        return self.component.model
+        return self.facet.model
 
     def get_queryset(self):
-        return self.component.queryset
+        return self.facet.queryset
 
     def get_form_class(self):
-        if getattr(self.component, "form_class", None):
-            return self.component.form_class
+        if getattr(self.facet, "form_class", None):
+            return self.facet.form_class
         return super().get_form_class()
 
     @property
     def fields(self):
-        if self.component.fields:
-            return self.component.fields
+        if self.facet.fields:
+            return self.facet.fields
         return super().fields
 
     def get_inline_classes(self):
-        return self.component.inline_classes
+        return self.facet.inline_classes
 
     def has_perm(self):
         try:
             obj = self.get_object()
         except AttributeError:
             obj = None
-        return self.component.has_perm(self.request.user, obj)
+        return self.facet.has_perm(self.request.user, obj)
 
     def handle_no_permission(self):
         if self.request.user.is_authenticated:
@@ -184,7 +184,7 @@ class UpdateWithInlinesMixin(InlinesMixin):
         )
 
 
-class CreateView(ComponentMixin, CreateWithInlinesMixin, generic.CreateView):
+class CreateView(FacetMixin, CreateWithInlinesMixin, generic.CreateView):
     def get_template_names(self):
         return super().get_template_names() + ["beam/create.html"]
 
@@ -224,7 +224,7 @@ class CreateView(ComponentMixin, CreateWithInlinesMixin, generic.CreateView):
         )
 
 
-class UpdateView(ComponentMixin, UpdateWithInlinesMixin, generic.UpdateView):
+class UpdateView(FacetMixin, UpdateWithInlinesMixin, generic.UpdateView):
     def get_template_names(self):
         return super().get_template_names() + ["beam/update.html"]
 
@@ -249,20 +249,20 @@ class UpdateView(ComponentMixin, UpdateWithInlinesMixin, generic.UpdateView):
         )
 
 
-class SortableListMixin(ComponentMixin):
+class SortableListMixin(FacetMixin):
     sort_param = "o"
     sort_separator = ","
 
     def get_sort_fields(self):
-        if self.component.list_sort_fields is None:
+        if self.facet.list_sort_fields is None:
             return [
                 # cast to string to support virtual fields
                 str(field)
-                for field in self.component.fields
+                for field in self.facet.fields
                 if self.get_sort_column_for_field(str(field))
             ]
 
-        for field in self.component.list_sort_fields:
+        for field in self.facet.list_sort_fields:
             if self.get_sort_column_for_field(field) is None:
                 raise Exception(
                     "Unable to determine sort column for explicit sort field {} on {}".format(
@@ -270,10 +270,10 @@ class SortableListMixin(ComponentMixin):
                     )
                 )
 
-        return self.component.list_sort_fields
+        return self.facet.list_sort_fields
 
     def get_sort_fields_columns(self):
-        return self.component.list_sort_fields_columns or {}
+        return self.facet.list_sort_fields_columns or {}
 
     def get_sort_column_for_field(self, field_name):
         explicit = self.get_sort_fields_columns()
@@ -335,7 +335,7 @@ class SortableListMixin(ComponentMixin):
         return context
 
 
-class FiltersetMixin(ComponentMixin):
+class FiltersetMixin(FacetMixin):
     filterset_class = None
     filterset_fields = None
     filterset = None
@@ -343,14 +343,14 @@ class FiltersetMixin(ComponentMixin):
     def get_filterset_fields(self):
         if self.filterset_fields is not None:
             return self.filterset_fields
-        return self.component.list_filterset_fields
+        return self.facet.list_filterset_fields
 
     def get_filterset_class(self):
         if self.filterset_class:
             return self.filterset_class
-        if self.component.list_filterset_class:
-            return self.component.list_filterset_class
-        elif self.component.list_filterset_fields:
+        if self.facet.list_filterset_class:
+            return self.facet.list_filterset_class
+        elif self.facet.list_filterset_fields:
             return filterset_factory(
                 model=self.model, fields=self.get_filterset_fields()
             )
@@ -364,7 +364,7 @@ class FiltersetMixin(ComponentMixin):
             "data": self.request.GET or None,
             "request": self.request,
             "prefix": "filter",
-            "queryset": self.component.queryset,
+            "queryset": self.facet.queryset,
         }
         return kwargs
 
@@ -447,8 +447,8 @@ class InlineActionMixin(InlinesMixin):
         return self.get(request, *args, **kwargs)
 
 
-class ListActionsMixin(ComponentMixin):
-    component: ListComponent
+class ListActionsMixin(FacetMixin):
+    facet: ListFacet
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -480,7 +480,7 @@ class ListActionsMixin(ComponentMixin):
         selected_action = self.request.POST.get("_action_choice")
         actions = []
         action_class: Type[Action]
-        for index, action_class in enumerate(self.component.list_actions_classes):
+        for index, action_class in enumerate(self.facet.list_actions_classes):
             action_id = "{}-{}".format(index, action_class.name)
             action = action_class(
                 data=self.request.POST if action_id == selected_action else None,
@@ -533,17 +533,17 @@ class ListView(
     FiltersetMixin,
     SearchableListMixin,
     SortableListMixin,
-    ComponentMixin,
+    FacetMixin,
     generic.ListView,
 ):
     paginate_max_show_all = 250
 
     @property
     def search_fields(self):
-        return self.component.list_search_fields
+        return self.facet.list_search_fields
 
     def get_paginate_by(self, queryset):
-        paginate_by = self.paginate_by or self.component.list_paginate_by
+        paginate_by = self.paginate_by or self.facet.list_paginate_by
 
         show_all = self.request.GET.get("show_all", False)
 
@@ -564,17 +564,17 @@ class ListView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["search_query"] = self.get_search_query()
-        context["list_item_link_layout"] = self.component.list_item_link_layout
+        context["list_item_link_layout"] = self.facet.list_item_link_layout
         context["paginate_max_show_all"] = self.paginate_max_show_all
         return context
 
 
-class DetailView(InlineActionMixin, ComponentMixin, InlinesMixin, generic.DetailView):
+class DetailView(InlineActionMixin, FacetMixin, InlinesMixin, generic.DetailView):
     def get_template_names(self):
         return super().get_template_names() + ["beam/detail.html"]
 
 
-class DeleteView(ComponentMixin, InlinesMixin, generic.DeleteView):
+class DeleteView(FacetMixin, InlinesMixin, generic.DeleteView):
     def get_template_names(self):
         return super().get_template_names() + ["beam/delete.html"]
 
