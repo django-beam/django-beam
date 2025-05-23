@@ -85,13 +85,13 @@ Refer to the documentation for usage instructions on each of the contrib package
 You can use the [tox](https://tox.readthedocs.io/en/latest/) testing tool to run the tests:
 
 ```bash
-tox -e py38-djangolatest
+tox -e py312-django_latest
 ```
 
 Run the tests of a specific test file only:
 
 ```bash
-tox -e py38-djangolatest -- test_tags
+tox -e py312-django_latest -- test_tags
 ```
 
 Run against all supported versions of Python and Django:
