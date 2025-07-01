@@ -2,6 +2,10 @@
 
 django-beam provides you with a set of views, templates, and integrations for the most common CRUD applications. It aims to offer the functionality of Django's own admin but in a way that integrates seamlessly with your frontend code.
 
+## Breaking changes
+
+In version 3.0 `Component` was renamed to `Facet` in order to reduce confusion with web components.
+
 ## Features
 
 - CRUD operations based on class-based views
