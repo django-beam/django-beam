@@ -82,7 +82,7 @@ class UrlTest(TestCase):
         with self.assertRaises(NoReverseMatch):
             get_link_url(None, links["delete"], None)
 
-    def test_component_url_with_extra_context(self):
+    def test_facet_url_with_extra_context(self):
         instance = Dragonfly(pk=123)
         link = DragonflyViewSet().links["extra"]
         self.assertEqual(
@@ -90,7 +90,7 @@ class UrlTest(TestCase):
             "/dragonfly/extra/123/param/",
         )
 
-    def test_component_url_kwarg_from_request(self):
+    def test_facet_url_kwarg_from_request(self):
         class request:
             class resolver_match:
                 kwargs = {"special": "from_request"}

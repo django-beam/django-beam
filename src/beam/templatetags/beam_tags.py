@@ -15,24 +15,24 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
-from beam.components import BaseComponent
+from beam.facets import BaseFacet
 from beam.layouts import layout_links
 from beam.registry import default_registry, get_viewset_for_model
-from beam.utils import navigation_component_entry, reverse_component
+from beam.utils import navigation_facet_entry, reverse_facet
 
 register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
 def get_link_url(
-    context: RequestContext, component: BaseComponent, obj=None, **override_kwargs
+    context: RequestContext, facet: BaseFacet, obj=None, **override_kwargs
 ):
     request = getattr(context, "request", None)
-    if not component:
+    if not facet:
         return None
 
-    return reverse_component(
-        component, obj=obj, request=request, override_kwargs=override_kwargs
+    return reverse_facet(
+        facet, obj=obj, request=request, override_kwargs=override_kwargs
     )
 
 
@@ -69,7 +69,7 @@ def is_queryset(value):
 
 
 @register.simple_tag(takes_context=True)
-def get_url_for_related(context, instance, component_name, **override_kwargs):
+def get_url_for_related(context, instance, facet_name, **override_kwargs):
     if not instance:
         return None
 
@@ -86,21 +86,21 @@ def get_url_for_related(context, instance, component_name, **override_kwargs):
     except KeyError:
         return None
 
-    components = viewset().components
-    if component_name not in components:
+    facets = viewset().facets
+    if facet_name not in facets:
         return None
 
     request = getattr(context, "request", None)
 
-    component = components[component_name]
+    facet = facets[facet_name]
 
-    if request and not component.has_perm(
+    if request and not facet.has_perm(
         request.user, obj=instance, request=request, override_kwargs=override_kwargs
     ):
         return None
 
-    return reverse_component(
-        component=component,
+    return reverse_facet(
+        facet=facet,
         obj=instance,
         request=request,
         override_kwargs=override_kwargs,
@@ -194,7 +194,7 @@ def get_apps_for_navigation(context):
     for app_label, viewsets_dict in default_registry.items():
         entries = []
         for viewset in viewsets_dict.values():
-            entry = navigation_component_entry(
+            entry = navigation_facet_entry(
                 viewset().links.get("list"), user=user, request=request
             )
             if entry:
@@ -248,7 +248,9 @@ def sort_link(context, field: str, sorted_fields: Sequence[str], page_param=None
         sorted_fields.append(field)
 
     return preserve_query_string(
-        context, ignore_params=page_param, **{sort_param: sort_separator.join(sorted_fields)}
+        context,
+        ignore_params=page_param,
+        **{sort_param: sort_separator.join(sorted_fields)},
     )
 
 
@@ -267,7 +269,8 @@ def preserve_query_string(context, ignore_params=None, **kwargs):
 def preserve_get_params_as_hidden_inputs(context, ignore_params=None, **kwargs):
     get = preserve_get_params(context, ignore_params=ignore_params, **kwargs)
     inputs = [
-        f'<input type="hidden" name="{escape(k)}" value="{escape(v)}">' for k, v in get.items()
+        f'<input type="hidden" name="{escape(k)}" value="{escape(v)}">'
+        for k, v in get.items()
     ]
     return mark_safe("".join(inputs))
 
@@ -362,11 +365,11 @@ PRESERVED_GET_PARAMS = [
 def get_visible_links(
     context: RequestContext,
     user,
-    links: Dict[str, BaseComponent],
+    links: Dict[str, BaseFacet],
     link_layout: List[str],
     obj: Model = None,
     **override_kwargs,
-) -> List[Tuple[BaseComponent, str]]:
+) -> List[Tuple[BaseFacet, str]]:
 
     get_params = {}
     request = getattr(context, "request", None)
@@ -377,14 +380,14 @@ def get_visible_links(
                 get_params[param] = value
 
     visible_links = []
-    for component in layout_links(links, link_layout):
-        if not component.has_perm(
+    for facet in layout_links(links, link_layout):
+        if not facet.has_perm(
             user, obj=obj, request=request, override_kwargs=override_kwargs
         ):
             continue
 
-        url = reverse_component(
-            component=component,
+        url = reverse_facet(
+            facet=facet,
             obj=obj,
             request=request,
             override_kwargs=override_kwargs,
@@ -394,5 +397,5 @@ def get_visible_links(
             url = _add_params_to_url_if_new(url, get_params)
 
         if url:
-            visible_links.append((component, url))
+            visible_links.append((facet, url))
     return visible_links

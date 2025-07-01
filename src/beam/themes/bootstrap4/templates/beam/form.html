@@ -11,7 +11,7 @@
     {% if heading %}
         {{ heading }}
     {% else %}
-        {% get_options component.model as options %}
+        {% get_options facet.model as options %}
         {% blocktrans with verbose_name=options.verbose_name %}Create {{ verbose_name }}{% endblocktrans %}
     {% endif %}
     | {{ block.super }}
@@ -19,7 +19,7 @@
 
 
 {% block content %}
-    {% get_options component.model as options %}
+    {% get_options facet.model as options %}
     <form {% block form_attributes %}method="post" class="beam-form" enctype="multipart/form-data" novalidate{% endblock %}>
         {% block form %}
         {% csrf_token %}
@@ -31,7 +31,7 @@
                 {% block links_container %}
                     <div class="float-right beam-links">
                         {% block links %}
-                            {% include "beam/partials/links.html" with links=viewset.links link_layout=component.link_layout %}
+                            {% include "beam/partials/links.html" with links=viewset.links link_layout=facet.link_layout %}
                         {% endblock %}
                     </div>
                 {% endblock %}
@@ -42,7 +42,7 @@
                             {% if heading %}
                                 {{ heading }}
                             {% else %}
-                                {% get_options component.model as options %}
+                                {% get_options facet.model as options %}
                                 {% blocktrans with verbose_name=options.verbose_name %}Create {{ verbose_name }}{% endblocktrans %}
                             {% endif %}
                         {% endblock %}
@@ -76,7 +76,7 @@
                         <div class="card-body">
                             <div class="card-text">
                                 {% block details %}
-                                    {% include "beam/partials/form_layout.html" with form=form fields=component.fields layout=component.layout %}
+                                    {% include "beam/partials/form_layout.html" with form=form fields=facet.fields layout=facet.layout %}
                                 {% endblock %}
                             </div>
                         </div>

@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from beam.components import BaseComponent
+from beam.facets import BaseFacet
 
 
 class HTML:
@@ -26,8 +26,8 @@ class VirtualField:
 
 
 def layout_links(
-    links: Dict[str, BaseComponent], link_layout: List[str]
-) -> List[BaseComponent]:
+    links: Dict[str, BaseFacet], link_layout: List[str]
+) -> List[BaseFacet]:
     if not links:
         return []
 

@@ -115,8 +115,8 @@ First add ``reversion`` and ``beam.contrib.reversion`` to your installed apps.
 Either use ``beam.contrib.reversion.VersionViewSet`` as the base class for the
 models where you want reversion or use the ``VersionViewSetMixin``.
 
-By default create and update views are tracked. You can use the ``versioned_component_names``
-class attribute to control which components are tracked.
+By default create and update views are tracked. You can use the ``versioned_facet_names``
+class attribute to control which facets are tracked.
 
 If you do not manually register your models with reversion then ``VersionViewSet.model`` is registered
-following all the inlines specified for the ``versioned_component_names``.
+following all the inlines specified for the ``versioned_facet_names``.

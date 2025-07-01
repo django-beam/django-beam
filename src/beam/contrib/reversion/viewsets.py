@@ -13,7 +13,7 @@ from reversion import (
 
 from beam import RelatedInline, ViewSet
 from beam.urls import UrlKwargDict
-from beam.viewsets import BaseViewSet, Component, DeleteMixin, DetailMixin, UpdateMixin
+from beam.viewsets import BaseViewSet, DeleteMixin, DetailMixin, Facet, UpdateMixin
 
 from .views import VersionDetailView, VersionListView, VersionRestoreView
 
@@ -27,8 +27,8 @@ class VersionRestoreMixin(BaseViewSet):
     version_restore_link_layout: List[str] = []
     version_restore_permission = "{app_label}.change_{model_name}"
 
-    def get_component_classes(self):
-        return super().get_component_classes() + [("version_restore", Component)]
+    def get_facet_classes(self):
+        return super().get_facet_classes() + [("version_restore", Facet)]
 
 
 class VersionDetailMixin(BaseViewSet):
@@ -42,8 +42,8 @@ class VersionDetailMixin(BaseViewSet):
 
     detail_link_layout = DetailMixin.detail_link_layout + ["!version_detail"]
 
-    def get_component_classes(self):
-        return super().get_component_classes() + [("version_detail", Component)]
+    def get_facet_classes(self):
+        return super().get_facet_classes() + [("version_detail", Facet)]
 
     # mirror the detail fields and layout
     @property
@@ -70,12 +70,12 @@ class VersionListMixin(BaseViewSet):
     version_list_link_layout = ["detail"]
     version_list_permission = "{app_label}.view_{model_name}"
 
-    def get_component_classes(self):
-        return super().get_component_classes() + [("version_list", Component)]
+    def get_facet_classes(self):
+        return super().get_facet_classes() + [("version_list", Facet)]
 
 
 class VersionViewSetMixin(VersionDetailMixin, VersionRestoreMixin, VersionListMixin):
-    versioned_component_names = ["create", "update", "delete"]
+    versioned_facet_names = ["create", "update", "delete"]
     update_link_layout = UpdateMixin.update_link_layout + [
         "!version_restore",
         "!version_detail",
@@ -97,9 +97,9 @@ class VersionViewSetMixin(VersionDetailMixin, VersionRestoreMixin, VersionListMi
         """
         return {
             inline_class
-            for component in self.components.values()
-            for inline_class in component.inline_classes
-            if component.name in self.versioned_component_names
+            for facet in self.facets.values()
+            for inline_class in facet.inline_classes
+            if facet.name in self.versioned_facet_names
         }
 
     def _register_model_with_parents(self, model, follow=()):
@@ -170,26 +170,26 @@ class VersionViewSetMixin(VersionDetailMixin, VersionRestoreMixin, VersionListMi
                 set_user(request.user)
             yield
 
-    def _set_revision_comment(self, component, request, *args, **kwargs):
+    def _set_revision_comment(self, facet, request, *args, **kwargs):
         """
-        Sets the revision comment according to component and parameters.
+        Sets the revision comment according to facet and parameters.
         """
         if not get_comment():
-            comment = component.verbose_name
+            comment = facet.verbose_name
             set_comment(comment)
 
-    def _get_view(self, component):
+    def _get_view(self, facet):
         """
-        Ensure that the views in `self.versioned_component_names`
+        Ensure that the views in `self.versioned_facet_names`
         are wrapped with the create_revision context_manager
         """
-        view = super()._get_view(component)
-        if component.name not in self.versioned_component_names:
+        view = super()._get_view(facet)
+        if facet.name not in self.versioned_facet_names:
             return view
 
         def wrapped_view(request, *args, **kwargs):
             with self.create_revision(request):
-                self._set_revision_comment(component, request, *args, **kwargs)
+                self._set_revision_comment(facet, request, *args, **kwargs)
                 return view(request, *args, **kwargs)
 
         return wrapped_view

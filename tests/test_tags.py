@@ -62,9 +62,7 @@ class TagsTest(TestCase):
             link_layout=["detail", "update", "create"],
             obj=Dragonfly(pk=123),
         )
-        self.assertEqual(
-            {component.name for component, url in links}, {"create", "detail"}
-        )
+        self.assertEqual({facet.name for facet, url in links}, {"create", "detail"})
 
     def test_apps_for_navigation(self):
         request = RequestFactory().get("/")
