@@ -21,10 +21,12 @@ def register(registry: RegistryType, viewset: Type[BaseViewSet]):
     app_registry = registry.setdefault(app_label, {})
     if model_name in app_registry:
         warnings.warn(
-            "Duplicate registration of {} for app label {} with model {}, "
-            "beam.viewsets.unregister the existing viewset first.".format(
-                viewset, app_label, registry
-            )
+            f"Duplicate registration of {viewset} for app label "
+            f"'{app_label}' with model '{model.__name__}'. "
+            f"To fix this, unregister the existing viewset by placing the following "
+            f"line directly above the class definition of {viewset}:\n\n"
+            f">>> beam.registry.unregister"
+            f"(beam.registry.default_registry, {model.__name__})\n"
         )
         return
     app_registry[model_name] = viewset
