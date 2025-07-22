@@ -18,7 +18,8 @@ The most common attributes for the viewset mixins in the provided code are:
 - ``form_class``: The form class used for handling form submissions in the view.
 - ``link_layout``: A list of facets that will be linked from within the user interface, see :ref:`Links between views`.
 
-
+.. TODO: This is the same text as Usage/Common viewset options. Should this be
+   removed from here?
 
 List view
 ^^^^^^^^^
@@ -47,3 +48,5 @@ can be configured using the following viewset attributes:
 - ``list_action_classes``
     Specify actions that can be applied to all selected items in the list.
     See :ref:`Actions` for more.
+
+.. TODO: add API description for other views

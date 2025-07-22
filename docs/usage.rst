@@ -23,6 +23,14 @@ those for all other views.
 
 .. code-block:: python
 
+    # books/models.py
+    class Book(models.Model):
+        title = models.CharField(max_length=255)
+        author = models.ForeignKey("Author", on_delete=models.CASCADE, related_name="books")
+        # add these two fields
+        publication_date = models.DateField()
+        price = models.DecimalField(max_digits=5, decimal_places=2)
+
     # books/views.py
     import beam
     from .models import Book
@@ -31,14 +39,6 @@ those for all other views.
         model = Book
         fields = ["title", "author", "publication_date", "price"]
         list_fields = ["title", "author"]
-
-    # urls.py
-    from books.views import BookViewSet
-    urlpatterns = [
-        url(r"^books/$", BookViewSet.as_view()),
-    ]
-
-
 
 
 Common viewset options
@@ -53,7 +53,8 @@ The most common attributes for the viewset mixins in the provided code are:
 - ``form_class``: The form class used for handling form submissions in the view.
 - ``link_layout``: A list of facets that will be linked from within the user interface, see :ref:`Links between views`.
 
-For a complete list of attributes, see the documentation for the respective viewset mixins.
+
+.. TODO For a complete list of attributes, see the documentation for the respective viewset mixins.
 
 .. _Layouts for fields:
 
@@ -71,7 +72,7 @@ rows and columns. The default theme supports up to 4 columns per row.
         [ # first row
             ["name", "age",],   # first column
             ["email", "phone"],   # second column
-        ]
+        ],
         [ # second row
             ["a", "b",],   # first column
             ["c", "d",],   # second column
@@ -96,27 +97,45 @@ you can pass ``HTML`` to render whatever you want.
 
 .. code-block:: python
 
+    # books/models.py
+    class Book(models.Model):
+        title = models.CharField(max_length=255)
+        author = models.ForeignKey("Author", on_delete=models.CASCADE, related_name="books")
+        publication_date = models.DateField()
+        price = models.DecimalField(max_digits=5, decimal_places=2)
+
+        # add this field
+        @property
+        def isbn_search(self):
+            return f'<a href="https://www.isbnsearch.org/isbn/{self.isbn}">Search ISBN</a>'
+
+
+    # books/views.py
     from beam.layouts import VirtualField, HTML
+    from django.utils.safestring import mark_safe
+    from .models import Book
 
-    class ExampleViewSet(beam.ViewSet):
-        model = Example
-        fields = ["name", "phone"]
-        layout = [[
-            [
-            "name",
-            VirtualField(
-                "phone",
-                lambda obj: mark_safe(obj.phone_as_link),
-                verbose_name=_("phone"))
+    class BookViewSet(beam.ViewSet):
+        model = Book
+        fields = ["title", "author", "publication_date", "price"]
+        layout = [
+            [  # row 1
+                ["title", "author"],            # first column
+                ["publication_date", "price"],  # second column
             ],
-            [
-            HTML("<h1>Some HTML</h1>")
-            ]
-        ]]
-
-
-
-
+            [  # row 2
+                [
+                    VirtualField(
+                        name="isbn_search",
+                        callback=lambda obj: mark_safe(obj.isbn_search),
+                        verbose_name="ISBN Search"
+                    ),
+                ],
+                [
+                    HTML("<h1>Hey! I'm a label for a book!</h1>")
+                ],
+            ],
+        ]
 .. _Links between views:
 
 Links between views
@@ -140,12 +159,15 @@ the delete view and all others would show up in between those two.
 
 .. code-block:: python
 
+    import beam
+    from .models import Book
+
     class BookViewSet(beam.ViewSet):
         model = Book
         fields = ["title", "author"]
         detail_link_layout = ["update", "...", "delete", "!create"]
-        list_link_layout = ["create]
-
+        list_link_layout = ["create"]
+        ...
 
 The list view also shows links next to each list item.
 To specify the links shown for each list item, set ``list_item_link_layout``.
@@ -155,7 +177,7 @@ Inlines
 -------
 Inlines are a way to display and edit related models within the same form or view of a parent model.
 
-There are two types of inline classes, the regular ``beam.RelatedInline`` and ``beam.TabularInline``.
+There are two types of inline classes, the regular ``beam.RelatedInline`` and ``beam.inlines.TabularRelatedInline``.
 The regular inline uses multiple rows to display the related model, while the tabular inline uses
 a table row for each related instance.
 
@@ -171,20 +193,14 @@ In the example below you'll be able to create, edit and view books from the resp
 
     class BookInline(beam.RelatedInline):
         model = Book
-        fk_field = "author"
+        foreign_key_field = "author"
         fields = ["title"]
 
     class AuthorViewSet(beam.ViewSet):
         model = Author
         fields = ["name"]
+        # add this line
         inline_classes = [BookInline]
-
-    # urls.py
-    from books.views import BookViewSet
-    urlpatterns = [
-        url(r"^books/$", BookViewSet.as_view()),
-    ]
-
 
 If you need to use different inlines for e.g. the detail and the update view, just create two different inline classes and add
 pass one of them to the ``detail_inline_classes`` and the other to the ``update_inline_classes`` attribute.
@@ -204,19 +220,34 @@ additional views as in the example below.
 
 .. code-block:: python
 
-    class CustomerCallView(beam.views.FacetMixin, MyBaseView):
-        phone = None
-        # your custom view code goes here ...
+    # books/views.py
+    import beam
+    from django.views.generic import TemplateView
+    from beam.views import Facet
+    from .models import Author
 
-    class CustomerViewSet(beam.ViewSet):
-        model = Customer
-        fields = ["first_name", "last_name", "email", "phone"]
+    class AuthorViewSet(beam.ViewSet):
+        model = Author
+        fields = ["name"]
 
+        # add these lines
         call_facet = Facet
         call_url = "call/{phone}/"
         call_url_kwargs = {"phone": "phone"}
-        call_permission = "customers.view_customer"
+        call_permission = "authors.view_author"
+        call_view_class = AuthorCallView
 
+    class AuthorCallView(beam.views.FacetMixin, TemplateView):
+        phone = None
+        template_name = "authors/author_call.html"
+
+
+    # books/templates/authors/author_call.html
+    # See next section for overriding templates
+    {% extends "beam/detail.html" %}
+    {% block details_container %}
+        Calling author ... ring ring!
+    {% endblock %}
 
 Overriding templates
 ---------------------
@@ -260,12 +291,32 @@ with the given subject and message to all selected customers.
 
 .. code-block:: python
 
+    # books/models.py
+    from django.db import models
+
+    class Email(models.Model):
+        subject = models.CharField(max_length=255)
+        message = models.TextField()
+        recipient = models.EmailField()
+
+
+    # books/forms.py
+    from django import forms
+    from .models import Email
+
+    class SendEmailForm(forms.ModelForm):
+        class Meta:
+            model = Email
+            fields = ["subject", "message", "recipient"]
+
+
+    # books/actions.py
     from django.core.mail import send_mail
     import beam
     from beam.actions import Action
 
     class SendEmailAction(Action):
-        label = _("Send email")
+        label = "Send email"
         form = SendEmailForm
 
         def apply(self, request, queryset):
@@ -277,11 +328,19 @@ with the given subject and message to all selected customers.
             )
 
         def get_success_message(self):
-            return _("Sent {count} emails").format(
+            return "Sent {count} emails".format(
                 count=self.count,
             )
 
-    class CustomerViewSet(beam.ViewSet):
-        model = Customer
-        fields = ["first_name", "last_name", "email", "phone"]
+
+    # books/views.py
+    import beam
+    from .models import Author
+    from .actions import SendEmailAction
+
+    class AuthorViewSet(beam.ViewSet):
+        model = Author
+        fields = ["name"]
+
+        # add this line
         list_actions = [SendEmailAction]
