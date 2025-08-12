@@ -1,0 +1,83 @@
+{% extends "beam/partials/form_inline.html" %}
+{% load i18n %}
+{% load beam_tags %}
+
+
+{% block inline_group_container %}
+    <div class="overflow-x-auto">
+    <table class="table table-zebra w-full" id="{{ inline.prefix }}-table">
+        {% block inline_group %}
+
+            {% block inline_group_head %}
+            <thead>
+                <tr>
+                    {% if inline.can_order %}<th></th>{% endif %}
+
+                    {% for field in inline.fields %}
+                        {% if inline.can_order and inline.order_field == field %}
+                            {# skip order field #}
+                        {% else %}
+                        {% block label_container %}
+                            <th>
+                                {% block label %}
+                                    {{ inline.model|field_verbose_name:field|capfirst }}
+                                {% endblock %}
+                            </th>
+                        {% endblock %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if inline.formset.can_delete %}<th></th>{% endif %}
+                </tr>
+            </thead>
+            {% endblock %}
+
+            {% block inline_items %}
+            <tbody class="related-inline-group">
+                {% for form in inline.formset %}
+
+                    {% block inline_item %}
+
+                        {% block form_errors_container %}
+                        {% if form.non_field_errors %}
+                            <tr>
+
+                                {% if inline.can_order  %}<td></td>{% endif %}
+
+                                <td class="p-0" colspan="{{ inline.fields|length }}">
+                                    <div class="alert alert-error m-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        <div>
+                                            {% block form_errors %}
+                                                {{ form.non_field_errors|unordered_list }}
+                                            {% endblock %}
+                                        </div>
+                                    </div>
+                                </td>
+
+                                {% if inline.formset.can_delete %}<td></td>{% endif %}
+
+                            </tr>
+                        {% endif %}
+                        {% endblock %}
+
+                        {% block inline_layout %}
+                            {% include "beam/partials/form_inline_tabular_row.html" with form=form fields=inline.fields inline_item_id=forloop.counter0 %}
+                        {% endblock %}
+
+                    {% endblock %}
+
+                {% endfor %}
+            </tbody>
+            {% endblock %}
+
+            {% block empty_form %}
+            <tbody class="hidden">
+                {% include "beam/partials/form_inline_tabular_row.html" with form=inline.formset.empty_form fields=inline.fields inline_item_id="__prefix__" empty_form=True %}
+            </tbody>
+            {% endblock %}
+
+        {% endblock %}
+    </table>
+    </div>
+{% endblock %}

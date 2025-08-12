@@ -1,0 +1,116 @@
+/* DaisyUI Theme Custom Styles for Django Beam */
+
+/* Minimal form styling - let DaisyUI handle most of the work */
+
+/* Form styling adjustments */
+.beam-form .form-control {
+  margin-bottom: 1rem;
+}
+
+/* Required field indicator */
+.required-field::after {
+  content: " *";
+  color: theme("colors.error");
+}
+
+/* Inline forms */
+.related-inline-item {
+  transition: all 0.3s ease;
+}
+
+.related-inline-item:hover {
+  background-color: theme("colors.base-200");
+}
+
+/* Table adjustments for better DaisyUI integration */
+.beam-list-table tbody tr:hover {
+  background-color: theme("colors.base-200");
+}
+
+/* Action checkbox styling */
+.beam-action__select-all,
+.beam-action__select-item {
+  cursor: pointer;
+}
+
+/* Messages/alerts animation */
+.beam-alerts .alert {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Navigation dropdown improvements */
+.navbar .dropdown-content {
+  min-width: 200px;
+}
+
+/* Card shadows for depth */
+.beam-main .card {
+  transition: box-shadow 0.3s ease;
+}
+
+.beam-main .card:hover {
+  box-shadow: theme("boxShadow.2xl");
+}
+
+/* Pagination active state */
+.join-item.btn-active {
+  pointer-events: none;
+}
+
+/* Filter collapse animation */
+.collapse-content {
+  transition: all 0.3s ease;
+}
+
+/* Loading state for forms */
+.beam-form.loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.beam-form.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid theme("colors.primary");
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .beam-main h1 {
+    font-size: 1.5rem;
+  }
+
+  .grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .text-right {
+    text-align: left;
+  }
+}

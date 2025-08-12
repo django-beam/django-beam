@@ -1,0 +1,32 @@
+{% load beam_tags beam_daisyui_tags %}
+
+{# Use Django's default rendering with DaisyUI styling #}
+<div class="form-control w-full mb-4">
+    {% if form_field.label and not form_field|is_checkbox %}
+        <label class="label" for="{{ form_field.id_for_label }}">
+            <span class="label-text">{{ form_field.label }}</span>
+            {% if form_field.field.required %}
+                <span class="label-text-alt text-error">*</span>
+            {% endif %}
+        </label>
+    {% endif %}
+
+    {# Render the actual Django form field - this preserves all Django functionality #}
+    <div class="beam-django-field">
+        {{ form_field }}
+    </div>
+
+    {% if form_field.help_text %}
+        <label class="label">
+            <span class="label-text-alt">{{ form_field.help_text }}</span>
+        </label>
+    {% endif %}
+
+    {% if form_field.errors %}
+        <label class="label">
+            {% for error in form_field.errors %}
+                <span class="label-text-alt text-error">{{ error }}</span>
+            {% endfor %}
+        </label>
+    {% endif %}
+</div>

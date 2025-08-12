@@ -1,0 +1,181 @@
+{% extends "beam/base.html" %}
+{% load i18n %}
+{% load beam_tags %}
+
+{% block body_classes %}{{ block.super }} beam-list{% if facet.model %}{% get_options facet.model as options %} beam-list-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
+{% block extra_scripts %}{{ block.super }}{{ filterset.form.media.js }}{% for action in actions %}{{ action.get_form.media.js }}{% endfor %}{% endblock %}
+{% block extra_styles %}{{ block.super }}{{ filterset.form.media.css }}{% for action in actions %}{{ action.get_form.media.css }}{% endfor %}{% endblock %}
+
+
+{% block title %}
+    {% if heading %}
+        {{ heading }}
+    {% else %}
+        {% get_options facet.model as options %}
+        {{ options.verbose_name_plural|capfirst }}
+    {% endif %}
+    | {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+    {% get_options facet.model as options %}
+    <section class="beam-main">
+        {% block links_container %}
+            <div class="flex justify-end mb-4 beam-links">
+                {% block links %}
+                    {% include "beam/partials/links.html" with links=viewset.links link_layout=facet.link_layout %}
+                {% endblock %}
+            </div>
+        {% endblock %}
+        {% block heading_container %}
+            <h1 class="text-3xl font-bold mb-6">
+                {% block heading %}
+                    {% if heading %}
+                        {{ heading }}
+                    {% else %}
+                        {{ options.verbose_name_plural|capfirst }}
+                    {% endif %}
+                {% endblock %}
+            </h1>
+        {% endblock %}
+
+        {% block search %}
+            {% if view.search_fields %}
+                <form method="get" id="search-form" class="mb-4">
+
+                    {% preserve_get_params_as_hidden_inputs ignore_params=view.page_kwarg q="" %}
+
+                    <div class="join w-full">
+                        <input name="q" type="text" value="{{ search_query }}"
+                               class="input input-bordered join-item flex-1"
+                               placeholder="{% trans 'Search the list below' %}"
+                               aria-label="{% trans 'Search the list below' %}"
+                               aria-describedby="search-form-input">
+
+                        {% if search_query %}
+                            <a href="{{ request.path }}{% preserve_query_string ignore_params=view.page_kwarg q="" %}"
+                               class="btn btn-ghost join-item">{% trans "Clear" %}</a>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary join-item">{% trans 'Search' %}</button>
+                    </div>
+                </form>
+            {% endif %}
+        {% endblock %}
+        {% block filters %}
+            {% include "beam/partials/filters.html" with page_param=view.page_kwarg %}
+        {% endblock %}
+
+        {% if actions %}
+        <form method="post" id="list-action-form" novalidate>
+            {% csrf_token %}
+            {% block actions %}
+                {% include "beam/partials/actions.html" %}
+            {% endblock %}
+        {% endif %}
+
+        {% block table %}
+            <div class="overflow-x-auto">
+            <table class="table table-zebra w-full beam-list-table">
+                {% block table_head %}
+                <thead>
+                <tr>
+                    {% if actions %}
+                    <th>
+                        <input class="beam-action__select-across" name="_action_select_across" type="hidden" value="">
+                        <label>
+                            <input title="{% trans "Select all" %}" class="checkbox checkbox-sm beam-action__select-all" type="checkbox">
+                        </label>
+                    </th>
+                    {% endif %}
+                    {% for field in facet.fields %}
+                        <th class="beam-list-field-label beam-field-label-{{ field }}">
+                            {% with field_name=field|stringformat:"s" %}{# cast to string to support virtual fields #}
+                                {% if field_name in sortable_fields %}
+                                    <a class="link link-hover inline-flex items-center gap-1" href="{% sort_link field_name sorted_fields page_param=view.page_kwarg %}">
+                                        {{ facet.model|field_verbose_name:field|capfirst }}
+                                        {% if field_name in sorted_fields %}
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+                                        {% elif "-"|add:field_name in sorted_fields %}
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                        {% endif %}
+                                    </a>
+                                    {% if field_name in sorted_fields or "-"|add:field_name in sorted_fields %}
+                                        <a title="{% trans "reset sort" %}" href="{% sort_link "" "" page_param=view.page_kwarg %}" class="link link-hover">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    {{ facet.model|field_verbose_name:field|capfirst }}
+                                {% endif %}
+                            {% endwith %}
+                        </th>
+                    {% endfor %}
+                    {% if facet.list_item_link_layout %}
+                    <th>{% trans "Actions" %}</th>
+                    {% endif %}
+                </tr>
+                </thead>
+                {% endblock %}
+                <tbody>
+                {% for object in object_list %}
+                    <tr data-pk="{{ object.pk }}" class="hover">
+                        {% if actions %}
+                        <td class="beam-list-action-checkbox">
+                            <label>
+                                <input type="checkbox" class="checkbox checkbox-sm beam-action__select-item" name="_action_select[]"
+                                       value="{{ object.pk }}">
+                            </label>
+                        </td>
+                        {% endif %}
+                        {% for field in facet.fields %}
+                            <td class="beam-list-field beam-field-{{ field }}">
+                                {% include "beam/partials/detail_field.html" with object=object field=field %}
+                            </td>
+                        {% endfor %}
+                        {% block list_item_links %}
+                            {% if facet.list_item_link_layout %}
+                            <td class="beam-list-item-links">
+                                {% include "beam/partials/list_links.html" with links=viewset.links link_layout=facet.list_item_link_layout object=object %}
+                            </td>
+                            {% endif %}
+                        {% endblock %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        {% endblock %}
+
+        {% block no_results %}
+            {% if not object_list %}
+                <div class="alert alert-info" role="alert">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>
+                    {% if search_query %}
+                        {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }} for query "{{ search_query }}"{% endblocktrans %}.
+                    {% elif filterset and filterset.is_bound and filterset.is_valid %}
+                        {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }} that match the current filters{% endblocktrans %}.
+                    {% else %}
+                        {% blocktrans with name=options.verbose_name_plural %}Could not find any {{ name }}{% endblocktrans %}.
+                    {% endif %}
+                    </span>
+                </div>
+            {% endif %}
+        {% endblock %}
+
+        {% block pagination_container %}
+            <div class="flex justify-between items-center mt-4">
+                {% block pagination %}
+                    {% include "beam/partials/pagination.html" with page_param=view.page_kwarg %}
+                {% endblock %}
+            </div>
+        {% endblock %}
+
+
+
+        {% if actions %}
+        </form>
+        {% endif %}
+    </section>
+{% endblock %}

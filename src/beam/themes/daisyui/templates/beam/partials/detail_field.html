@@ -1,0 +1,103 @@
+{% load i18n %}
+{% load beam_tags %}
+
+
+{% block detail_field_container %}
+{% get_attribute object field as value %}
+
+    {% block detail_field %}
+    {% if value|is_queryset %}
+
+        {% block queryset %}
+            {% for related in value %}
+                {% get_url_for_related related "detail" as related_url %}
+                {% if related_url %}<a href="{{ related_url }}" class="link link-primary">{{ related }}</a>{% else %}{{ related }}{% endif %}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+                <span class="text-base-content/50">—</span>
+            {% endfor %}
+        {% endblock %}
+
+    {% elif value.pk %}
+
+        {% block foreign_key %}
+            {% get_url_for_related value "detail" as related_url %}
+            {% if related_url %}
+                <a href="{{ related_url }}" class="link link-primary">{{ value }}</a>
+            {% else %}
+                {{ value }}
+            {% endif %}
+        {% endblock %}
+
+    {% elif value|is_image %}
+
+        {% block image %}
+            {% if value %}
+                <img class="max-w-full h-auto rounded-lg" src="{{ value.url }}"/>
+            {% else %}
+                <span class="text-base-content/50">—</span>
+            {% endif %}
+        {% endblock %}
+
+    {% elif value|is_file %}
+
+        {% block file %}
+            {% if value %}
+                <a href="{{ value.url }}" class="btn btn-sm btn-outline">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    {% trans "Download" %}
+                </a>
+            {% else %}
+                <span class="text-base-content/50">—</span>
+            {% endif %}
+        {% endblock %}
+
+    {% elif value|is_bool %}
+
+        {% block bool %}
+            {% if value %}
+                <span class="badge badge-success gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                    {% trans "Yes" %}
+                </span>
+            {% else %}
+                <span class="badge badge-ghost gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    {% trans "No" %}
+                </span>
+            {% endif %}
+        {% endblock %}
+
+    {% elif value|is_int %}
+
+        {% block int %}
+            {{ value }}
+        {% endblock %}
+
+    {% elif value|is_float %}
+
+        {% block float %}
+            {{ value }}
+        {% endblock %}
+
+    {% elif value|is_decimal %}
+
+        {% block decimal %}
+            {{ value }}
+        {% endblock %}
+
+    {% else %}
+
+        {% block else %}
+            {% if value %}{{ value }}{% else %}<span class="text-base-content/50">—</span>{% endif %}
+        {% endblock %}
+
+    {% endif %}
+    {% endblock %}
+
+{% endblock %}

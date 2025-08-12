@@ -1,0 +1,107 @@
+{% load beam_tags %}
+{% load i18n %}
+
+
+{% if fields and not layout %}
+    {% fields_to_layout form.fields as layout %}
+{% elif not fields and not layout %}
+    {% fields_to_layout form.fields as layout %}
+{% endif %}
+
+
+{% block layout %}
+{% for row in layout %}
+
+    {% block row %}
+    <div class="grid grid-cols-1 md:grid-cols-{{ row|length }} gap-4">
+        {% block columns %}
+        {% for col in row %}
+
+            {% block column %}
+            <div>
+                {% block fields %}
+                {% for field in col %}
+
+                    {% block field %}
+                    {% if field.is_html %}
+
+                        {% block html_field_container %}
+                        <div class="beam-field mb-4 beam-html-field beam-field-{{ field.name|default:"html" }}">
+                            {% block html_field %}
+                                {{ field.content|safe }}
+                            {% endblock %}
+                        </div>
+                        {% endblock %}
+
+                    {% else %}
+
+                        {% get_form_field form field as form_field %}
+                        {% if form_field is None %}
+
+                            {% block detail_field_container %}
+                            <div class="grid grid-cols-3 gap-4 mb-4">
+                                <div class="text-right beam-field-label beam-detail-field-label beam-field-label-{{ field }}">
+
+                                    {% block detail_field_label %}
+                                        <label class="font-semibold">
+                                            {{ form.instance|field_verbose_name:field|capfirst }}
+                                        </label>
+                                    {% endblock %}
+
+                                </div>
+                                <div class="col-span-2 beam-field beam-detail-field beam-field-{{ field }}">
+
+                                    {% block detail_field %}
+                                        {% include "beam/partials/detail_field.html" with object=form.instance field=field %}
+                                    {% endblock %}
+
+                                </div>
+                            </div>
+                            {% endblock %}
+
+                        {% elif not form_field.is_hidden %}
+
+                            {% get_url_for_related form_field.field.queryset.model "create" as create_url %}
+                            {% get_options form_field.field.queryset.model as related_options %}
+
+                            {% block form_field_container %}
+                            <div class="mb-4 beam-field-group"
+                                    {% if create_url %}
+                                         data-create-text="{% blocktrans with verbose_name=related_options.verbose_name|capfirst %}Create {{ verbose_name }}{% endblocktrans %}"
+                                         data-create-url="{{ create_url }}?_popup={{ form_field.auto_id }}"
+                                    {% endif %}>
+
+                                {% block form_field %}
+                                    {% include "beam/partials/form_field.html" %}
+                                {% endblock %}
+
+                            </div>
+                            {% endblock %}
+
+                        {% endif %}
+
+                    {% endif %}
+                    {% endblock %}
+
+                {% endfor %}
+                {% endblock %}
+            </div>
+            {% endblock %}
+
+        {% endfor %}
+        {% endblock %}
+
+    </div>
+    {% endblock %}
+
+{% endfor %}
+{% endblock %}
+
+
+{% block hidden_fields %}
+    {% for hidden in form.hidden_fields %}
+        {% block hidden_field %}
+            {{ hidden }}
+        {% endblock %}
+    {% endfor %}
+{% endblock %}

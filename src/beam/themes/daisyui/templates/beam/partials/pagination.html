@@ -1,0 +1,73 @@
+{% load i18n %}
+{% load beam_tags %}
+
+
+<div class="flex flex-col sm:flex-row justify-between items-center gap-4" data-object-count="{% if is_paginated %}{{ page_obj.paginator.count }}{% else %}{{ object_list.count }}{% endif %}">
+    <div class="text-sm text-base-content/70">
+        {% if object_list %}
+            {% if is_paginated %}
+                {% blocktrans with total=page_obj.paginator.count start=page_obj.start_index end=page_obj.end_index name=options.verbose_name_plural %}Showing {{ start }} to {{ end }} of {{ total }} {{ name }}{% endblocktrans %}
+                {% if page_obj.paginator.count <= paginate_max_show_all %}
+                    <a class="link link-primary ml-2"
+                       href="{% preserve_query_string ignore_params=page_param show_all=1 %}">
+                        {% trans "Show all"|capfirst %}
+                    </a>
+                {% endif %}
+            {% elif page_obj.paginator.count == 1 %}
+                {% blocktrans with total=page_obj.paginator.count name_singular=options.verbose_name %}Showing {{ total }} {{ name_singular }}{% endblocktrans %}
+            {% else %}
+                {% blocktrans with total=object_list.count name_plural=options.verbose_name_plural %}Showing {{ total }} {{ name_plural }}{% endblocktrans %}
+            {% endif %}
+        {% endif %}
+    </div>
+
+    {% if is_paginated %}
+        <div class="join" aria-label="{% trans 'pagination' %}">
+            {% if page_obj.has_previous %}
+                <a class="join-item btn btn-sm" href="{% page_link page_param page_obj.previous_page_number  %}" aria-label="Previous">
+                    «
+                </a>
+            {% endif %}
+
+            {% with current_page=page_obj.number num_pages=paginator.page_range|length %}
+            {% if num_pages > 9 %}
+                {% for page_number in paginator.page_range|slice:2 %}
+                    <a class="join-item btn btn-sm {% if page_number == current_page %}btn-active{% endif %}" href="{% page_link page_param page_number %}">{{ page_number }}</a>
+                {% endfor %}
+                {% if current_page == 1 or current_page > 4 %}
+                    <button class="join-item btn btn-sm btn-disabled">...</button>
+                {% endif %}
+
+                {% if current_page > 3 and current_page < num_pages %}
+                <a class="join-item btn btn-sm" href="{% page_link page_param current_page|add:-1 %}">{{ current_page|add:-1 }}</a>
+                {% endif %}
+
+                {% if current_page > 2 and current_page < num_pages|add:-1 %}
+                    <a class="join-item btn btn-sm btn-active" href="{% page_link page_param current_page %}">{{ current_page }}</a>
+                {% endif %}
+
+                {% if current_page > 1 and current_page < num_pages|add:-2 %}
+                    <a class="join-item btn btn-sm" href="{% page_link page_param current_page|add:1 %}">{{ current_page|add:1 }}</a>
+                {% endif %}
+
+                {% if current_page > 1 and current_page < num_pages|add:-3 %}
+                    <button class="join-item btn btn-sm btn-disabled">...</button>
+                {% endif %}
+
+                {% for page_number in paginator.page_range|slice:"-2:" %}
+                    <a class="join-item btn btn-sm {% if page_number == current_page %}btn-active{% endif %}" href="{% page_link page_param page_number %}">{{ page_number }}</a>
+                {% endfor %}
+            {% else %}
+                {% for page_number in paginator.page_range %}
+                    <a class="join-item btn btn-sm {% if page_number == page_obj.number %}btn-active{% endif %}" href="{% page_link page_param page_number %}">{{ page_number }}</a>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+            {% if page_obj.has_next %}
+                <a class="join-item btn btn-sm" href="{% page_link page_param page_obj.next_page_number  %}" aria-label="Next">
+                    »
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
