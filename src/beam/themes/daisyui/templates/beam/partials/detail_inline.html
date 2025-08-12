@@ -1,0 +1,120 @@
+{% load i18n %}
+
+
+{% block inline_container %}
+{% with inline.page as page %}
+{% with actions=inline.actions %}
+<section
+        id="{% if inline.prefix %}{{ inline.prefix }}-related-inline{% endif %}" class="related-inline mb-6" data-inline-model="{{ inline.model_options.app_label }}.{{ inline.model_options.model_name }}">
+    {% block inline %}
+
+        {% block title_container %}
+            <h2 class="text-2xl font-bold mb-4">
+                {% block title %}
+                    {{ inline.get_title|capfirst }}
+                {% endblock %}
+            </h2>
+        {% endblock %}
+
+        {% block filters %}
+            {% include "beam/partials/filters.html" with filterset=inline.filterset %}
+        {% endblock %}
+
+        {% block actions_container %}
+            {% if actions %}
+                <form method="post" id="{{ inline.prefix }}-action-form" novalidate>
+                {% csrf_token %}
+
+                {% block actions %}
+                    {% include "beam/partials/actions.html" %}
+                {% endblock %}
+            {% endif %}
+        {% endblock %}
+
+        {% block inline_group_container %}
+        <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+                <ul class="space-y-2">
+                {% block inline_group %}
+
+                    {% block inline_group_head %}
+                        {% if actions %}
+                            <li class="p-2">
+                                {% block select_all %}
+                                    <input class="beam-action__select-across" name="_action_select_across" type="hidden" value="">
+                                    <label>
+                                        <input title="{% trans "Select all" %}" class="checkbox checkbox-sm beam-action__select-all" type="checkbox">
+                                        <span class="ml-2 text-sm">{% trans "Select all" %}</span>
+                                    </label>
+                                {% endblock %}
+                            </li>
+                        {% endif %}
+                    {% endblock %}
+
+                    {% block inline_items %}
+                    {% for object in page.object_list %}
+                        {% block inline_item_container %}
+                        <li id="{{ inline.prefix }}-{{ forloop.counter0 }}" class="p-4 bg-base-100 rounded-lg" data-inline-item-pk="{{ object.id }}">
+                            {% block inline_item %}
+                                {% if actions %}
+                                    {% block select_item %}
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox" class="checkbox checkbox-sm beam-action__select-item" name="_action_select[]"
+                                                   value="{{ object.pk }}">
+                                        </label>
+                                    {% endblock %}
+                                {% endif %}
+                                {% block inline_layout %}
+                                    {% include "beam/partials/layout.html" with object=object layout=inline.layout fields=inline.fields %}
+                                {% endblock %}
+                            {% endblock %}
+                        </li>
+                        {% endblock %}
+                    {% empty %}
+                        {% block empty_container %}
+                        {% if inline.filterset.is_bound %}
+                            <li class="p-4 bg-base-100 rounded-lg text-center text-base-content/60">
+                                {% block empty_filters %}
+                                    {% blocktrans trimmed with title=inline.get_title %}
+                                        There aren't any that match the current filters.
+                                    {% endblocktrans %}
+                                {% endblock %}
+                            </li>
+                        {% else %}
+                            <li class="p-4 bg-base-100 rounded-lg text-center text-base-content/60">
+                                {% block empty %}
+                                    {% blocktrans trimmed with title=inline.get_title %}
+                                        There aren't any.
+                                    {% endblocktrans %}
+                                {% endblock %}
+                            </li>
+                        {% endif %}
+                        {% endblock %}
+                    {% endfor %}
+                    {% endblock %}
+
+                {% endblock %}
+                </ul>
+            </div>
+        </div>
+        {% endblock %}
+
+        {% block pagination_container %}
+            <div class="mt-4">
+                {% block pagination %}
+                    {% include "beam/partials/pagination.html" with page_param=inline.page_param paginator=page.paginator is_paginated=page.has_other_pages page_obj=page page_number=page.number object_list=page.object_list options=inline.model_options %}
+                {% endblock %}
+            </div>
+        {% endblock %}
+
+        {% block actions_container_end %}
+            {% if actions %}
+                </form>
+            {% endif %}
+        {% endblock %}
+
+    {% endblock %}
+</section>
+{% endwith %}
+{% endwith %}
+{% endblock %}

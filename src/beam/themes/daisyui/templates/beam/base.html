@@ -1,0 +1,118 @@
+{% load beam_tags static %}
+{% block html %}
+<!doctype html>
+<html {% block html_attributes %}lang="en" data-theme="light"{% endblock %}>
+
+<head>
+    {% block meta %}
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        {% block extra_meta %}{% endblock %}
+    {% endblock %}
+
+    <title>{% block title %}Django Beam{% endblock %}</title>
+
+    {% block styles %}
+        {% block tailwind_styles %}
+            <!-- Tailwind CSS + DaisyUI -->
+            <script src="https://cdn.tailwindcss.com"></script>
+            <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.24/dist/full.min.css" rel="stylesheet" type="text/css" />
+        {% endblock %}
+
+        <!-- Custom DaisyUI theme styles -->
+        <link rel="stylesheet" href="{% static 'beam/css/daisyui-theme.css' %}">
+
+        {% block extra_styles %}{% endblock %}
+    {% endblock %}
+
+    {% block extra_head %}{% endblock %}
+
+</head>
+
+<body class="beam {% if popup %}popup {% endif %}{% block body_classes %}{% endblock %}"
+      data-beam-facet="{{ facet.name }}"
+      {% if facet.model %}
+          {% get_options facet.model as options %}
+          data-model="{{ options.app_label }}.{{ options.model_name }}"
+      {% endif %}
+      {% if object %} data-pk="{{ object.pk }}" {% endif %}
+>
+
+    {% block layout %}
+
+        {% block navigation %}
+            {% include "beam/partials/navigation.html" %}
+        {% endblock %}
+
+        {% block messages_container %}
+            {% if messages %}
+                <div class="container mx-auto px-4">
+                    {% block messages %}
+                        {% include "beam/partials/messages.html" %}
+                    {% endblock %}
+                </div>
+            {% endif %}
+        {% endblock %}
+
+        {% block content_container %}
+            <div class="container mx-auto px-4 py-8">
+                {% block content %}{% endblock %}
+            </div>
+        {% endblock %}
+
+    {% endblock %}
+
+
+    {% block scripts %}
+        <!-- Optional JavaScript -->
+        {% block jquery %}
+            <!-- jQuery (required for beam JS) -->
+            <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        {% endblock %}
+
+        {% block beam_scripts %}
+            <!-- beam JS -->
+            <script src="{% static "beam/js/sortable.min.js" %}"></script>
+            <script src="{% static "beam/js/inlines-daisyui.js" %}"></script>
+            <script src="{% static "beam/js/add_related.js" %}"></script>
+            <script src="{% static "beam/js/actions-daisyui.js" %}"></script>
+
+            <!-- Apply DaisyUI classes to Django form elements -->
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Apply DaisyUI classes to form elements
+                document.querySelectorAll('.beam-django-field input[type="text"], .beam-django-field input[type="email"], .beam-django-field input[type="password"], .beam-django-field input[type="number"], .beam-django-field input[type="url"], .beam-django-field input[type="date"], .beam-django-field input[type="datetime-local"], .beam-django-field input[type="time"], .beam-django-field input[type="search"]').forEach(function(el) {
+                    el.className = 'input input-bordered w-full';
+                });
+
+                document.querySelectorAll('.beam-django-field textarea').forEach(function(el) {
+                    el.className = 'textarea textarea-bordered w-full';
+                });
+
+                document.querySelectorAll('.beam-django-field select').forEach(function(el) {
+                    el.className = 'select select-bordered w-full';
+                });
+
+                document.querySelectorAll('.beam-django-field input[type="file"]').forEach(function(el) {
+                    el.className = 'file-input file-input-bordered w-full';
+                });
+
+                document.querySelectorAll('.beam-django-field input[type="checkbox"]').forEach(function(el) {
+                    el.className = 'checkbox';
+                });
+
+                document.querySelectorAll('.beam-django-field input[type="radio"]').forEach(function(el) {
+                    el.className = 'radio';
+                });
+            });
+            </script>
+        {% endblock %}
+
+        {% block extra_scripts %}{% endblock %}
+    {% endblock %}
+
+</body>
+</html>
+{% endblock %}

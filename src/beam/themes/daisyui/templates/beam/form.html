@@ -1,0 +1,113 @@
+{% extends "beam/base.html" %}
+{% load i18n %}
+{% load beam_tags %}
+
+
+{% block extra_scripts %}{{ block.super }}{{ form.media.js }}{% for inline in inlines %}{{ inline.formset.media.js }}{% endfor %}{% endblock %}
+{% block extra_styles %}{{ block.super }}{{ form.media.css }}{% for inline in inlines %}{{ inline.formset.media.css }}{% endfor %}{% endblock %}
+
+
+{% block title %}
+    {% if heading %}
+        {{ heading }}
+    {% else %}
+        {% get_options facet.model as options %}
+        {% blocktrans with verbose_name=options.verbose_name %}Create {{ verbose_name }}{% endblocktrans %}
+    {% endif %}
+    | {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+    {% get_options facet.model as options %}
+    <form {% block form_attributes %}method="post" class="beam-form" enctype="multipart/form-data" novalidate{% endblock %}>
+        {% block form %}
+        {% csrf_token %}
+
+        {% block main_container %}
+        <main class="beam-main">
+            {% block main %}
+
+                {% block links_container %}
+                    <div class="flex justify-end mb-4 beam-links">
+                        {% block links %}
+                            {% include "beam/partials/links.html" with links=viewset.links link_layout=facet.link_layout %}
+                        {% endblock %}
+                    </div>
+                {% endblock %}
+
+                {% block heading_container %}
+                    <h1 class="text-3xl font-bold mb-6">
+                        {% block heading %}
+                            {% if heading %}
+                                {{ heading }}
+                            {% else %}
+                                {% get_options facet.model as options %}
+                                {% blocktrans with verbose_name=options.verbose_name %}Create {{ verbose_name }}{% endblocktrans %}
+                            {% endif %}
+                        {% endblock %}
+                    </h1>
+                {% endblock %}
+
+                {% block form_buttons_top_container %}
+                    <div class="beam-form__buttons-top flex justify-end mb-4">
+                        <div class="btn-group">
+                            {% block form_buttons_top %}
+                                <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+                            {% endblock %}
+                        </div>
+                    </div>
+                {% endblock %}
+
+                {% block form_errors_container %}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-error mb-4 beam-form__errors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <div>
+                                {% block form_errors %}
+                                    {{ form.non_field_errors|unordered_list }}
+                                {% endblock %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endblock %}
+
+                {% block details_container %}
+                    <div class="card bg-base-200 shadow-xl mb-6">
+                        <div class="card-body">
+                            {% block details %}
+                                {% include "beam/partials/form_layout.html" with form=form fields=facet.fields layout=facet.layout %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                {% endblock %}
+
+            {% endblock %}
+        </main>
+        {% endblock %}
+
+        {% block above_inlines %}{% endblock %}
+
+        {% block inlines %}
+            {% for inline in inlines %}
+                {% block inline %}
+                    {% include inline.form_template_name|default:"beam/partials/form_inline.html" %}
+                {% endblock %}
+            {% endfor %}
+        {% endblock %}
+
+        {% block below_inlines %}{% endblock %}
+
+        {% block form_buttons_container %}
+            <div class="beam-form__buttons flex justify-end mt-6">
+                <div class="btn-group">
+                    {% block form_buttons %}
+                        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+                    {% endblock %}
+                </div>
+            </div>
+        {% endblock %}
+
+        {% endblock %}
+    </form>
+{% endblock %}

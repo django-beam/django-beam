@@ -1,0 +1,43 @@
+{% extends "beam/form.html" %}
+{% load i18n %}
+{% load beam_tags %}
+
+
+{% block body_classes %}{{ block.super }} beam-update{% if facet.model %}{% get_options facet.model as options %} beam-update-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
+
+{% block form_attributes %}{{ block.super }} {% get_options facet.model as options %} id="{{ options.app_label }}-{{ options.model_name }}-update-form"{% endblock %}
+
+
+{% block title %}
+    {% if heading %}
+        {{ heading }}
+    {% else %}
+        {% get_options facet.model as options %}
+        {% blocktrans %}Update {{ object }}{% endblocktrans %}
+        | {{ options.verbose_name|capfirst }}
+    {% endif %}
+    | {{ block.super }}
+{% endblock %}
+
+
+{% block heading %}
+    {% if heading %}
+        {{ heading }}
+    {% else %}
+        {% get_options facet.model as options %}
+        {% blocktrans %}Update {{ object }}{% endblocktrans %}
+        <span class="text-base-content/60 text-lg ml-2">{{ options.verbose_name|capfirst }}</span>
+    {% endif %}
+{% endblock %}
+
+
+{% block form_buttons_top %}
+    <button type="submit" class="btn btn-outline" name="submit" value="save_and_continue_editing">{% trans "Save and continue editing" %}</button>
+    <button type="submit" class="btn btn-primary" name="submit" value="save">{% trans "Save" %}</button>
+{% endblock %}
+
+
+{% block form_buttons %}
+    <button type="submit" class="btn btn-outline" name="submit" value="save_and_continue_editing">{% trans "Save and continue editing" %}</button>
+    <button type="submit" class="btn btn-primary" name="submit" value="save">{% trans "Save" %}</button>
+{% endblock %}

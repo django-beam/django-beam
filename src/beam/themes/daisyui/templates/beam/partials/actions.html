@@ -1,0 +1,34 @@
+{% load i18n %}
+<div class="beam-action mb-4">
+    <div class="flex flex-wrap items-center gap-2">
+        <label class="flex items-center gap-2">
+            <span>{% trans "Action" %}</span>
+            <select name="_action_choice" class="select select-bordered select-sm beam-action__choice">
+                <option value="_no_action_selected">--------</option>
+                {% for action in actions %}
+                    <option value="{{ action.id }}" {% if action.is_bound %}selected="selected"{% endif %}>{{ action.verbose_name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <button class="btn btn-primary btn-sm" type="submit">{% trans "Apply" %}</button>
+
+        {% trans "Selected COUNT of TOTAL." as selected_text %}
+        <span class="text-sm text-base-content/70 beam-action__selected-items-text" style="display: none" data-text-template="{{ selected_text }}">{{ selected_text }}</span>
+
+        {% trans "Select all TOTAL." as select_across_text %}
+        <a href="#" class="link link-primary text-sm beam-action__select-across-button" style="display: none" data-text-template="{{ select_across_text }}">{{ select_across_text }}</a>
+
+        {% trans "Cancel selection" as cancel_text %}
+        <a href="#" class="link link-primary text-sm beam-action__clear-selection-button" style="display: none" data-text-template="{{ cancel_text }}">{{ cancel_text }}</a>
+
+    </div>
+    {% for action in actions %}
+        {% with form=action.get_form %}
+            {% if form %}
+                <div class="beam-action-form mt-4 p-4 bg-base-200 rounded-lg" {% if not action.is_bound %}style="display: none"{% endif %} id="beam-action-form-{{ action.id  }}">
+                    {% include "beam/partials/form_layout.html" with form=form layout=action.form_layout %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    {% endfor %}
+</div>

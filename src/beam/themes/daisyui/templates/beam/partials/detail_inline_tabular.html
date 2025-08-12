@@ -1,0 +1,82 @@
+{% extends "beam/partials/detail_inline.html" %}
+{% load i18n %}
+{% load beam_tags %}
+
+
+{% block inline_group_container %}
+    <div class="overflow-x-auto">
+    <table class="table table-zebra w-full" id="{{ inline.prefix }}-table">
+        {% block inline_group %}
+            {% block inline_group_head %}
+            <thead>
+                <tr>
+                    {% if actions %}
+                        <th>
+                            {% block select_all %}{{ block.super }}{% endblock %}
+                        </th>
+                    {% endif %}
+
+                    {% for field in inline.fields %}
+                        {% block label_container %}
+                        <th>
+                            {% block label %}
+                                {{ inline.model|field_verbose_name:field|capfirst }}
+                            {% endblock %}
+                        </th>
+                        {% endblock %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            {% endblock %}
+
+            {% block inline_items %}
+            <tbody>
+                {% for object in page.object_list %}
+                    {% block inline_item_container %}
+                    <tr id="{{ inline.prefix }}-{{ forloop.counter0 }}" data-inline-item-pk="{{ object.pk }}" class="hover">
+                        {% if actions %}
+                            <td>
+                                {% block select_item %}{{ block.super }}{% endblock %}
+                            </td>
+                        {% endif %}
+
+                        {% block inline_item %}
+                        {% for field in inline.fields %}
+                            {% block field_container %}
+                            <td class="beam-field-{{ field }}">
+                                {% block field %}
+                                    {% if field.is_html %}
+                                        {{ field.content|safe }}
+                                    {% else %}
+                                        {% include "beam/partials/detail_field.html" with object=object field=field %}
+                                    {% endif %}
+                                {% endblock %}
+                            </td>
+                            {% endblock %}
+                        {% endfor %}
+                        {% endblock %}
+                    </tr>
+                    {% endblock %}
+                {% empty %}
+                    {% block empty_container %}
+                    <tr>
+                        {% if actions %}<td></td>{% endif %}
+                        {% if inline.filterset.is_bound %}
+                            <td colspan="{{ inline.fields|length }}" class="text-center text-base-content/60">
+                                {% block empty_filters %}{{ block.super }}{% endblock %}
+                            </td>
+                        {% else %}
+                            <td colspan="{{ inline.fields|length }}" class="text-center text-base-content/60">
+                                {% block empty %}{{ block.super }}{% endblock %}
+                            </td>
+                        {% endif %}
+                    </tr>
+                    {% endblock %}
+                {% endfor %}
+            </tbody>
+            {% endblock %}
+        {% endblock %}
+
+    </table>
+    </div>
+{% endblock %}
