@@ -3,6 +3,7 @@ from typing import List, Mapping, Optional, Set, Type
 
 import django_filters
 from django.urls import reverse
+from django.urls.exceptions import NoReverseMatch
 
 from .actions import Action
 from .utils import check_permission
@@ -21,7 +22,7 @@ class BaseFacet:
         url_namespace=None,
         permission=None,
         resolve_url=None,
-        **kwargs
+        **kwargs,
     ):
         if not name:
             raise ValueError("Facets need a name")
@@ -96,7 +97,18 @@ class BaseFacet:
         if self.url_namespace:
             url_name = self.url_namespace + ":" + url_name
 
-        return self.resolve_url(url_name, kwargs=kwargs)
+        try:
+            return self.resolve_url(url_name, kwargs=kwargs)
+        except NoReverseMatch as e:
+            if not self.url_kwargs:
+                hint = (
+                    f"URL reversal failed for facet '{self.name}'. "
+                    f"Did you forget to define '{self.name}_url_kwargs' on "
+                    f"your ViewSet ({self.viewset.__name__})?"
+                )
+                raise NoReverseMatch(hint) from e
+            else:
+                raise
 
     def resolve_url_kwargs(self, obj=None, request=None, override_kwargs=None):
         """
@@ -137,7 +149,7 @@ class Facet(BaseFacet):
         name=None,
         url_name=None,
         url_namespace=None,
-        **kwargs
+        **kwargs,
     ):
         self.url = url
 
@@ -206,7 +218,7 @@ class ListFacet(Facet):
             Type[django_filters.filterset.BaseFilterSet]
         ] = None,
         list_action_classes: Optional[List[Type[Action]]] = None,
-        **kwargs
+        **kwargs,
     ):
         self.list_search_fields = list_search_fields
         self.list_paginate_by = list_paginate_by
