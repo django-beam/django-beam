@@ -1,0 +1,16 @@
+{% load beam_tags %}
+{% for object in inline.page.object_list %}
+    {% for field in inline.fields %}
+        {{ inline.model|field_verbose_name:field }}
+
+        {# doing getattr in a template tag is much faster than field.is_html for some reason #}
+        {% if field.is_html %}
+            {{ field.content|safe }}
+        {% else %}
+            {% get_attribute object field as value %}
+            {{ value }}
+        {% endif %}
+        <br>
+    {% endfor %}
+    <hr>
+{% endfor %}
