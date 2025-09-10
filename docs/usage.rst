@@ -103,11 +103,7 @@ you can pass ``HTML`` to render whatever you want.
         author = models.ForeignKey("Author", on_delete=models.CASCADE, related_name="books")
         publication_date = models.DateField()
         price = models.DecimalField(max_digits=5, decimal_places=2)
-
-        # add this field
-        @property
-        def isbn_search(self):
-            return f'<a href="https://www.isbnsearch.org/isbn/{self.isbn}">Search ISBN</a>'
+        isbn = models.CharField(max_length=255)
 
 
     # books/views.py
@@ -127,7 +123,7 @@ you can pass ``HTML`` to render whatever you want.
                 [
                     VirtualField(
                         name="isbn_search",
-                        callback=lambda obj: mark_safe(obj.isbn_search),
+                        callback=f'<a href="https://www.isbnsearch.org/isbn/{obj.isbn}">Search ISBN</a>',
                         verbose_name="ISBN Search"
                     ),
                 ],

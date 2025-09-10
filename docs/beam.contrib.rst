@@ -106,7 +106,7 @@ example by overriding the widget dicts.
             fields = ["title", "author"]
             widgets = {
                 "author": ModelSelect2(
-                    url="PROJECTNAME_author_autocomplete",
+                    url="PROJECTNAME/APP_LABEL/author_autocomplete",
                 ),
             }
 
