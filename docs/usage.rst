@@ -103,7 +103,7 @@ you can pass ``HTML`` to render whatever you want.
         author = models.ForeignKey("Author", on_delete=models.CASCADE, related_name="books")
         publication_date = models.DateField()
         price = models.DecimalField(max_digits=5, decimal_places=2)
-        isbn = models.CharField(max_length=255)
+        isbn = models.CharField(max_length=255, null=True, blank=True)
 
 
     # books/views.py
@@ -123,7 +123,7 @@ you can pass ``HTML`` to render whatever you want.
                 [
                     VirtualField(
                         name="isbn_search",
-                        callback=f'<a href="https://www.isbnsearch.org/isbn/{obj.isbn}">Search ISBN</a>',
+                        callback=lambda obj: mark_safe(f'<a href="https://www.isbnsearch.org/isbn/{obj.isbn}">Search ISBN</a>'),
                         verbose_name="ISBN Search"
                     ),
                 ],
@@ -214,6 +214,8 @@ to the view.
 You only need to care about facets if you want to extend a viewset with
 additional views as in the example below.
 
+In the follow up example we introduce a "call" facet to the author view.
+
 .. code-block:: python
 
     # books/views.py
@@ -228,21 +230,34 @@ additional views as in the example below.
 
         # add these lines
         call_facet = Facet
-        call_url = "call/{phone}/"
-        call_url_kwargs = {"phone": "phone"}
+        call_url = "<str:pk>/call/"
+        call_url_kwargs = {"pk": "pk"}
         call_permission = "authors.view_author"
         call_view_class = AuthorCallView
+        call_verbose_name = "Call author!"
 
     class AuthorCallView(beam.views.FacetMixin, TemplateView):
         phone = None
         template_name = "authors/author_call.html"
+
+         # pass author from kwargs to context for template
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            author_pk = self.kwargs.get("pk", None)
+
+            try:
+                context["author"] = Author.objects.get(pk=author_pk)
+            except Author.DoesNotExist:
+                pass
+
+            return context
 
 
     # books/templates/authors/author_call.html
     # See next section for overriding templates
     {% extends "beam/detail.html" %}
     {% block details_container %}
-        Calling author ... ring ring!
+        Calling {{ author.title }} ... ring ring!
     {% endblock %}
 
 Overriding templates
