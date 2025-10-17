@@ -46,7 +46,9 @@ will be picked up.
 
     # In your urls.py:
     urlpatterns = [
+       path("auth/", include("beam.contrib.auth.urls")),
        path("accounts/", include("django.contrib.auth.urls")),
+       path("accounts/", include("beam.contrib.auth.urls")),
        # ...
     ]
 
@@ -79,25 +81,32 @@ example by overriding the widget dicts.
 
     # views.py
     import beam
+    from .models import Book, Author
+    from .forms import BookForm
     from beam.contrib.autocomplete_light import AutocompleteMixin
 
-    class GroupViewSet(AutocompleteMixin, beam.ViewSet):
-        fields = ['name']
-        autocomplete_search_fields = ["name"]
+    class BookViewSet(beam.ViewSet):
+        model = Book
+        fields = ["title", "author"]
+        form_class = BookForm
+
+    class AuthorViewSet(AutocompleteMixin, beam.ViewSet):
+        model = Author
+        fields = ["title"]
+        autocomplete_search_fields = ["title"]
 
     # forms.py
     from django import forms
-    from people.models import Person
+    from .models import Book
+    from dal_select2.widgets import ModelSelect2
 
-    from dal_select2.widgets import ModelSelect2Multiple
-
-    class PersonForm(forms.ModelForm):
+    class BookForm(forms.ModelForm):
         class Meta:
-            model = Person
-            fields = ["name", "email", "groups"]
+            model = Book
+            fields = ["title", "author"]
             widgets = {
-                "groups": ModelSelect2Multiple(
-                    url="people_group_autocomplete"
+                "author": ModelSelect2(
+                    url="books_and_authors_author_autocomplete",
                 ),
             }
 

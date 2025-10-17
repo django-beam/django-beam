@@ -11,7 +11,7 @@ Install django-beam using pip:
     pip install django-beam
 
 
-Add `beam`, `beam.themes.boostrap4` and `crispy_forms` to your `INSTALLED_APPS` in `settings.py`:
+Add ``beam``, ``beam.themes.boostrap4`` and ``crispy_forms`` to your ``INSTALLED_APPS`` in `settings.py`:
 
 
 .. code-block:: python
@@ -29,6 +29,7 @@ Add `beam`, `beam.themes.boostrap4` and `crispy_forms` to your `INSTALLED_APPS` 
 Quickstart example
 ------------------
 Let's say you have a list of books that you want to manage in your Django project. You can use django-beam to quickly create a list view, detail view, create view and update view for your books.
+Note that if you set an ``app_name`` in `urls.py`, you need to set ``url_namespace=app_name`` accordingly in the ``ViewSet``.
 
 .. code-block:: python
 
@@ -47,16 +48,19 @@ Let's say you have a list of books that you want to manage in your Django projec
     import beam
 
     class BookViewSet(beam.ViewSet):
+        url_namespace = "books_and_authors"
         model = Book
         fields = ['title', 'author']
 
     class AuthorViewSet(beam.ViewSet):
+        url_namespace = "books_and_authors"
         model = Author
-        fields = ['title']
+        fields = ['name']
 
-    # urls.py
+    # books/urls.py
     from django.urls import path, include
 
+    app_name = "books_and_authors"
     urlpatterns = [
         path('books/', include(BookViewSet().get_urls())),
         path('authors/', include(AuthorViewSet().get_urls())),
