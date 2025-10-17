@@ -108,6 +108,7 @@ you can pass ``HTML`` to render whatever you want.
 
     # books/views.py
     from beam.layouts import VirtualField, HTML
+    from django.utils.html import escape
     from django.utils.safestring import mark_safe
     from .models import Book
 
@@ -123,7 +124,7 @@ you can pass ``HTML`` to render whatever you want.
                 [
                     VirtualField(
                         name="isbn_search",
-                        callback=lambda obj: mark_safe(f'<a href="https://www.isbnsearch.org/isbn/{obj.isbn}">Search ISBN</a>'),
+                        callback=lambda obj: mark_safe(f'<a href="https://www.isbnsearch.org/isbn/{escape(obj.isbn)}">Search ISBN</a>'),
                         verbose_name="ISBN Search"
                     ),
                 ],
