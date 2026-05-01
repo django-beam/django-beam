@@ -21,9 +21,12 @@ Add ``beam``, ``beam.themes.boostrap4`` and ``crispy_forms`` to your ``INSTALLED
         # ...
         "beam",
         "beam.themes.bootstrap4",
+        "crispy_bootstrap4",
         "crispy_forms",
     ]
 
+    CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap4",)
+    CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 
 Quickstart example

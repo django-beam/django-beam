@@ -4,7 +4,8 @@ django-beam provides you with a set of views, templates, and integrations for th
 
 ## Breaking changes
 
-In version 3.0 `Component` was renamed to `Facet` in order to reduce confusion with web components.
+- In version 4.0, django-beam now depends on `django-crispy-forms` 2.x. Projects using django-beam must install `crispy-bootstrap4`, add `"crispy_bootstrap4"` to `INSTALLED_APPS`, and set `CRISPY_TEMPLATE_PACK = "bootstrap4"`.
+- In version 3.0, `Component` was renamed to `Facet` in order to reduce confusion with web components.
 
 ## Features
 
@@ -33,8 +34,12 @@ INSTALLED_APPS = [
     # ...
     "beam",
     "beam.themes.bootstrap4",
+    "crispy_bootstrap4",
     "crispy_forms",
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap4",)
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 ```
 
 3. Import and use `beam` in your Django project, as shown in the example below:
