@@ -7,8 +7,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 INSTALLED_APPS = [
     "beam",
     "beam.themes.bootstrap4",
-    "testapp",
+    "crispy_bootstrap4",
     "crispy_forms",
+    "testapp",
     "django.contrib.contenttypes",
     # "django.contrib.admin",
     "django.contrib.sessions",
@@ -48,5 +49,8 @@ TEMPLATES = [
         },
     }
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap4",)
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 STATIC_URL = "/static/"
