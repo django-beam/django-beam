@@ -1,0 +1,16 @@
+{% load beam_tags %}
+{% load i18n %}
+
+{% get_visible_links request.user links link_layout object as link_urls %}
+
+{% if link_urls %}
+    <div class="btn-group" role="group" aria-label="{% trans "Actions" %}">
+        {% for link, url in link_urls %}
+        <a href="{{ url }}" class="btn btn-type-{{ link.name }} btn-xs
+                {% if link.name == 'delete' %}btn-error btn-outline
+                {% elif link.name == 'create' or link.name == 'update' %}btn-primary btn-outline
+                {% else %}btn-outline{% endif %}
+              ">{{ link.verbose_name|capfirst }}</a>
+        {% endfor %}
+    </div>
+{% endif %}

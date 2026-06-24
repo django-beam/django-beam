@@ -1,0 +1,148 @@
+{% load i18n %}
+{% load beam_tags  %}
+
+
+{% block inline_container %}
+{% with inline.page as page %}
+<section id="{{ inline.prefix }}-related-inline" class="related-inline mb-6"
+         data-related-inline-js
+         {% if inline.can_order %}data-can-order="true" data-order-field="{{ inline.order_field }}"{% endif %}
+         {% if inline.can_delete %}data-can-delete="true"{% endif %}
+         data-prefix="{{ inline.prefix }}">
+    {% block inline %}
+
+        {% block title_container %}
+            <h2 class="text-2xl font-bold mb-4">
+                {% block title %}
+                    {{ inline.get_title|capfirst }}
+                {% endblock %}
+            </h2>
+        {% endblock %}
+
+        {% block management_form %}
+            {{ inline.formset.management_form }}
+        {% endblock %}
+
+        {% block formset_errors_container %}
+            {% if inline.formset.non_field_errors %}
+                <div class="alert alert-error mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <div>
+                        {% block formset_errors %}
+                            {{ inline.formset.non_field_errors|unordered_list }}
+                        {% endblock %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endblock %}
+
+        {% block inline_group_container %}
+        <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+                <ul class="related-inline-group space-y-4">
+
+                    {% block inline_group %}
+                    {% for form in inline.formset %}
+
+                        {% block inline_item_container %}
+                        <li data-inline-id="{{ forloop.counter0 }}" id="{{ inline.prefix }}-{{ forloop.counter0 }}" data-inline-item-pk="{{ object.pk }}"
+                            class="related-inline-item p-4 bg-base-100 rounded-lg">
+
+                            {% block inline_item %}
+
+                                {% block order_container %}
+                                {% if inline.can_order  %}
+                                    <div class="field-group float-left">
+                                        {% block order_field %}
+                                        {% get_form_field form inline.order_field as order_field %}
+                                        <div class="hidden">{{ order_field }}</div>
+                                        {% endblock %}
+                                    </div>
+                                {% endif %}
+                                {% endblock %}
+
+                                {% block form_errors_container %}
+                                {% if form.non_field_errors %}
+                                    <div class="alert alert-error mb-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        <div>
+                                            {% block form_errors %}
+                                            {{ form.non_field_errors|unordered_list }}
+                                            {% endblock %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% endblock %}
+
+                                {% block delete_container %}
+                                {% if inline.formset.can_delete %}
+                                    {% block delete %}
+                                    <button class="btn btn-error btn-outline btn-sm related-inline-item-remove hidden float-right">
+                                        {% trans "delete"|capfirst %}
+                                    </button>
+                                    {% endblock %}
+                                {% endif %}
+                                {% endblock %}
+
+                                {% block inline_layout %}
+                                    {% include "beam/partials/form_layout.html" with form=form fields=inline.fields layout=inline.layout %}
+                                {% endblock %}
+
+                            {% endblock %}
+
+                        </li>
+                        {% endblock %}
+
+                    {% endfor %}
+                    {% endblock %}
+
+                </ul>
+                <ul class="hidden">
+                    {% block empty_form %}
+                    <li data-inline-id="__prefix__" id="{{ inline.prefix }}-__prefix__"
+                        class="related-inline-item p-4 bg-base-100 rounded-lg empty-form">
+                        {% if inline.can_order  %}
+                            <div class="field-group float-left">
+                                {% get_form_field inline.formset.empty_form inline.order_field as order_field %}
+                                <div class="hidden">{{ order_field }}</div>
+                            </div>
+                        {% endif %}
+                        {% if inline.formset.can_delete %}
+                            <button class="btn btn-error btn-outline btn-sm related-inline-item-remove float-right hidden">
+                                {% trans "delete"|capfirst %}
+                            </button>
+                        {% endif %}
+                        {% include "beam/partials/form_layout.html" with form=inline.formset.empty_form fields=inline.fields layout=inline.layout %}
+                    </li>
+                    {% endblock %}
+                </ul>
+            </div>
+        </div>
+        {% endblock %}
+
+        {% block pagination_and_add_form_container %}
+            <div class="flex flex-col sm:flex-row justify-between items-center mt-4">
+                <div class="flex-1">
+                    {% block pagination %}
+                        {% include "beam/partials/pagination.html" with page_param=inline.page_param paginator=page.paginator is_paginated=page.has_other_pages page_obj=page page_number=page.number object_list=page.object_list options=inline.model_options %}
+                    {% endblock %}
+                </div>
+                <div>
+                    {% block add_form %}
+                        <div class="btn-group">
+                            {% block inline_add_button %}
+                                {% get_options inline.formset.model as inline_options %}
+                                <button class="btn btn-primary btn-outline related-inline-item-add hidden">
+                                    {% blocktrans with name=inline_options.verbose_name %}add {{ name }}{% endblocktrans %}
+                                </button>
+                            {% endblock %}
+                        </div>
+                    {% endblock %}
+                </div>
+            </div>
+        {% endblock %}
+
+    {% endblock %}
+</section>
+{% endwith %}
+{% endblock %}

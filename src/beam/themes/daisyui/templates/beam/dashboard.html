@@ -1,0 +1,43 @@
+{% extends "beam/base.html" %}
+{% load i18n %}
+{% load beam_tags %}
+
+
+{% block title %}{% trans "Dashboard" %} | {{ block.super }}{% endblock %}
+
+
+{% block content %}
+    {% for entry in grouped_by_app %}
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold mb-4">{{ entry.app_config.verbose_name|capfirst }}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for viewset, links in entry.viewsets %}
+                <div class="card bg-base-200 shadow-xl">
+                    <div class="card-body">
+                        {% get_options viewset.model as options %}
+                        <h3 class="card-title">{{ options.verbose_name_plural|capfirst }}</h3>
+                        <div class="card-actions justify-start">
+                            {% for link in links %}
+                                <a class="btn {% if link.name == 'list' %}btn-primary{% else %}btn-outline{% endif %} btn-sm" href="{{ link.reverse }}">
+                                    {{ link.verbose_name|capfirst }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </section>
+    {% empty %}
+        {% if not request.user.is_authenticated %}
+            <div class="alert alert-info">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>{% trans "You don't have permission to view anything, try logging in."  %}</span>
+                {% url 'login' as login_url %}
+                {% if login_url %}
+                    <a href="{{ login_url }}" class="btn btn-sm btn-primary">{% trans "Log in" %}</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

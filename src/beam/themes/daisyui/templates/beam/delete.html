@@ -1,0 +1,76 @@
+{% extends "beam/base.html" %}
+{% load beam_tags %}
+{% load i18n %}
+
+
+{% block body_classes %}{{ block.super }} beam-delete{% if facet.model %}{% get_options facet.model as options %} beam-delete-{{ options.app_label }}-{{ options.model_name }}{% endif %}{% endblock %}
+
+
+{% block title %}
+    {% if heading %}
+        {{ heading }}
+    {% else %}
+        {% get_options facet.model as options %}
+        {% blocktrans %}Delete {{ object }}{% endblocktrans %}
+        | {{ options.verbose_name|capfirst }}
+    {% endif %}
+    | {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+    <section class="beam-main">
+        {% block heading_container %}
+            <h1 class="text-3xl font-bold mb-6">
+                {% block heading %}
+                    {% if heading %}
+                        {{ heading }}
+                    {% else %}
+                        {% get_options facet.model as options %}
+                        {% blocktrans %}Delete {{ object }}{% endblocktrans %}
+                        <span class="text-base-content/60 text-lg ml-2">{{ options.verbose_name|capfirst }}</span>
+                    {% endif %}
+                {% endblock %}
+            </h1>
+        {% endblock %}
+
+        {% if protected_objects %}
+
+            <div class="alert alert-warning">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <div>
+                    <p class="font-bold">
+                        {% blocktrans with object_name=object %}You can't delete <em>{{ object_name }}</em> because the following objects depend on it:{% endblocktrans %}
+                    </p>
+                    <ul class="mt-2">{{ protected_objects|unordered_list }}</ul>
+                </div>
+            </div>
+
+        {% else %}
+            <div class="card bg-base-200 shadow-xl">
+                <div class="card-body">
+                    <p class="text-lg mb-4">
+                        {% blocktrans with object_name=object %}Are you sure you want to delete <strong>{{ object_name }}</strong>?{% endblocktrans %}
+                    </p>
+                    {% if nested_objects|length > 1 %}
+                    <div class="alert alert-warning mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        <div>
+                            <p class="font-bold">{%trans "The following objects will also be deleted:" %}</p>
+                            <ul class="mt-2">{{ nested_objects|unordered_list }}</ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <form {% block form_attributes %}method="post" {% get_options facet.model as options %} id="{{ options.app_label }}-{{ options.model_name }}-delete-form"{% endblock %}>
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div class="card-actions justify-end">
+                            <button type="button" class="btn btn-ghost" onclick="window.history.back()">{% trans "No, go back" %}</button>
+                            <button type="submit" class="btn btn-error">{% trans "Yes, I'm sure" %}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

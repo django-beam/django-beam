@@ -1,0 +1,85 @@
+{% load i18n %}
+{% load beam_tags %}
+
+{% block navigation_container %}
+{% get_apps_for_navigation as apps %}
+<div class="navbar bg-base-200 shadow-lg mb-6">
+    <div class="navbar-start">
+        {% block navbar_brand %}
+            {% url "dashboard" as dashboard_url %}
+            <a class="btn btn-ghost text-xl" href="{{ dashboard_url|default:'/' }}">
+                {% trans "Home" %}
+            </a>
+        {% endblock %}
+
+        {% block app_navigation %}
+            {% for app in apps %}
+                {% if app.entries|any %}
+                <div class="dropdown">
+                    <label tabindex="0" class="btn btn-ghost">
+                        {{ app.app_config.verbose_name|capfirst }}
+                        <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+                    </label>
+                    <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                        {% for label_url in app.entries %}
+                            {% if label_url %}
+                            {% block viewset_menu_entry %}
+                                <li><a href="{{ label_url.1 }}">{{label_url.0|capfirst }}</a></li>
+                            {% endblock %}
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endblock %}
+    </div>
+
+    <div class="navbar-end">
+        {% block user_navigation_container %}
+        {% if request.user.is_authenticated %}
+            {% block user_navigation %}
+                {% url "logout" as logout_url %}
+                {% url "password_change" as password_change_url %}
+
+                {% if logout_url or password_change_url %}
+                    <div class="dropdown dropdown-end">
+                        <label tabindex="0" class="btn btn-ghost">
+                            {{ request.user }}
+                            <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/></svg>
+                        </label>
+                        {% block user_navigation_items_container %}
+                        <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                            {% block user_navigation_items %}
+
+                                {% block password_change_item %}
+                                    {% if password_change_url and request.user.has_usable_password %}
+                                        <li><a href="{{ password_change_url }}">{% trans "Change password" %}</a></li>
+                                    {% endif %}
+                                {% endblock %}
+
+                                {% block logout_item %}
+                                    {% if logout_url %}
+                                        <li>
+                                            <form id="logout-form" method="post" action="{{ logout_url }}">
+                                                {% csrf_token %}
+                                                <button type="submit">{% translate "Log out" %}</button>
+                                            </form>
+                                        </li>
+                                    {% endif %}
+                                {% endblock %}
+
+                            {% endblock %}
+                        </ul>
+                        {% endblock %}
+                    </div>
+                {% else %}
+                    <span class="btn btn-ghost">{{ request.user }}</span>
+                {% endif %}
+
+            {% endblock %}
+        {% endif %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}
